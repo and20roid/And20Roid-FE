@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1092602569915",
+    "project_id": "and20roid-a7e09",
+    "storage_bucket": "and20roid-a7e09.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092602569915:android:cbdb05c1cae89a7fe1359e",
+        "android_client_info": {
+          "package_name": "com.example.and20roid"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvZaKCj4zILZogQ0yy2_DBPMv4QCgTzwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
