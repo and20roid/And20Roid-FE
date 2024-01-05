@@ -38,12 +38,10 @@ class _TmpPageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  // 제거해도 되는 부분이나, 추후 권한 설정과 관련된 포스팅 예정
   _permission() async{
     Map<Permission, PermissionStatus> statuses = await [
       Permission.storage,
     ].request();
-    //logger.i(statuses[Permission.storage]);
   }
 
   _auth(){
@@ -52,6 +50,7 @@ class _TmpPageState extends State<MyHomePage> {
       if(FirebaseAuth.instance.currentUser == null){
         Get.off(() => const LoginPage());
       } else {
+        print('firebase uid : ${FirebaseAuth.instance.currentUser?.uid}');
         Get.off(() => const ListPage());
       }
     });

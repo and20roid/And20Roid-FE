@@ -12,7 +12,20 @@
           "package_name": "com.example.and20roid"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1092602569915-gek175v0v66t13t4fmi3tld53goho722.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.and20roid",
+            "certificate_hash": "5ec06b1a4551622320388eda7902b7815fbde3b4"
+          }
+        },
+        {
+          "client_id": "1092602569915-sqj0vvop04640k09btvujkm1q2fu8dae.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBvZaKCj4zILZogQ0yy2_DBPMv4QCgTzwo"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1092602569915-sqj0vvop04640k09btvujkm1q2fu8dae.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1092602569915-le6avr6j06m8qaq8c63r5js8lrp6t255.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.and20roid"
+              }
+            }
+          ]
         }
       }
     }
