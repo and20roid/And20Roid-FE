@@ -1,14 +1,14 @@
 import 'dart:convert';
 
-import 'package:and20roid/common.dart';
-import 'package:and20roid/my_home_page.dart';
+import 'package:and20roid/utility/common.dart';
+import 'package:and20roid/direct_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-import 'list_page.dart';
+import '../bottom_navigator.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -92,6 +92,48 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future<bool> requestSignup(String? token, String userNick) async {
+    try {
+      String url = "${Common.url}users/signup";
+      Map<String, dynamic> body = {
+        "token": token,
+        "nickname": userNick,
+      };
+
+      var data = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(body),
+      );
+
+      if (data.statusCode == 200) {
+        if(data.body.isNotEmpty) {
+          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
+          print(jsonResults.toString());
+          print(jsonEncode(jsonResults));
+
+        }
+
+        print("~~~~~~~Success sign up request");
+        // 성공적으로 처리된 경우
+        return true;
+      } else {
+        print("~~~~~~~~~~fail sign up request");
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+        // 실패한 경우
+        return false;
+      }
+    } catch (e) {
+      // 예외 처리
+      print('Error: $e');
+      return false;
+    }
+  }
+
+
   Future<void> signInWithGoogle() async {
     try {
       // Google 로그인
@@ -125,24 +167,35 @@ class _LoginPageState extends State<LoginPage> {
 
       print('~~~~~~~~~~~구글 로그인 완료');
 
-      // await requestSignup(_auth.currentUser?.uid,userNick);
-
-      print('`~~~~~~~~~request done');
-
       sharedPreferences.setUserToken(_auth.currentUser!.uid);
       sharedPreferences.setUserNick(userNick);
 
-      print("`~~~~~~~~~~~저장된 유저 닉 : ${sharedPreferences.getUserNick().toString()}");
-      print("`~~~~~~~~~~~저장된 유저 토큰 : ${sharedPreferences.getUserToken().toString()}");
+      sharedPreferences.getUserNick().then((value) => {
+      print("`~~~~~~~~~~~저장된 유저 닉 : $value")
+      });
+
+      sharedPreferences.getUserToken().then((value) => {
+        print("`~~~~~~~~~~~저장된 유저 token : $value")
+      });
+
+      _auth.currentUser?.getIdToken().then((token) {
+        print("firebase token : $token");
+      });
+
+      String? uId = await sharedPreferences.getUserToken();
+
+      //회원가입시 서버에 저장
+      await requestSignup(uId, userNick);
 
       if(_auth.currentUser != null)
         {
           print("~~~~~~~~~null은 아니라서 넘어가유 ~");
-          Get.offAll(() => const ListPage());
+          Get.offAll(() => const BottomNavigatorPage());
         }
       else{
         print("-----------------안넘어가유 ~");
       }
+
 
     } on FirebaseAuthException catch (e) {
       // FirebaseAuthException 예외 발생 시 처리
@@ -161,38 +214,4 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  Future<bool> requestSignup(String? token, String userNick) async {
-    try {
-      String url = "${Common.url}users/signup";
-      Map<String, dynamic> body = {
-        "token": token,
-        "nickname": userNick,
-      };
-
-      var data = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(body),
-      );
-
-      var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
-      print(jsonResults.toString());
-      print(jsonEncode(jsonResults));
-
-      if (data.statusCode == 200) {
-        print("~~~~~~~Success sign up request");
-        // 성공적으로 처리된 경우
-        return true;
-      } else {
-        print("~~~~~~~~~~fail sign up request");
-        // 실패한 경우
-        return false;
-      }
-    } catch (e) {
-      // 예외 처리
-      print('Error: $e');
-      return false;
-    }
-  }}
+}
