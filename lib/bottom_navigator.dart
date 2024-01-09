@@ -1,15 +1,8 @@
-import 'dart:convert';
+import 'package:and20roid/view/list/list_page.dart';
 import 'package:and20roid/view/ranking/rank_page.dart';
 import 'package:and20roid/view/notification_page.dart';
 import 'package:and20roid/view/upload/upload.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'model/list_model.dart';
-import 'utility/common.dart';
-import 'view/list_page.dart';
 import 'view/my_page.dart';
 
 class BottomNavigatorPage extends StatefulWidget {
