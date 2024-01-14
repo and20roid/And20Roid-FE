@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         body: Container(
-          color: MyColor.mainColor,
+          color: CustomColor.mainColor,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -68,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                       },
                       child: Text(
                         "Sign up with Google",
-                        style: TextStyle(color: MyColor.mainColor),
+                        style: TextStyle(color: CustomColor.mainColor),
                       ),
                     ),
                     const SizedBox(height: 200),
@@ -96,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       String url = "${Common.url}users/signup";
       Map<String, dynamic> body = {
-        "token": token,
+        "uid": token,
         "nickname": userNick,
       };
 
@@ -182,7 +182,8 @@ class _LoginPageState extends State<LoginPage> {
         print("firebase token : $token");
       });
 
-      String? uId = await sharedPreferences.getUserToken();
+      String? uId = _auth.currentUser!.uid;
+      print("uid : $uId");
 
       //회원가입시 서버에 저장
       await requestSignup(uId, userNick);

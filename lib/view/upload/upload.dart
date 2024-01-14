@@ -105,6 +105,7 @@ class _UploadScreenState extends State<UploadScreen> {
             onPressed: () async{
               if (_contentController.text.isNotEmpty) {
                 await uploadImages(_imageFiles!, _titleController.text, _contentController.text, _appTestLinkController.text, _webTestLinkController.text, int.parse(_recruitController.text));
+                print("업로드 성공");
                 getx.Get.offAll(() => BottomNavigatorPage());
               } else {
                 print('이미지와 내용을 모두 입력해주세요.');

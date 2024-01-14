@@ -1,59 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../mypage/another_mypage.dart';
 
 class RankingContent extends StatelessWidget {
+
+  void movePage(String userName){
+    Get.to(()=>RequestTest(userName: userName,));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Text('테스트에 도움 주신 분', style: TextStyle(fontSize: 30)),
+          const Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
+                child: Text('랭킹',
+                    style:
+                        TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+              ),
+              Spacer()
+            ],
           ),
           Container(
             height: MediaQuery.of(context).size.height * 0.3,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Trophy Placeholder for 2nd Place
-                Container(
-                  width: 50,
-                  height: 100,
-                  margin: EdgeInsets.symmetric(horizontal: 10),
-                  child: Icon(
-                      size : 50,
-                      Icons.emoji_events_outlined, color: Colors.grey),
-                ),
-                // Trophy Placeholder for 1st Place
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 100,
-                        margin: EdgeInsets.symmetric(horizontal: 10),
-                        child: Icon(
-                          size : 50,
-                          Icons.emoji_events_outlined,
-                          color: Colors.amber,
-                        ),
-                      ),
-                      Text("이번 달 최다 테스트 : 멋남 님")
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 50,
-                  height: 100,
-                  margin: EdgeInsets.symmetric(horizontal: 10),
-                  child: Icon(
-                    size : 50,
-                    Icons.emoji_events_outlined,
-                    color: Colors.brown,
-                  ),
-                ),
+                trophy('2','seungw2n','100',"assets/images/Vector-1.png"),
+                trophy('1','seungw1n','99',"assets/images/Vector.png"),
+                trophy('3','seungw3n','98',"assets/images/Vector-2.png"),
               ],
             ),
           ),
@@ -66,16 +45,47 @@ class RankingContent extends StatelessWidget {
                     int ranking = index + 4;
                     int testCount =
                         10; // Replace this with the actual test count
-
-                    return ListTile(
-                      title: Text('$ranking등 $playerName'),
-                      trailing: Text('$testCount회'),
+                    return InkWell(
+                      onTap: (){
+                        movePage(playerName);
+                      },
+                      child: ListTile(
+                        title: Text('$ranking등 $playerName'),
+                        trailing: Text('$testCount회'),
+                      ),
                     );
                   },
                   itemCount:
                       5, // Replace this with the actual number of items in your list
                 )),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget trophy(String ranking, String name, String count, String imagePath) {
+    return InkWell(
+      onTap: (){
+        movePage(name);
+      },
+      child: Column(
+        children: [
+          (ranking == '1')?
+          Container():const SizedBox(
+            height: 60,
+          ),
+          Container(
+            width: 50,
+            height: 100,
+            margin: EdgeInsets.symmetric(horizontal: 10),
+            child: Image.asset(imagePath),
+          ),
+          Text(
+            "$ranking등\n$name\n$count회",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          )
         ],
       ),
     );

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-class MyColor {
+class CustomColor {
   static Color mainColor = const Color(0xFFA4C639);
+  static Color pointColor = const Color(0xFF00A84C);
 }
 
 class Common {

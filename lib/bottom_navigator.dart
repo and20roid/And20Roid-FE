@@ -3,7 +3,7 @@ import 'package:and20roid/view/ranking/rank_page.dart';
 import 'package:and20roid/view/notification_page.dart';
 import 'package:and20roid/view/upload/upload.dart';
 import 'package:flutter/material.dart';
-import 'view/my_page.dart';
+import 'view/mypage/my_page.dart';
 
 class BottomNavigatorPage extends StatefulWidget {
   const BottomNavigatorPage({Key? key}) : super(key: key);
@@ -25,23 +25,23 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
           type: BottomNavigationBarType.fixed,
           items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.list),
-              label: '목록',
+              icon: Image.asset("assets/icons/Vector.png"),
+              label: '홈',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.star),
+              icon: Image.asset("assets/icons/Vector-1.png"),
               label: '랭킹',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.upload),
+              icon: Image.asset("assets/icons/Vector-2.png"),
               label: '업로드',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.notifications),
+              icon: Image.asset("assets/icons/Vector-3.png"),
               label: '알림',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person),
+              icon: Image.asset("assets/icons/Vector-4.png"),
               label: '마이페이지',
             ),
           ],
