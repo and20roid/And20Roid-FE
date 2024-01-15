@@ -7,6 +7,8 @@ class GatherList {
   final String thumbnailUrl;
   final String nickname;
   final String createdDate;
+  int views;
+  int likes;
 
   GatherList({
     required this.id,
@@ -17,6 +19,8 @@ class GatherList {
     required this.thumbnailUrl,
     required this.nickname,
     required this.createdDate,
+    required this.views,
+    required this.likes,
   });
 
   factory GatherList.fromJson(Map<String, dynamic> json) {
@@ -29,6 +33,8 @@ class GatherList {
       thumbnailUrl: json['thumbnailUrl'],
       nickname: json['nickname'],
       createdDate: json['createdDate'],
+      views: (json['views']==null) ? 0 : json['views'],
+      likes: (json['likes'] == null) ? 0 :json['likes'],
     );
   }
 }

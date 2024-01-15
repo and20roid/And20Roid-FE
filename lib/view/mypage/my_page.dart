@@ -4,27 +4,31 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../utility/common.dart';
 import 'another_mypage.dart';
 
-class MyPageContent extends StatelessWidget {
+class MyPageContent extends StatefulWidget {
+  @override
+  State<MyPageContent> createState() => _MyPageContentState();
+}
+
+class _MyPageContentState extends State<MyPageContent> {
   final SaveSharedPreferences sharedPreferences = SaveSharedPreferences();
 
-  Future<String> _getUserName() async {
-    return await sharedPreferences.getUserNick();
+  String? name;
+
+  Future<void> _getUserName() async {
+    name = await sharedPreferences.getUserNick();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    _getUserName();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-      future: _getUserName(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          String name = snapshot.data ?? "";
-          return Scaffold(
-            body: RequestTest(userName: name),
-          );
-        } else {
-          return CircularProgressIndicator(); // or any loading indicator
-        }
-      },
-    );
+    return SafeArea(child: Scaffold(
+      body: RequestTest(userName: name!,userId: 1,)
+    ));
   }
 }

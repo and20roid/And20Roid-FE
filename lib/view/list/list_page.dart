@@ -97,6 +97,8 @@ class _ListContentState extends State<ListContent> {
                       nickname: gatherListItems[index].nickname,
                       createdDate: gatherListItems[index].createdDate,
                       thumbnailUrl: gatherListItems[index].thumbnailUrl,
+                      likes: gatherListItems[index].likes,
+                      views: gatherListItems[index].views,
                     ));
               },
               child: renderCard(
@@ -105,6 +107,8 @@ class _ListContentState extends State<ListContent> {
                 // gatherListItems[index].content,
                 gatherListItems[index].thumbnailUrl,
                 gatherListItems[index].nickname,
+                gatherListItems[index].likes,
+                gatherListItems[index].views,
               ),
             );
           },
@@ -139,7 +143,9 @@ class _ListContentState extends State<ListContent> {
       // String? content,
       // List<String> urls,
       String thumbnailUrl,
-      String nickname) {
+      String nickname,
+      int likes,
+      int views) {
     return Card(
       child: Column(
         children: [
@@ -184,8 +190,9 @@ class _ListContentState extends State<ListContent> {
               ],
             ),
           ),
+
           /// imageList(),
-          /// threeTitle(),
+          threeTitle(nickname, likes.toString(), views.toString()),
         ],
       ),
     );

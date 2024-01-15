@@ -1,14 +1,69 @@
+import 'dart:convert';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-class RequestTest extends StatelessWidget {
+import '../../model/user_model.dart';
+import '../../utility/common.dart';
+
+class RequestTest extends StatefulWidget {
   final String userName;
+  final int userId;
+  const RequestTest({Key? key, required this.userName, required this.userId})
+      : super(key: key);
+  @override
+  State<RequestTest> createState() => _RequestTestState();
+}
 
-  const RequestTest({super.key, required this.userName});
+class _RequestTestState extends State<RequestTest> {
+
+  UserTestInfo? userTestInfo;
+
+  Future<void> requestUserTestNum() async {
+    try {
+      String url = "${Common.url}users/${widget.userId}";
+      String? bearerToken =
+      await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      var data = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+      );
+
+      if (data.statusCode == 200) {
+        if (data.body.isNotEmpty) {
+          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
+          setState(() {
+            userTestInfo = UserTestInfo.fromJson(jsonResults);
+          });
+        }
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    init();
+    super.initState();
+  }
+
+  init()async{
+    await requestUserTestNum();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return (userTestInfo == null) ? const Center(child: CircularProgressIndicator()):SafeArea(
       child: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -16,7 +71,7 @@ class RequestTest extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                userName,
+                widget.userName,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
               ),
               Padding(
@@ -29,9 +84,9 @@ class RequestTest extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Expanded(child: testInfo("테스트 진행 횟수", '7')),
+                  Expanded(child: testInfo("테스트 진행 횟수", userTestInfo!.completedTestCount.toString())),
                   SizedBox(width: 10,),
-                  Expanded(child: testInfo("테스트 의뢰 횟수", '2')),
+                  Expanded(child: testInfo("테스트 의뢰 횟수", userTestInfo!.uploadBoardCount.toString())),
                 ],
               ),
               const Spacer(),

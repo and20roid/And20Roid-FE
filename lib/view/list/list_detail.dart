@@ -17,6 +17,8 @@ class ListDetail extends StatefulWidget {
   final String nickname;
   final String createdDate;
   final String thumbnailUrl;
+  final int likes;
+  final int views;
 
   const ListDetail({
     Key? key,
@@ -25,6 +27,8 @@ class ListDetail extends StatefulWidget {
     required this.nickname,
     required this.createdDate,
     required this.thumbnailUrl,
+    required this.likes,
+    required this.views,
   }) : super(key: key);
 
   @override
@@ -33,11 +37,12 @@ class ListDetail extends StatefulWidget {
 
 class _ListDetailState extends State<ListDetail> {
   String content = '';
-  List<dynamic> urls = [];
+  List<String> urls = [];
   int participantNum = 0;
   TextEditingController emailController = TextEditingController();
-
   bool isWaiting = true;
+
+  bool isLiked = false;
 
   Future<void> requestRecruitingDetail() async {
     try {
@@ -59,7 +64,74 @@ class _ListDetailState extends State<ListDetail> {
 
           content = jsonResults["content"];
           urls = jsonResults["imageUrls"];
+          for (String url in urls) {
+            print(url);
+          }
           participantNum = jsonResults["participantNum"];
+        }
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> requestClickPartButton(String email) async {
+    try {
+      String url = "${Common.url}participation";
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      var _body = {"boardId": widget.intValue, "email": email};
+      var data = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+        body: jsonEncode(_body),
+      );
+
+      if (data.statusCode == 200) {
+        print("참여 요청 성공");
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> requestClickHeartButton() async {
+    try {
+      String url = "${Common.url}boards/${widget.intValue}/likes";
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      var _body = {"boardId": widget.intValue};
+      var data = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+        body: jsonEncode(_body),
+      );
+
+      if (data.statusCode == 200) {
+        print("좋아요 요청 성공");
+        print(data.body.toString());
+        if (data.body.toString() == "좋아요") {
+          setState(() {
+            isLiked = true;
+          });
+        } else {
+          setState(() {
+            isLiked = false;
+          });
         }
       } else {
         print("Status code: ${data.statusCode}");
@@ -90,7 +162,9 @@ class _ListDetailState extends State<ListDetail> {
             children: [
               const Padding(
                 padding: EdgeInsets.all(12.0),
-                child: Text("이메일 제출하기", style: TextStyle(fontSize:18 ,fontWeight: FontWeight.bold),textAlign: TextAlign.center),
+                child: Text("이메일 제출하기",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center),
               ),
               const Text(
                 "하단에 Email란에 메일을 적어주시면\n작성자 확인 후 테스트 링크를 보내드립니다.",
@@ -103,7 +177,8 @@ class _ListDetailState extends State<ListDetail> {
                   decoration: InputDecoration(
                     labelText: '이메일 입력하기',
                     filled: true,
-                    fillColor: Colors.black12, // 바탕색 설정
+                    fillColor: Colors.black12,
+                    // 바탕색 설정
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.transparent),
                     ),
@@ -116,11 +191,9 @@ class _ListDetailState extends State<ListDetail> {
               ),
               const Divider(height: 2, thickness: 1),
               TextButton(
-                onPressed: () {
-                  // '제출하기' 버튼
+                onPressed: () async {
                   String userEmail = emailController.text;
-                  // 여기에서 userEmail을 사용하여 작성자 확인 및 테스트 링크 전송 로직을 추가할 수 있습니다.
-                  print("이메일 제출: $userEmail");
+                  await requestClickPartButton(userEmail);
                   Navigator.of(context).pop(); // 다이얼로그 닫기
                   emailController.clear();
                 },
@@ -154,7 +227,7 @@ class _ListDetailState extends State<ListDetail> {
   }
 
   @override
-  void dispose(){
+  void dispose() {
     emailController.dispose();
   }
 
@@ -194,9 +267,8 @@ class _ListDetailState extends State<ListDetail> {
                           style: TextStyle(
                               fontWeight: FontWeight.w400, fontSize: 16)),
                     ),
-
-                    /// threeTitle(),
-
+                    threeTitle(widget.nickname, widget.likes.toString(),
+                        widget.views.toString()),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 6.0, 12.0, 0),
                       child: Row(
@@ -225,8 +297,7 @@ class _ListDetailState extends State<ListDetail> {
                           CustomColor.pointColor), // 진행률 바 색상
                       minHeight: 10,
                     ),
-
-                    /// imageList(),
+                    imageList(urls),
                   ],
                 ),
               ),
@@ -288,15 +359,32 @@ class _ListDetailState extends State<ListDetail> {
 
   Widget threeTitle(String nickname, String heart, String views) {
     return Padding(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.only(top: 12.0),
       child: Row(
         children: [
           Text(nickname),
           SizedBox(width: 16),
-          Icon(Icons.favorite_border_outlined, color: Colors.red), // Heart icon
-          Text(" $heart"),
+          InkWell(
+              onTap: () async {
+                await requestClickHeartButton();
+              },
+              child: isLiked
+                  ? Row(
+                      children: [
+                        Icon(Icons.favorite, color: Colors.red),
+                        Text(" $heart"),
+                      ],
+                    )
+                  : Row(
+                    children: [
+                      Icon(Icons.favorite_border_outlined, color: Colors.red),
+                      Text(" $heart"),
+                    ],
+                  )),
+
           SizedBox(width: 16),
-          Icon(Icons.visibility_outlined), // View count icon
+          Icon(Icons.visibility_outlined),
+          // View count icon
           // Text("$viewCount"), // View coun
           Text(' $views')
         ],
@@ -305,17 +393,20 @@ class _ListDetailState extends State<ListDetail> {
   }
 
   Widget imageList(List<String> urls) {
-    return ListView.builder(
-      itemCount: urls.length,
-      itemBuilder: (context, index) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(12.0),
-          child: CachedNetworkImage(
-            imageUrl: urls[index],
-            fit: BoxFit.cover,
-          ),
-        );
-      },
+    return Container(
+      height: 400,
+      child: ListView.builder(
+        itemCount: urls.length,
+        itemBuilder: (context, index) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(12.0),
+            child: CachedNetworkImage(
+              imageUrl: urls[index],
+              fit: BoxFit.cover,
+            ),
+          );
+        },
+      ),
     );
   }
 }
