@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:and20roid/view/upload/upload.dart';
+import 'package:and20roid/view/upload/upload_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart'; // Get 패키지를 import
 import 'package:image_picker/image_picker.dart';
@@ -20,8 +20,8 @@ class UploadThirdController extends GetxController {
   TextEditingController contentController = TextEditingController();
 }
 
-class UploadFirst extends StatelessWidget {
-  const UploadFirst({super.key});
+class UploadView extends StatelessWidget {
+  const UploadView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,6 @@ class _UploadSecondState extends State<UploadSecond> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: CustomColor.grey1,
       appBar: _appbar("앱 사진 등록", true),
@@ -94,7 +93,7 @@ class _UploadSecondState extends State<UploadSecond> {
               ),
             ),
             const Padding(
-              padding:  EdgeInsets.symmetric(vertical: 12.0),
+              padding: EdgeInsets.symmetric(vertical: 12.0),
               child: Text(
                 ' 앱 사진',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -162,8 +161,6 @@ class _UploadSecondState extends State<UploadSecond> {
                 },
               ),
             ),
-
-
             Align(
                 alignment: Alignment.bottomRight,
                 child: Padding(
@@ -200,13 +197,16 @@ class UploadThird extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: CustomColor.grey1,
       appBar: _appbar("서비스 소개", true),
       body: GetBuilder<UploadThirdController>(
         init: UploadThirdController(), // GetBuilder로 컨트롤러 초기화
         builder: (controller) {
-          return _body3(controller);
+          return SingleChildScrollView(
+              child: SizedBox(
+                  height: screenHeight - 80, child: _body3(controller)));
         },
       ),
     );
@@ -318,7 +318,6 @@ Column _body3(UploadThirdController controller) {
   final UploadFirstController first = Get.put(UploadFirstController());
   final UploadThirdController third = Get.put(UploadThirdController());
 
-
   return Column(
     children: [
       CustomInputField("앱 링크", controller.appLinkController, "스토어 url을 입력해주세요"),
@@ -329,9 +328,10 @@ Column _body3(UploadThirdController controller) {
       Padding(
         padding: const EdgeInsets.all(12.0),
         child: ElevatedButton(
-          onPressed: () {
+          onPressed: () async {
             File? appIconImageValue = total.appIconImage.value;
-            if (appIconImageValue != null) {
+            int totalSize = await total.calculateTotalSize(total.appPhotoImage);
+            if (appIconImageValue != null && totalSize < 15 * 1024 * 1024) {
               // appIconImageValue 사용 가능
               total.uploadImages(
                 first.titleController.text,
@@ -381,18 +381,57 @@ Widget CustomInputField(title, TextEditingController testController, hintText) {
         const SizedBox(
           height: 10,
         ),
-        TextFormField(
-          controller: testController,
-          style: TextStyle(fontSize: 16, color: CustomColor.grey3),
-          decoration: InputDecoration(
-            hintText: hintText,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.0),
-              borderSide: BorderSide(color: CustomColor.grey3, width: 1),
-            ),
-          ),
-          maxLines: 1,
-        ),
+        (title == '모집인원')
+            ? Row(
+                children: [
+                  Container(
+                      width: 60,
+                      child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          controller: testController,
+                          style:
+                              TextStyle(fontSize: 16, color: CustomColor.grey5),
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.all(12),
+                            hintText: hintText,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: BorderSide(
+                                  color: CustomColor.grey1, width: 1),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              // 포커스가 있을 때의 테두리 설정
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: BorderSide(
+                                  color: CustomColor.primary1, width: 1),
+                            ),
+                          ),
+                          maxLines: 1)),
+                  Text(
+                    "  명",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  )
+                ],
+              )
+            : TextFormField(
+                controller: testController,
+                style: TextStyle(fontSize: 16, color: CustomColor.grey5),
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.all(12),
+                  hintText: hintText,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                    borderSide: BorderSide(color: CustomColor.grey1, width: 1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    // 포커스가 있을 때의 테두리 설정
+                    borderRadius: BorderRadius.circular(12.0),
+                    borderSide:
+                        BorderSide(color: CustomColor.primary1, width: 1),
+                  ),
+                ),
+                maxLines: (title != '서비스 소개') ? 1 : 6,
+              ),
       ],
     ),
   );

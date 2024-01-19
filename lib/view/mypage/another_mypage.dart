@@ -10,9 +10,10 @@ import '../../utility/common.dart';
 
 class RequestTest extends StatefulWidget {
   final String userName;
-  final int? userId; // userId 추가
+  final int? userId;
+  final String ranking;
 
-  const RequestTest({Key? key, required this.userName, this.userId})
+  const RequestTest({Key? key, required this.userName, this.userId, required this.ranking})
       : super(key: key);
 
   @override
@@ -92,14 +93,8 @@ class _RequestTestState extends State<RequestTest> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Expanded(
-                                child: testInfo(" 랭킹", '100등',
+                                child: testInfo(" 랭킹", widget.ranking.toString(),
                                     'assets/icons/trophyIcon.png')),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                                child: testInfo(" 횟수", '200',
-                                    'assets/icons/pointIcon.png')),
                             const SizedBox(
                               width: 10,
                             ),
@@ -107,6 +102,28 @@ class _RequestTestState extends State<RequestTest> {
                                 child: testInfo(" 서로도움", '200',
                                     'assets/icons/handshake.png'))
                           ],
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(
+                                  child: testInfo(
+                                      " 테스트 수",
+                                      userTestInfo!.uploadBoardCount.toString(),
+                                      'assets/icons/trophyIcon.png')),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                  child: testInfo(
+                                      " 의뢰 횟수",
+                                      userTestInfo!.completedTestCount.toString(),
+                                      'assets/icons/handshake.png'))
+                            ],
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -137,53 +154,6 @@ class _RequestTestState extends State<RequestTest> {
                       ],
                     ),
                   ),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(30.0),
-                          topRight: Radius.circular(30.0),
-                        ),
-                        color: CustomColor.white,
-                      ),
-                      child: DefaultTabController(
-                        length: 2,
-                        child: Column(
-                          children: [
-                            TabBar(
-                              indicatorColor: CustomColor.primary1,
-                              tabs: [
-                                Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Text(
-                                    '업로드한 테스트',
-                                    style: TextStyle(color: CustomColor.grey4, fontSize: 18),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Text(
-                                    '참여한 테스트',
-                                    style: TextStyle(color: CustomColor.grey4, fontSize: 18),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Expanded(
-                              child: TabBarView(
-                                children: [
-                                  // 첫 번째 탭의 내용
-                                  Center(child: Text('업로드한 테스트 내용')),
-                                  // 두 번째 탭의 내용
-                                  Center(child: Text('참여한 테스트 내용')),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
                 ],
               ),
             ),
@@ -220,6 +190,8 @@ class _RequestTestState extends State<RequestTest> {
           ],
         ));
   }
+
+  userInfoBox() {}
 }
 
 AppBar _appBar() {

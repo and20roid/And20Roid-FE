@@ -1,7 +1,7 @@
 import 'package:and20roid/view/list/list_page.dart';
 import 'package:and20roid/view/ranking/rank_page.dart';
 import 'package:and20roid/view/notification_page.dart';
-import 'package:and20roid/view/upload/upload_1.dart';
+import 'package:and20roid/view/upload/upload_page.dart';
 import 'package:flutter/material.dart';
 import 'view/mypage/my_page.dart';
 
@@ -62,7 +62,7 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
       case 1:
         return RankingContent(); // 랭킹 페이지
       case 2:
-        return UploadFirst(); // 업로드 페이지
+        return UploadView(); // 업로드 페이지
       case 3:
         return NotificationContent(); // 알림 페이지
       case 4:

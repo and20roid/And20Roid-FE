@@ -52,8 +52,9 @@ class _RankingContentState extends State<RankingContent> {
     // 추가적인 실제 데이터가 있다면 이어서 추가
   ];
 
-  void movePage(String userName, int userId) {
-    Get.to(() => RequestTest(userName: userName, userId: userId));
+  void movePage(String userName, int userId, String ranking) {
+    Get.to(() =>
+        RequestTest(userName: userName, userId: userId, ranking: ranking));
   }
 
   Future<void> requestTotalRanking() async {
@@ -75,7 +76,7 @@ class _RankingContentState extends State<RankingContent> {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
           var jsonData = jsonResults['rankInfos'];
           for (var jsonResult in jsonData) {
-            print("ranking : $jsonResult");
+            print("ranking : $jsonResult, length : ${jsonData.length}");
             Rank ranking = Rank.fromJson(jsonResult);
             rankList.add(ranking);
             setState(() {});
@@ -132,22 +133,24 @@ class _RankingContentState extends State<RankingContent> {
                           rankList.first.completedTestCount.toString(),
                           "assets/images/Vector.png",
                           rankList.first.userId),
-                      // trophy(
-                      //     '2',
-                      //     rankList[1].nickname,
-                      //     rankList[1].completedTestCount.toString(),
-                      //     "assets/images/Vector-1.png",
-                      //     rankList[1].userId),
-                      // trophy(
-                      //     '3',
-                      //     rankList[2].nickname,
-                      //     rankList[2].completedTestCount.toString(),
-                      //     "assets/images/Vector-2.png",
-                      //     rankList[2].userId),
-                      trophy('2', 'seungw2n', '100',
-                          "assets/images/Vector-1.png", 2),
-                      trophy('3', 'seungw3n', '98',
-                          "assets/images/Vector-2.png", 3),
+                      (rankList.length > 1)
+                          ? trophy(
+                              '2',
+                              rankList[1].nickname,
+                              rankList[1].completedTestCount.toString(),
+                              "assets/images/Vector-1.png",
+                              rankList[1].userId)
+                          : trophy('2', 'seungw2n', '100',
+                              "assets/images/Vector-1.png", 2),
+                      (rankList.length > 2)
+                          ? trophy(
+                              '3',
+                              rankList[2].nickname,
+                              rankList[2].completedTestCount.toString(),
+                              "assets/images/Vector-2.png",
+                              rankList[2].userId)
+                          : trophy('3', 'seungw3n', '98',
+                              "assets/images/Vector-2.png", 3),
                     ],
                   ),
                 ),
@@ -166,57 +169,43 @@ class _RankingContentState extends State<RankingContent> {
                 ),
                 Expanded(
                   child: Container(
-                      color: CustomColor.grey1,
-                      child: ListView.builder(
-                          itemBuilder: (context, index) {
-                            // 4등부터의 데이터를 가져옴
-                            Map<String, dynamic> playerData =
-                                dummyList[index + 3];
-                            String playerName = playerData['nickname'];
-                            int ranking = playerData['rank'];
-                            int testCount = playerData['completedTestCount'];
-                            return ListTile(
-                              title: Text(
-                                '$playerName',
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                              leading: Text(
-                                '$ranking등',
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                              trailing: Text(
-                                '$testCount회',
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                            );
-                          },
-                          itemCount: 2)
+                    color: CustomColor.grey1,
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        // 4등부터의 데이터를 가져옴
+                        Map<String, dynamic> playerData =
+                            rankList[index + 3] as Map<String, dynamic>;
+                        String playerName = playerData['nickname'];
+                        int ranking = playerData['rank'];
+                        int testCount = playerData['completedTestCount'];
 
-                      // ListView.builder(
-                      //   itemBuilder: (context, index) {
-                      //     // 4등부터의 데이터를 가져옴
-                      //     Map<String, dynamic> playerData = rankList[index + 3] as Map<String, dynamic>;
-                      //     String playerName = playerData['nickname'];
-                      //     int ranking = playerData['rank'];
-                      //     int testCount = playerData['completedTestCount'];
-                      //
-                      //     return InkWell(
-                      //       onTap: () {
-                      //         movePage(playerName,playerData['userId']);
-                      //       },
-                      //       child: ListTile(
-                      // title: Text('$playerName'),
-                      // leading: Text('$ranking등'),
-                      // trailing: Text('$testCount회'),
-                      //       ),
-                      //     );
-                      //   },
-                      //   itemCount: rankList.length > 3 ? rankList.length - 3 : 0,
-                      // ),
-                      ),
+                        return InkWell(
+                          onTap: () {
+                            movePage(playerName, playerData['userId'],
+                                ranking.toString());
+                          },
+                          child: ListTile(
+                            title: Text(
+                              '$playerName',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            leading: Text(
+                              '$ranking등',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            trailing: Text(
+                              '$testCount회',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        );
+                      },
+                      itemCount: rankList.length > 3 ? rankList.length - 3 : 0,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -231,7 +220,7 @@ class _RankingContentState extends State<RankingContent> {
           borderRadius: BorderRadius.circular(8.0), color: CustomColor.white),
       child: InkWell(
         onTap: () {
-          movePage(name, userId);
+          movePage(name, userId, ranking);
         },
         child: Padding(
           padding: const EdgeInsets.all(12.0),

@@ -83,4 +83,15 @@ class UploadGetx extends getx.GetxController {
       print('오류 발생: $e');
     }
   }
+
+  Future<int> calculateTotalSize(List<File> fileList) async {
+    int totalSize = 0;
+
+    for (File file in fileList) {
+      int fileSize = await file.length();
+      totalSize += fileSize;
+    }
+
+    return totalSize;
+  }
 }

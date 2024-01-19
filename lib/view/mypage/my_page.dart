@@ -143,7 +143,7 @@ class _MyPageContentState extends State<MyPageContent> {
                       ),
                       Text(
                         ' $name',
-                        style: TextStyle(
+                        style:const TextStyle(
                             fontSize: 30, fontWeight: FontWeight.bold),
                       )
                     ],
@@ -157,12 +157,18 @@ class _MyPageContentState extends State<MyPageContent> {
                       Expanded(
                           child: testInfo(" 랭킹", '100등',
                               'assets/icons/trophyIcon.png')),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       Expanded(
                           child: testInfo(
-                              " 횟수", '200P', 'assets/icons/pointIcon.png'))
+                              " 게시물", '200P', 'assets/icons/pointIcon.png')),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                          child: testInfo(
+                              " 참여수", '200P', 'assets/icons/pointIcon.png'))
                     ],
                   ),
                 ),
