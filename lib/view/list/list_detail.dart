@@ -19,6 +19,9 @@ class ListDetail extends StatefulWidget {
   final String thumbnailUrl;
   final int likes;
   final int views;
+  final List<String> urls;
+  final String introLine;
+  final bool likedBoard;
 
   const ListDetail({
     Key? key,
@@ -29,6 +32,9 @@ class ListDetail extends StatefulWidget {
     required this.thumbnailUrl,
     required this.likes,
     required this.views,
+    required this.urls,
+    required this.introLine,
+    required this.likedBoard,
   }) : super(key: key);
 
   @override
@@ -37,12 +43,11 @@ class ListDetail extends StatefulWidget {
 
 class _ListDetailState extends State<ListDetail> {
   String content = '';
-  List<String> urls = [];
   int participantNum = 0;
   TextEditingController emailController = TextEditingController();
   bool isWaiting = true;
 
-  bool isLiked = false;
+  late bool isLiked = widget.likedBoard;
 
   Future<void> requestRecruitingDetail() async {
     try {
@@ -63,10 +68,6 @@ class _ListDetailState extends State<ListDetail> {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
           content = jsonResults["content"];
-          urls = jsonResults["imageUrls"];
-          for (String url in urls) {
-            print(url);
-          }
           participantNum = jsonResults["participantNum"];
         }
       } else {
@@ -98,7 +99,7 @@ class _ListDetailState extends State<ListDetail> {
         print("참여 요청 성공");
       } else {
         print("Status code: ${data.statusCode}");
-        print("Response body: ${data.body}");
+        print("Response body: ${utf8.decode(data.bodyBytes)}");
       }
     } catch (e) {
       print('Error: $e');
@@ -148,72 +149,112 @@ class _ListDetailState extends State<ListDetail> {
     }
   }
 
-  void _showEmailDialog() {
+  void _showEmailDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Text("이메일 제출하기",
+        return Theme(
+          data: ThemeData(
+              // ThemeData를 사용하여 DialogTheme을 수정
+              dialogBackgroundColor: Colors.white),
+          child: Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(20.0,20.0,20.0,12),
+                  child: Text(
+                    "이메일 전송하기",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center),
-              ),
-              const Text(
-                "하단에 Email란에 메일을 적어주시면\n작성자 확인 후 테스트 링크를 보내드립니다.",
-                textAlign: TextAlign.center,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    labelText: '이메일 입력하기',
-                    filled: true,
-                    fillColor: Colors.black12,
-                    // 바탕색 설정
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent),
-                    ),
-                    contentPadding: EdgeInsets.all(12.0),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-              ),
-              const Divider(height: 2, thickness: 1),
-              TextButton(
-                onPressed: () async {
-                  String userEmail = emailController.text;
-                  await requestClickPartButton(userEmail);
-                  Navigator.of(context).pop(); // 다이얼로그 닫기
-                  emailController.clear();
-                },
-                child: Text(
-                  '제출하기',
-                  style: TextStyle(color: Colors.blue, fontSize: 14),
+                const Text(
+                  "하단에 Email란에 메일을 적어주시면\n작성자 확인 후 테스트 링크를 보내드립니다.",
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              const Divider(height: 2, thickness: 1),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // 취소 버튼
-                  emailController.clear();
-                },
-                child: Text(
-                  '취소',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 0),
+                  child: TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      labelText: '이메일 입력하기',
+                      filled: true,
+                      fillColor: CustomColor.grey2,
+                      // 텍스트 필드의 배경색을 변경
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.transparent),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.transparent),
+                      ),
+                      contentPadding: EdgeInsets.all(12.0),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // 취소 버튼
+                          emailController.clear();
+                        },
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(CustomColor.white),
+                          minimumSize:
+                              MaterialStateProperty.all(const Size(135, 40)),
+                          side: MaterialStateProperty.all(
+                              BorderSide(color: CustomColor.grey3, width: 1.0)),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          '취소',
+                          style:
+                              TextStyle(color: CustomColor.grey3, fontSize: 18),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      TextButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(CustomColor.primary1),
+                          minimumSize: MaterialStateProperty.all(Size(135, 40)),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                        onPressed: () async {
+                          String userEmail = emailController.text;
+                          requestClickPartButton(userEmail);
+                          Navigator.of(context).pop();
+                          emailController.clear();
+                        },
+                        child: Text(
+                          '전송',
+                          style: TextStyle(color: Colors.black, fontSize: 18),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         );
       },
@@ -229,7 +270,9 @@ class _ListDetailState extends State<ListDetail> {
   @override
   void dispose() {
     emailController.dispose();
+    super.dispose();
   }
+
 
   init() async {
     await requestRecruitingDetail();
@@ -243,101 +286,119 @@ class _ListDetailState extends State<ListDetail> {
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        body: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            children: [
-              Container(
-                height: MediaQuery.of(context).size.height * 0.85,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    appIcon(widget.thumbnailUrl),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 12.0, 12.0, 6.0),
-                      child: Text(
-                        widget.title,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 24),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 0, 12.0, 0),
-                      child: Text(content,
+        backgroundColor: CustomColor.grey1,
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.8,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      appIcon(widget.thumbnailUrl),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 12.0, 12.0, 6.0),
+                        child: Text(
+                          widget.title,
                           style: TextStyle(
-                              fontWeight: FontWeight.w400, fontSize: 16)),
-                    ),
-                    threeTitle(widget.nickname, widget.likes.toString(),
-                        widget.views.toString()),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 6.0, 12.0, 0),
-                      child: Row(
-                        children: [
-                          Image.asset("assets/icons/personIcon.png"),
-                          Text(
-                            " $participantNum / 20명",
+                              fontWeight: FontWeight.bold, fontSize: 24),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 12.0, 0),
+                        child: Text(widget.introLine,
                             style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w400),
-                          )
-                        ],
+                                fontWeight: FontWeight.w400, fontSize: 16)),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 6.0, 12.0, 12.0),
-                      child: Text(
-                        "진행률 ${(participantNum / 20).toStringAsFixed(1)}%",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w400),
+                      threeTitle(widget.nickname, widget.likes.toString(),
+                          widget.views.toString()),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 6.0, 12.0, 12.0),
+                        child: Row(
+                          children: [
+                            Image.asset("assets/icons/personIcon.png"),
+                            Text(
+                              " $participantNum / 20명",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w400),
+                            )
+                          ],
+                        ),
                       ),
+                      LinearProgressIndicator(
+                        value: participantNum / 20,
+                        backgroundColor: Colors.black12, // 배경색
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            CustomColor.primary3), // 진행률 바 색상
+                        minHeight: 10,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      imageList(widget.urls, MediaQuery.of(context).size.width),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 12.0, 0, 0),
+                        child: Text(content,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w300, fontSize: 16)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: CustomColor.primary2,
+                ),
+                padding: const EdgeInsets.all(6.0),
+                child: Text(
+                  "$participantNum명의 테스터 참여 중",
+                  style: TextStyle(
+                      color: CustomColor.primary3,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  _showEmailDialog(context);
+                },
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: CustomColor.primary1,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(12.0), // 모서리 radius 설정
                     ),
-                    LinearProgressIndicator(
-                      value: participantNum / 20,
-                      backgroundColor: Colors.black12, // 배경색
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                          CustomColor.pointColor), // 진행률 바 색상
-                      minHeight: 10,
+                    minimumSize: const Size.fromHeight(60)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset("assets/icons/email.png"),
+                    // 아이콘 색상 설정
+                    const SizedBox(width: 8.0),
+                    // 아이콘과 텍스트 사이의 간격 조절
+                    const Text(
+                      "참여하기",
+                      style: TextStyle(color: Colors.black, fontSize: 20),
                     ),
-                    imageList(urls),
+                    // 글자색 설정
                   ],
                 ),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _showEmailDialog();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: CupertinoColors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(12.0), // 모서리 radius 설정
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.link_outlined,
-                          color: Colors.white,
-                          size: 40,
-                        ),
-                        // 아이콘 색상 설정
-                        SizedBox(width: 8.0),
-                        // 아이콘과 텍스트 사이의 간격 조절
-                        Text(
-                          "참여하기",
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                        // 글자색 설정
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );
@@ -376,33 +437,37 @@ class _ListDetailState extends State<ListDetail> {
                       ],
                     )
                   : Row(
-                    children: [
-                      Icon(Icons.favorite_border_outlined, color: Colors.red),
-                      Text(" $heart"),
-                    ],
-                  )),
-
+                      children: [
+                        Icon(Icons.favorite_border_outlined, color: Colors.red),
+                        Text(" $heart"),
+                      ],
+                    )),
           SizedBox(width: 16),
           Icon(Icons.visibility_outlined),
-          // View count icon
-          // Text("$viewCount"), // View coun
           Text(' $views')
         ],
       ),
     );
   }
 
-  Widget imageList(List<String> urls) {
+  Widget imageList(List<String> urls, double screenWidth) {
     return Container(
-      height: 400,
+      height: screenWidth / 1.5,
       child: ListView.builder(
+        scrollDirection: Axis.horizontal,
         itemCount: urls.length,
         itemBuilder: (context, index) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(12.0),
-            child: CachedNetworkImage(
-              imageUrl: urls[index],
-              fit: BoxFit.cover,
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(0, 12.0, 12.0, 0),
+            child: Container(
+              width: screenWidth / 3.5, // 화면 너비의 3분의 1 크기로 설정
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12.0),
+                child: CachedNetworkImage(
+                  imageUrl: urls[index],
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           );
         },

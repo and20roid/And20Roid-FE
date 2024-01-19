@@ -10,24 +10,57 @@ import '../../utility/common.dart';
 import '../mypage/another_mypage.dart';
 
 class RankingContent extends StatefulWidget {
-
   @override
   State<RankingContent> createState() => _RankingContentState();
 }
 
 class _RankingContentState extends State<RankingContent> {
   List<Rank> rankList = [];
+  List<Map<String, dynamic>> dummyList = [
+    // 더미 데이터
+    {
+      'rank': 1,
+      'nickname': 'John Doe',
+      'completedTestCount': 10,
+      'userId': 'user123',
+    },
+    {
+      'rank': 2,
+      'nickname': 'John Doe',
+      'completedTestCount': 10,
+      'userId': 'user123',
+    },
+    {
+      'rank': 3,
+      'nickname': 'John Doe',
+      'completedTestCount': 10,
+      'userId': 'user123',
+    },
+    {
+      'rank': 4,
+      'nickname': 'John Doe',
+      'completedTestCount': 10,
+      'userId': 'user123',
+    },
+    {
+      'rank': 5,
+      'nickname': 'Kohn Doe',
+      'completedTestCount': 8,
+      'userId': 'user123',
+    },
 
-  void movePage(String userName, int userId){
-    Get.to(()=>RequestTest(userName: userName, userId :userId));
+    // 추가적인 실제 데이터가 있다면 이어서 추가
+  ];
+
+  void movePage(String userName, int userId) {
+    Get.to(() => RequestTest(userName: userName, userId: userId));
   }
-
 
   Future<void> requestTotalRanking() async {
     try {
       String url = "${Common.url}participation/ranking";
       String? bearerToken =
-      await FirebaseAuth.instance.currentUser!.getIdToken();
+          await FirebaseAuth.instance.currentUser!.getIdToken();
 
       var data = await http.get(
         Uri.parse(url),
@@ -63,92 +96,166 @@ class _RankingContentState extends State<RankingContent> {
     super.initState();
   }
 
-  init() async{
+  init() async {
     await requestTotalRanking();
   }
 
   @override
   Widget build(BuildContext context) {
-    return (rankList.isEmpty)?Center(
-        child: CircularProgressIndicator(),
-      ):Scaffold(
-      body: Column(
-        children: [
-          const Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
-                child: Text('랭킹',
-                    style:
-                        TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-              ),
-              Spacer()
-            ],
-          ),
-          Container(
-            height: MediaQuery.of(context).size.height * 0.3,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return (rankList.isEmpty)
+        ? Center(
+            child: CircularProgressIndicator(),
+          )
+        : Scaffold(
+            backgroundColor: CustomColor.grey1,
+            body: Column(
               children: [
-                trophy('2','seungw2n','100',"assets/images/Vector-1.png",2),
-                trophy('1',rankList.first.nickname,rankList.first.completedTestCount.toString(),"assets/images/Vector.png",rankList.first.userId),
-                trophy('3','seungw3n','98',"assets/images/Vector-2.png",3),
+                const Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 20, 0, 0),
+                      child: Text('랭킹',
+                          style: TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold)),
+                    ),
+                    Spacer()
+                  ],
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      trophy(
+                          '1',
+                          rankList.first.nickname,
+                          rankList.first.completedTestCount.toString(),
+                          "assets/images/Vector.png",
+                          rankList.first.userId),
+                      // trophy(
+                      //     '2',
+                      //     rankList[1].nickname,
+                      //     rankList[1].completedTestCount.toString(),
+                      //     "assets/images/Vector-1.png",
+                      //     rankList[1].userId),
+                      // trophy(
+                      //     '3',
+                      //     rankList[2].nickname,
+                      //     rankList[2].completedTestCount.toString(),
+                      //     "assets/images/Vector-2.png",
+                      //     rankList[2].userId),
+                      trophy('2', 'seungw2n', '100',
+                          "assets/images/Vector-1.png", 2),
+                      trophy('3', 'seungw3n', '98',
+                          "assets/images/Vector-2.png", 3),
+                    ],
+                  ),
+                ),
+                const ListTile(
+                  title: Text(
+                    '아이디',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  leading: Text(
+                    '순위',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  trailing: Text('테스트 횟수',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+                Expanded(
+                  child: Container(
+                      color: CustomColor.grey1,
+                      child: ListView.builder(
+                          itemBuilder: (context, index) {
+                            // 4등부터의 데이터를 가져옴
+                            Map<String, dynamic> playerData =
+                                dummyList[index + 3];
+                            String playerName = playerData['nickname'];
+                            int ranking = playerData['rank'];
+                            int testCount = playerData['completedTestCount'];
+                            return ListTile(
+                              title: Text(
+                                '$playerName',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              leading: Text(
+                                '$ranking등',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              trailing: Text(
+                                '$testCount회',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            );
+                          },
+                          itemCount: 2)
+
+                      // ListView.builder(
+                      //   itemBuilder: (context, index) {
+                      //     // 4등부터의 데이터를 가져옴
+                      //     Map<String, dynamic> playerData = rankList[index + 3] as Map<String, dynamic>;
+                      //     String playerName = playerData['nickname'];
+                      //     int ranking = playerData['rank'];
+                      //     int testCount = playerData['completedTestCount'];
+                      //
+                      //     return InkWell(
+                      //       onTap: () {
+                      //         movePage(playerName,playerData['userId']);
+                      //       },
+                      //       child: ListTile(
+                      // title: Text('$playerName'),
+                      // leading: Text('$ranking등'),
+                      // trailing: Text('$testCount회'),
+                      //       ),
+                      //     );
+                      //   },
+                      //   itemCount: rankList.length > 3 ? rankList.length - 3 : 0,
+                      // ),
+                      ),
+                ),
               ],
             ),
-          ),
-          Expanded(
-            child: Container(
-              color: Colors.grey[200], // 리스트뷰의 배경색
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  // 4등부터의 데이터를 가져옴
-                  Map<String, dynamic> playerData = rankList[index + 3] as Map<String, dynamic>;
-                  String playerName = playerData['nickname'];
-                  int ranking = playerData['rank'];
-                  int testCount = playerData['completedTestCount'];
-
-                  return InkWell(
-                    onTap: () {
-                      movePage(playerName,playerData['userId']);
-                    },
-                    child: ListTile(
-                      title: Text('$ranking등 $playerName'),
-                      trailing: Text('$testCount회'),
-                    ),
-                  );
-                },
-                itemCount: rankList.length > 3 ? rankList.length - 3 : 0,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 
-  Widget trophy(String ranking, String name, String count, String imagePath, int userId) {
-    return InkWell(
-      onTap: (){
-        movePage(name,userId);
-      },
-      child: Column(
-        children: [
-          (ranking == '1')?
-          Container():const SizedBox(
-            height: 60,
+  Widget trophy(
+      String ranking, String name, String count, String imagePath, int userId) {
+    return Container(
+      height: 220,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0), color: CustomColor.white),
+      child: InkWell(
+        onTap: () {
+          movePage(name, userId);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              Container(
+                  child: (ranking == '1')
+                      ? Image.asset('assets/icons/1st.png')
+                      : (ranking == '2')
+                          ? Image.asset('assets/icons/2nd.png')
+                          : Image.asset('assets/icons/3rd.png')),
+              Container(
+                width: 90,
+                height: 100,
+                child: Image.asset(imagePath),
+              ),
+              Text(
+                "$name\n$count회",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              )
+            ],
           ),
-          Container(
-            width: 50,
-            height: 100,
-            margin: EdgeInsets.symmetric(horizontal: 10),
-            child: Image.asset(imagePath),
-          ),
-          Text(
-            "$ranking등\n$name\n$count회",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          )
-        ],
+        ),
       ),
     );
   }

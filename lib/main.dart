@@ -41,6 +41,9 @@ class MyApp extends StatelessWidget {
       alert: true,
       sound: true,
     );
+    String? token = await FirebaseMessaging.instance.getToken();
+    print("fcm token $token");
+
   }
 
   void firebaseMessageSetting() async {
@@ -91,6 +94,20 @@ class MyApp extends StatelessWidget {
         print(message.notification!.title);
         print(message.notification!.body);
       }
+      String jsonString = jsonEncode({
+        'data': message.data,
+        'notification': {
+          'title': message.notification?.title,
+          'body': message.notification?.body,
+        },
+      });
+
+      print("Message as JSON: $jsonString");
+
+      if (message.data["action"] != null) {
+        print("Action: ${message.data["action"].toString()}");
+        // Handle the action here
+      }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -111,6 +128,9 @@ class MyApp extends StatelessWidget {
       }
     });
   }
+
+
+
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {

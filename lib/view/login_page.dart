@@ -149,6 +149,9 @@ class _LoginPageState extends State<LoginPage> {
       final GoogleSignInAuthentication googleSignInAuthentication =
           await googleSignInAccount.authentication;
 
+      String? userProfileUrl = googleSignInAccount.photoUrl?.toString();
+      sharedPreferences.setUserProfile(userProfileUrl!);
+
       // 사용자의 이메일 앞부분 추출
       final String userEmail = googleSignInAccount.email;
       int atIdx = userEmail.indexOf("@");

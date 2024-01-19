@@ -79,6 +79,7 @@ class _ListContentState extends State<ListContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: CustomColor.grey1,
       appBar: _appBar(),
       body: SmartRefresher(
         enablePullDown: true,
@@ -99,16 +100,22 @@ class _ListContentState extends State<ListContent> {
                       thumbnailUrl: gatherListItems[index].thumbnailUrl,
                       likes: gatherListItems[index].likes,
                       views: gatherListItems[index].views,
+                      urls: gatherListItems[index].imageUrls,
+                      introLine: gatherListItems[index].introLine,
+                      likedBoard: gatherListItems[index].likedBoard,
                     ));
               },
               child: renderCard(
                 gatherListItems[index].participantNum.toString(),
                 gatherListItems[index].title,
-                // gatherListItems[index].content,
+                gatherListItems[index].introLine,
+                gatherListItems[index].imageUrls,
                 gatherListItems[index].thumbnailUrl,
                 gatherListItems[index].nickname,
                 gatherListItems[index].likes,
                 gatherListItems[index].views,
+                MediaQuery.of(context).size.width,
+                gatherListItems[index].likedBoard,
               ),
             );
           },
@@ -118,35 +125,97 @@ class _ListContentState extends State<ListContent> {
   }
 
   AppBar _appBar() {
-    return AppBar(
-      title: Container(
-        padding: EdgeInsets.all(8.0),
+    List<Widget> dropbox = [
+      Container(
+        width: 90,
+        padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
-          border: Border.all(color: CustomColor.pointColor),
+          border: Border.all(color: CustomColor.primary3),
           borderRadius: BorderRadius.circular(12.0),
         ),
-        child: Text(
-          "모집 중",
-          style: TextStyle(
-            color: CustomColor.pointColor,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+        child: Row(
+          children: [
+            Text(
+              "전체",
+              style: TextStyle(
+                color: CustomColor.primary3,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            SizedBox(width: 10, child: Image.asset("assets/icons/dropdown.png"))
+          ],
         ),
       ),
-    );
+      Container(
+        width: 110,
+        padding: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          border: Border.all(color: CustomColor.primary3),
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Row(
+          children: [
+            Text(
+              "모집 중",
+              style: TextStyle(
+                color: CustomColor.primary3,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            SizedBox(width: 10, child: Image.asset("assets/icons/dropdown.png"))
+          ],
+        ),
+      ),
+      Container(
+        width: 130,
+        padding: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          border: Border.all(color: CustomColor.primary3),
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Row(
+          children: [
+            Text(
+              "모집 완료",
+              style: TextStyle(
+                color: CustomColor.primary3,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            SizedBox(width: 10, child: Image.asset("assets/icons/dropdown.png"))
+          ],
+        ),
+      ),
+    ];
+
+    return AppBar(toolbarHeight: 80.0,backgroundColor: CustomColor.grey1, title: dropbox[0]);
   }
 
   Card renderCard(
       String participantNum,
       String title,
-      // String? content,
-      // List<String> urls,
+      String intro,
+      List<String> imageUrls,
       String thumbnailUrl,
       String nickname,
       int likes,
-      int views) {
+      int views,
+      double screenWidth,
+      bool liked) {
     return Card(
+      color: CustomColor.white,
       child: Column(
         children: [
           Padding(
@@ -154,15 +223,17 @@ class _ListContentState extends State<ListContent> {
             child: Align(
               alignment: Alignment.topLeft,
               child: Container(
-                color: Colors.amber,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(2.0),
-                    child: Text(" $participantNum명의 테스터 참여중 "),
-                  ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: CustomColor.primary2,
+                ),
+                padding: const EdgeInsets.all(6.0),
+                child: Text(
+                  "$participantNum명의 테스터 참여 중",
+                  style: TextStyle(
+                      color: CustomColor.primary3,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -182,17 +253,19 @@ class _ListContentState extends State<ListContent> {
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
-                      // Text(content),
-                      Text("안드로이드 앱 테스터 커뮤니티 서비스")
+                      Text(
+                        intro,
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w400),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-
-          /// imageList(),
-          threeTitle(nickname, likes.toString(), views.toString()),
+          imageList(imageUrls, screenWidth),
+          threeTitle(nickname, likes.toString(), views.toString(), liked),
         ],
       ),
     );
@@ -212,33 +285,46 @@ class _ListContentState extends State<ListContent> {
     );
   }
 
-  Widget imageList(List<String> urls) {
-    return ListView.builder(
-      itemCount: urls.length,
-      itemBuilder: (context, index) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(12.0),
-          child: CachedNetworkImage(
-            imageUrl: urls[index],
-            fit: BoxFit.cover,
-          ),
-        );
-      },
+  Widget imageList(List<String> urls, double screenWidth) {
+    return SizedBox(
+      height: screenWidth / 1.5,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: urls.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(12.0, 0, 6.0, 0),
+            child: SizedBox(
+              width: screenWidth / 3.5, // 화면 너비의 3분의 1 크기로 설정
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12.0),
+                child: CachedNetworkImage(
+                  imageUrl: urls[index],
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+
+          );
+        },
+      ),
     );
   }
 
-  Widget threeTitle(String nickname, String heart, String views) {
+  Widget threeTitle(String nickname, String heart, String views, bool liked) {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Row(
         children: [
           Text(nickname),
-          SizedBox(width: 16),
-          Icon(Icons.favorite_border_outlined, color: Colors.red), // Heart icon
+          const SizedBox(width: 16),
+          liked
+              ? const Icon(Icons.favorite, color: Colors.red)
+              : const Icon(Icons.favorite_border_outlined,
+                  color: Colors.red), // Heart icon
           Text(" $heart"),
-          SizedBox(width: 16),
-          Icon(Icons.visibility_outlined), // View count icon
-          // Text("$viewCount"), // View coun
+          const SizedBox(width: 16),
+          const Icon(Icons.visibility_outlined), // View count icon
           Text(' $views')
         ],
       ),
