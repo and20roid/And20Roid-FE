@@ -442,8 +442,8 @@ class _ListDetailState extends State<ListDetail> {
                         Text(" $heart"),
                       ],
                     )),
-          SizedBox(width: 16),
-          Icon(Icons.visibility_outlined),
+          const SizedBox(width: 16),
+          const Icon(Icons.visibility_outlined),
           Text(' $views')
         ],
       ),
@@ -460,6 +460,10 @@ class _ListDetailState extends State<ListDetail> {
           return Padding(
             padding: const EdgeInsets.fromLTRB(0, 12.0, 12.0, 0),
             child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: CustomColor.grey5, width: 1.5),
+                borderRadius: BorderRadius.circular(12.0)
+              ),
               width: screenWidth / 3.5, // 화면 너비의 3분의 1 크기로 설정
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12.0),

@@ -94,6 +94,7 @@ class _MyPageContentState extends State<MyPageContent> {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
           var jsonData = jsonResults['readBoardResponses'];
+          print(jsonData);
 
           for (var jsonResult in jsonData) {
             GatherList gatherList = GatherList.fromJson(jsonResult);
@@ -211,13 +212,13 @@ class _MyPageContentState extends State<MyPageContent> {
                           Expanded(
                             child: TabBarView(
                               children: [
-                                ListView.builder(
+                                myUploadTest.isEmpty? Center(child: Text("컨텐츠가 없어요"),):ListView.builder(
                                     itemCount: myUploadTest.length,
                                     itemBuilder: (context, index) {
                                       return CustomListTile(
                                           myUploadTest, index);
                                     }),
-                                ListView.builder(
+                                myPartiTest.isEmpty? Center(child: Text("컨텐츠가 없어요"),):ListView.builder(
                                     itemCount: myPartiTest.length,
                                     itemBuilder: (context, index) {
                                       return CustomListTile(
