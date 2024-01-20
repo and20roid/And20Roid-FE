@@ -4,37 +4,36 @@ import 'package:flutter/material.dart';
 import '../../utility/common.dart';
 
 class NotificationContent extends StatelessWidget {
+  List<Map<String, String>> notiData = [
+    {'type': 'request', 'nickname': '{닉네임}', 'image': 'https://and20roid-s3-bucket.s3.ap-northeast-2.amazonaws.com/0252baf4-dafe-4656-8f35-f8619d950092.jpeg', 'title': 'title', 'introLine': 'introLine'},
+    {'type': 'join', 'nickname': '{닉네임}', 'image': 'https://and20roid-s3-bucket.s3.ap-northeast-2.amazonaws.com/0252baf4-dafe-4656-8f35-f8619d950092.jpeg', 'title': 'title', 'introLine': 'introLine'},
+    {'type': 'start', 'title': '{글 제목} 테스트가 시작됐어요', 'image': 'https://and20roid-s3-bucket.s3.ap-northeast-2.amazonaws.com/0252baf4-dafe-4656-8f35-f8619d950092.jpeg', 'title': 'title', 'introLine': 'introLine'},
+    {'type': 'end', 'title': '{글 제목} 테스트가 종료되었어요.', 'image': 'https://and20roid-s3-bucket.s3.ap-northeast-2.amazonaws.com/0252baf4-dafe-4656-8f35-f8619d950092.jpeg', 'title': 'title', 'introLine': 'introLine'},
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(),
       body: Container(
         color: CustomColor.grey1,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              requestMsgBox(
-                  '{닉네임}',
-                  'https://and20roid-s3-bucket.s3.ap-northeast-2.amazonaws.com/0252baf4-dafe-4656-8f35-f8619d950092.jpeg',
-                  'title',
-                  'introLine'),
-              joinMsgBox(
-                  '{닉네임}',
-                  'https://and20roid-s3-bucket.s3.ap-northeast-2.amazonaws.com/0252baf4-dafe-4656-8f35-f8619d950092.jpeg',
-                  'title',
-                  'introLine'),
-              startMsgBox(
-                  '{글 제목} 테스트가 시작됐어요',
-                  'https://and20roid-s3-bucket.s3.ap-northeast-2.amazonaws.com/0252baf4-dafe-4656-8f35-f8619d950092.jpeg',
-                  'title',
-                  'introLine'),
-              endMsgBox(
-                  '{글 제목} 테스트가 종료되었어요.',
-                  'https://and20roid-s3-bucket.s3.ap-northeast-2.amazonaws.com/0252baf4-dafe-4656-8f35-f8619d950092.jpeg',
-                  'title',
-                  'introLine'),
-            ],
-          ),
+        child: ListView.builder(
+          itemCount: notiData.length,
+          itemBuilder: (context, index) {
+            Map<String, String> data = notiData[index];
+            switch (data['type']) {
+              case 'request':
+                return requestMsgBox(data['nickname']!, data['image']!, data['title']!, data['introLine']!);
+              case 'join':
+                return joinMsgBox(data['nickname']!, data['image']!, data['title']!, data['introLine']!);
+              case 'start':
+                return startMsgBox(data['title']!, data['image']!, data['title']!, data['introLine']!);
+              case 'end':
+                return endMsgBox(data['title']!, data['image']!, data['title']!, data['introLine']!);
+              default:
+                return Container(); // 예외 처리
+            }
+          },
         ),
       ),
     );

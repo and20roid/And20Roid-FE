@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:and20roid/utility/common.dart';
 import 'package:and20roid/direct_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get/get.dart';
@@ -133,6 +134,37 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<bool> _requestToken() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    final token = await messaging.getToken();
+    print('~~~~~~~~~~~~~~~~~~token : $token');
+    try {
+      String url = "${Common.url}users/tokens";
+      String? bearerToken =
+      await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      Map<String, dynamic> body = {
+        "token": token,
+      };
+
+      var data = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+        body: jsonEncode(body),
+      );
+
+      if (data.statusCode == 200) {
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~requestToken Success');
+        return true;
+      }
+    } catch (e) {
+      print('failed to _requestToken Exception =' + e.toString());
+    }
+    return false;
+  }
 
   Future<void> signInWithGoogle() async {
     try {
@@ -174,11 +206,11 @@ class _LoginPageState extends State<LoginPage> {
       sharedPreferences.setUserNick(userNick);
 
       sharedPreferences.getUserNick().then((value) => {
-      print("`~~~~~~~~~~~저장된 유저 닉 : $value")
+      print("~~~~~~~~~~~저장된 유저 닉 : $value")
       });
 
       sharedPreferences.getUserToken().then((value) => {
-        print("`~~~~~~~~~~~저장된 유저 token : $value")
+        print("~~~~~~~~~~~저장된 유저 token : $value")
       });
 
       _auth.currentUser?.getIdToken().then((token) {
@@ -193,6 +225,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if(_auth.currentUser != null)
         {
+          _requestToken();
           print("~~~~~~~~~null은 아니라서 넘어가유 ~");
           Get.offAll(() => const BottomNavigatorPage());
         }

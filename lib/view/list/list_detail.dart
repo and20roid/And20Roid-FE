@@ -204,6 +204,7 @@ class _ListDetailState extends State<ListDetail> {
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop(); // 취소 버튼
+                          Common().showToastN(context, '취소하였습니다', 2);
                           emailController.clear();
                         },
                         style: ButtonStyle(
@@ -331,7 +332,7 @@ class _ListDetailState extends State<ListDetail> {
                         value: participantNum / 20,
                         backgroundColor: Colors.black12, // 배경색
                         valueColor: AlwaysStoppedAnimation<Color>(
-                            CustomColor.primary3), // 진행률 바 색상
+                            CustomColor.primary1), // 진행률 바 색상
                         minHeight: 10,
                       ),
                       const SizedBox(

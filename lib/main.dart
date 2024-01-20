@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:and20roid/utility/common.dart';
 import 'package:and20roid/view/alarm/notification_controller.dart';
 import 'package:and20roid/view/alarm/notification_page.dart';
 import 'package:flutter/foundation.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     init();
     firebaseMessageSetting();
-    firebaseMessageProc();
+    firebaseMessageProc(context);
 
     return const GetMaterialApp(
       home: DirectingPage(),
@@ -97,7 +98,7 @@ void firebaseMessageSetting() async {
   }
 }
 
-void firebaseMessageProc() {
+void firebaseMessageProc(context) {
   final notificationController = Get.put(NotiController());
 
   ///알림 수신[앱 실행중]
@@ -119,23 +120,24 @@ void firebaseMessageProc() {
 
     print("Message as JSON: $jsonString");
 
-    notificationController.alarmCount.value++;
-    print(notificationController.alarmCount.value);
-
-    if (!kIsWeb && message.data["action"] != null) {
-      String msgAction = message.data["action"].toString();
-      print("Action: ${message.data["action"].toString()}");
+    if (!kIsWeb && message.data["clickAction"] != null) {
+      String msgAction = message.data["clickAction"].toString();
+      print("Action: ${message.data["clickAction"].toString()}");
       if (msgAction == 'requestTest') {
         notificationController.alarmCount.value++;
+        print('requestTest');
+
       } else if (msgAction == 'joinTest') {
         notificationController.alarmCount.value++;
+        print('joinTest');
 
       } else if (msgAction == 'startTest') {
         notificationController.alarmCount.value++;
+        print('startTest');
 
       } else if (msgAction == 'endTest') {
         notificationController.alarmCount.value++;
-
+        print('endTest');
       }
     }
   });

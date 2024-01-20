@@ -12,8 +12,16 @@ class RequestTest extends StatefulWidget {
   final String userName;
   final int? userId;
   final String ranking;
+  final int helpEach;
+  final bool related;
 
-  const RequestTest({Key? key, required this.userName, this.userId, required this.ranking})
+  const RequestTest(
+      {Key? key,
+      required this.userName,
+      this.userId,
+      required this.ranking,
+      required this.helpEach,
+      required this.related})
       : super(key: key);
 
   @override
@@ -76,82 +84,96 @@ class _RequestTestState extends State<RequestTest> {
               backgroundColor: CustomColor.grey1,
               body: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            widget.userName,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 28),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                                child: testInfo(" 랭킹", widget.ranking.toString(),
-                                    'assets/icons/trophyIcon.png')),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                                child: testInfo(" 서로도움", '200',
-                                    'assets/icons/handshake.png'))
-                          ],
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(
-                                  child: testInfo(
-                                      " 테스트 수",
-                                      userTestInfo!.uploadBoardCount.toString(),
-                                      'assets/icons/trophyIcon.png')),
-                              const SizedBox(
-                                width: 10,
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                widget.userName,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 28),
                               ),
-                              Expanded(
-                                  child: testInfo(
-                                      " 의뢰 횟수",
-                                      userTestInfo!.completedTestCount.toString(),
-                                      'assets/icons/handshake.png'))
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16.0),
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: CustomColor.primary1,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      12.0), // 모서리 radius 설정
-                                ),
-                                minimumSize: const Size.fromHeight(60)),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Image.asset("assets/icons/handshake.png"),
-                                const SizedBox(width: 8.0),
-                                const Text(
-                                  "내 테스트 참여 요청",
-                                  style: TextStyle(
-                                      color: Colors.black, fontSize: 20),
+                                Expanded(
+                                    child: testInfo(
+                                        " 랭킹",
+                                        '${widget.ranking.toString()}등',
+                                        'assets/icons/trophyIcon.png')),
+                                const SizedBox(
+                                  width: 10,
                                 ),
-                                // 글자색 설정
+                                Expanded(
+                                    child: testInfo(
+                                      "서로도움",
+                                      '${widget.helpEach.toString()}회',
+                                      'assets/icons/handshake.png',
+                                      related: widget.related,
+                                    )
+                                )
                               ],
                             ),
-                          ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 16.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Expanded(
+                                      child: testInfo(
+                                          " 테스트 수",
+                                          '${userTestInfo!.uploadBoardCount.toString()}회',
+                                          'assets/icons/trophyIcon.png')),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                      child: testInfo(
+                                          " 의뢰 횟수",
+                                          '${userTestInfo!.completedTestCount.toString()}회',
+                                          'assets/icons/handshake.png'))
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                  Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: CustomColor.primary1,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(12.0), // 모서리 radius 설정
+                          ),
+                          minimumSize: const Size.fromHeight(60)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset("assets/icons/handshake.png"),
+                          const SizedBox(width: 8.0),
+                          const Text(
+                            "내 테스트 참여 요청",
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                          ),
+                          // 글자색 설정
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -160,10 +182,14 @@ class _RequestTestState extends State<RequestTest> {
           );
   }
 
-  Widget testInfo(String title, String num, String iconPath) {
+  Widget testInfo(String title, String num, String iconPath, {bool? related}) {
     return Container(
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8.0), color: Colors.white),
+          border: Border.all(
+            color: (related!=null && related == true)?CustomColor.primary1:CustomColor.white,
+            width: 2
+          ),
+            borderRadius: BorderRadius.circular(8.0), color: (related!=null&& related == true)?CustomColor.primary4:CustomColor.white),
         height: 100,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start, // 앞쪽 정렬 설정
