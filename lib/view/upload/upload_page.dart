@@ -65,8 +65,15 @@ class _UploadSecondState extends State<UploadSecond> {
     if (pickedFile != null) {
       total.appPhotoImage.add((File(pickedFile.path)));
     }
+    await total.calculateTotalSize(total.appPhotoImage);
     setState(() {});
   }
+
+  Future<void> removePhoto(index) async {
+    total.appPhotoImage.removeAt(index);
+    await total.calculateTotalSize(total.appPhotoImage);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -92,11 +99,11 @@ class _UploadSecondState extends State<UploadSecond> {
                 child: appIcon(total.appIconImage.value),
               ),
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 12.0),
               child: Text(
-                ' 앱 사진',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ' 앱 사진 ${total.totalFileSize.value ~/ (1000000)}MB / 15MB',
+                style:TextStyle(fontSize: 16, fontWeight: FontWeight.bold ,color:  total.totalFileSize.value ~/ (1000000) < 15 ? CustomColor.grey5 : Colors.red),
               ),
             ),
             SizedBox(
@@ -117,8 +124,8 @@ class _UploadSecondState extends State<UploadSecond> {
                             top: 0,
                             right: 0,
                             child: IconButton(
-                              onPressed: () {
-                                total.appPhotoImage.removeAt(index);
+                              onPressed: () async {
+                                await removePhoto(index);
                                 setState(() {});
                               },
                               icon: Icon(Icons.close, color: Colors.white),
@@ -206,7 +213,7 @@ class UploadThird extends StatelessWidget {
         builder: (controller) {
           return SingleChildScrollView(
               child: SizedBox(
-                  height: screenHeight - 80, child: _body3(controller)));
+                  height: screenHeight - 80, child: _body3(controller,context)));
         },
       ),
     );
@@ -313,8 +320,8 @@ Widget appPhoto(File appPhotoImage) {
   );
 }
 
-Column _body3(UploadThirdController controller) {
-  final UploadGetx total = Get.put(UploadGetx());
+Column _body3(UploadThirdController controller, context) {
+  final UploadGetx total = Get.find<UploadGetx>();
   final UploadFirstController first = Get.put(UploadFirstController());
   final UploadThirdController third = Get.put(UploadThirdController());
 
@@ -331,24 +338,29 @@ Column _body3(UploadThirdController controller) {
           onPressed: () async {
             File? appIconImageValue = total.appIconImage.value;
             int totalSize = await total.calculateTotalSize(total.appPhotoImage);
-            if (appIconImageValue != null && totalSize < 15 * 1024 * 1024) {
-              // appIconImageValue 사용 가능
-              total.uploadImages(
-                first.titleController.text,
-                first.oneLineController.text,
-                first.recruitNumController.text,
-                total.appPhotoImage,
-                appIconImageValue,
-                third.appLinkController.text,
-                third.webLinkController.text,
-                third.contentController.text,
-              );
-            } else {
-              print("앱 아이콘이 없음");
+            if (appIconImageValue != null){
+              if(totalSize < 15 * 1024 * 1024){
+                // appIconImageValue 사용 가능
+                total.uploadImages(
+                  first.titleController.text,
+                  first.oneLineController.text,
+                  first.recruitNumController.text,
+                  total.appPhotoImage,
+                  appIconImageValue,
+                  third.appLinkController.text,
+                  third.webLinkController.text,
+                  third.contentController.text,
+                );
+                Get.offAll(() => const BottomNavigatorPage());
+              }else{
+                Common().showToastN(context, '사진 크기를 확인해 주세요', 1);
+                Get.back();
+              }
+            }else {
+              Common().showToastN(context, '앱 아이콘을 확인해 주세요', 1);
+              Get.back();
             }
-
-            Get.offAll(() => const BottomNavigatorPage());
-          },
+            },
           child: Text(
             "업로드 하기",
             style: TextStyle(fontSize: 18),

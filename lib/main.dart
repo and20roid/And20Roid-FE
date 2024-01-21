@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:and20roid/utility/common.dart';
 import 'package:and20roid/view/alarm/notification_controller.dart';
-import 'package:and20roid/view/alarm/notification_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
 bool kIsWeb = false;
 
 void init() async {
+  // await deleteToken();
 
   if (await Permission.notification.isDenied) {
     await Permission.notification.request();
@@ -125,6 +127,7 @@ void firebaseMessageProc(context) {
       print("Action: ${message.data["clickAction"].toString()}");
       if (msgAction == 'requestTest') {
         notificationController.alarmCount.value++;
+
         print('requestTest');
 
       } else if (msgAction == 'joinTest') {
@@ -180,4 +183,28 @@ movePage(RemoteMessage message) async {
   // if(clickAction == "testRequest"){
   //     Get.to(()=>NotificationContent());
   // }
+}
+
+Future<void> deleteToken() async {
+  final url = Uri.parse('${Common.url}users/tokens');
+  String? bearerToken =
+  await FirebaseAuth.instance.currentUser!.getIdToken();
+  try {
+    final response = await http.delete(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $bearerToken',  // 토큰을 헤더에 포함
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('Token deletion successful');
+    } else {
+      print('Token deletion failed. Status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    }
+  } catch (e) {
+    print('Error during token deletion: $e');
+  }
 }

@@ -51,9 +51,13 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
               ),
             ],
             onTap: (index) {
+              if(index == 3){
+                notiCtrl.alarmCount = 0.obs;
+              }
               setState(() {
                 _currentIndex = index;
               });
+
             },
           ),
           Obx(() => alarmCount(notiCtrl.alarmCount.value.toString())),

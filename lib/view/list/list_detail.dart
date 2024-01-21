@@ -1,13 +1,10 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../utility/common.dart';
 
@@ -96,9 +93,17 @@ class _ListDetailState extends State<ListDetail> {
       );
 
       if (data.statusCode == 200) {
-        print("참여 요청 성공");
+        Common().showToastN(context,'이메일을 성공적으로 전송했습니다',1);
       } else {
-        print("Status code: ${data.statusCode}");
+        // JSON 파싱
+        Map<String, dynamic> parsedResponse = jsonDecode(utf8.decode(data.bodyBytes));
+
+        // "message" 필드 가져오기
+        String message = parsedResponse['message'];
+
+        if(data.statusCode == 400 ){
+          Common().showToastN(context,message,1);
+        }
         print("Response body: ${utf8.decode(data.bodyBytes)}");
       }
     } catch (e) {
@@ -140,12 +145,6 @@ class _ListDetailState extends State<ListDetail> {
       }
     } catch (e) {
       print('Error: $e');
-    }
-  }
-
-  Future<void> _launchUrl(_url) async {
-    if (!await launchUrl(_url)) {
-      throw Exception('Could not launch $_url');
     }
   }
 
@@ -204,7 +203,6 @@ class _ListDetailState extends State<ListDetail> {
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop(); // 취소 버튼
-                          Common().showToastN(context, '취소하였습니다', 2);
                           emailController.clear();
                         },
                         style: ButtonStyle(
@@ -434,7 +432,7 @@ class _ListDetailState extends State<ListDetail> {
                   ? Row(
                       children: [
                         Icon(Icons.favorite, color: Colors.red),
-                        Text(" $heart"),
+                        Text(" ${(int.parse(heart)+1).toString()}"),
                       ],
                     )
                   : Row(
@@ -460,17 +458,19 @@ class _ListDetailState extends State<ListDetail> {
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.fromLTRB(0, 12.0, 12.0, 0),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: CustomColor.grey5, width: 1.5),
-                borderRadius: BorderRadius.circular(12.0)
-              ),
+            child: SizedBox(
               width: screenWidth / 3.5, // 화면 너비의 3분의 1 크기로 설정
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12.0),
-                child: CachedNetworkImage(
-                  imageUrl: urls[index],
-                  fit: BoxFit.cover,
+                child: Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: CustomColor.grey5, width: 1.5),
+                      borderRadius: BorderRadius.circular(12.0)
+                  ),
+                  child: CachedNetworkImage(
+                    imageUrl: urls[index],
+                    fit: BoxFit.fill,
+                  ),
                 ),
               ),
             ),

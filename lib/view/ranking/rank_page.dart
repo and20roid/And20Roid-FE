@@ -164,8 +164,10 @@ class _RankingContentState extends State<RankingContent> {
                                   rankList[1].interactionCountAsTester),
                               rankList[1].relatedUser,
                             )
-                          : trophy('2', '없음', '0', "assets/images/Vector-1.png",
-                              2, 0, false),
+                          : const SizedBox(
+                              height: 220,
+                              width: 120,
+                            ),
                       (rankList.length > 2)
                           ? trophy(
                               '3',
@@ -177,8 +179,19 @@ class _RankingContentState extends State<RankingContent> {
                                   rankList[2].interactionCountAsTester),
                               rankList[2].relatedUser,
                             )
-                          : trophy('3', '없음', '0', "assets/images/Vector-2.png",
-                              3, 0, false),
+                          : const SizedBox(
+                              height: 220,
+                              width: 120,
+                            )
+                      // trophy(
+                      //           '3',
+                      //           'nicknamsssssse',
+                      //           'toString()',
+                      //           "assets/images/Vector-2.png",
+                      //           3,
+                      //           3,
+                      //           true,
+                      //         ),
                     ],
                   ),
                 ),
@@ -274,7 +287,13 @@ class _RankingContentState extends State<RankingContent> {
       int userId, int helpEach, bool relatedUser) {
     return Container(
       height: 220,
+      width: 120,
       decoration: BoxDecoration(
+          border: (ranking == '1')
+              ? Border.all(color: CustomColor.goldStroke)
+              : (ranking == '2')
+                  ? Border.all(color: CustomColor.silverStroke)
+                  : Border.all(color: CustomColor.cooperStroke),
           borderRadius: BorderRadius.circular(8.0),
           color: relatedUser ? CustomColor.primary4 : CustomColor.white),
       child: InkWell(
@@ -296,11 +315,20 @@ class _RankingContentState extends State<RankingContent> {
                 height: 100,
                 child: Image.asset(imagePath),
               ),
+              Flexible(
+                child: Text(
+                  "$name",
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
               Text(
-                "$name\n$count회",
+                "$count회",
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
-              )
+              ),
             ],
           ),
         ),

@@ -10,6 +10,8 @@ class UploadGetx extends getx.GetxController {
   getx.Rx<File?> appIconImage = getx.Rx<File?>(null);
   List<File> appPhotoImage = [];
 
+  getx.RxInt totalFileSize = 0.obs;
+
   Future<void> uploadImages(
     String title,
     String introLine,
@@ -91,7 +93,7 @@ class UploadGetx extends getx.GetxController {
       int fileSize = await file.length();
       totalSize += fileSize;
     }
-
+    totalFileSize.value = totalSize;
     return totalSize;
   }
 }

@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../utility/common.dart';
+import 'notification_controller.dart';
 
 class NotificationContent extends StatelessWidget {
   List<Map<String, String>> notiData = [
@@ -10,6 +12,7 @@ class NotificationContent extends StatelessWidget {
     {'type': 'start', 'title': '{글 제목} 테스트가 시작됐어요', 'image': 'https://and20roid-s3-bucket.s3.ap-northeast-2.amazonaws.com/0252baf4-dafe-4656-8f35-f8619d950092.jpeg', 'title': 'title', 'introLine': 'introLine'},
     {'type': 'end', 'title': '{글 제목} 테스트가 종료되었어요.', 'image': 'https://and20roid-s3-bucket.s3.ap-northeast-2.amazonaws.com/0252baf4-dafe-4656-8f35-f8619d950092.jpeg', 'title': 'title', 'introLine': 'introLine'},
   ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -175,6 +178,9 @@ Widget requestMsgBox(
 
 Widget joinMsgBox(
     String name, String thumbnailUrl, String title, String introLine) {
+
+  final noti = Get.find<NotiController>();
+
   return Padding(
     padding: const EdgeInsets.all(12.0),
     child: Column(children: [
@@ -239,7 +245,9 @@ Widget joinMsgBox(
                             ),
                           ),
                         ),
-                        onPressed: () async {},
+                        onPressed: () async {
+                          noti.requestUserTestNum();
+                        },
                         child: Text(
                           '글 보러가기',
                           style: TextStyle(

@@ -14,6 +14,13 @@ class CustomColor {
   static Color grey3 = const Color(0XFFACACAC);
   static Color grey4 = const Color(0XFF858585);
   static Color grey5 = const Color(0XFF1D1D1F);
+  static Color gold = const Color(0XFFFFF5BF);
+  static Color goldStroke = const Color(0XFFF1CB00);
+  static Color silver = const Color(0XFFECECEC);
+  static Color silverStroke = const Color(0XFFA3A3A3);
+  static Color cooper = const Color(0XFFFCE4CC);
+  static Color cooperStroke = const Color(0XFFCD7F32);
+
 }
 
 class Common {
