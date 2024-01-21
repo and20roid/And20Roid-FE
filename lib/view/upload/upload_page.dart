@@ -222,11 +222,12 @@ class UploadThird extends StatelessWidget {
 
 AppBar _appbar(title, isback) {
   return AppBar(
-    elevation: 0.2,
+    toolbarHeight: 80,
     backgroundColor: CustomColor.grey1,
     title: Text(
       title,
-      style: TextStyle(fontWeight: FontWeight.bold),
+      style: TextStyle(
+          color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
     ),
     automaticallyImplyLeading: isback,
   );

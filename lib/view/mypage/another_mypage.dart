@@ -276,7 +276,7 @@ AppBar _appBar() {
     backgroundColor: CustomColor.grey1,
     title: Text(
       "다른 테스터 정보",
-      style: TextStyle(fontSize: 18, color: CustomColor.grey5),
+      style: TextStyle(fontSize: 18, color: CustomColor.grey5,fontWeight: FontWeight.w500),
     ),
   );
 }

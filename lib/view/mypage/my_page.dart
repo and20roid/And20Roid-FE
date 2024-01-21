@@ -1,14 +1,15 @@
 import 'dart:convert';
 
+import 'package:and20roid/view/list/list_detail.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../model/list_detail.dart';
 import '../../model/mypage_tests.dart';
 import '../../utility/common.dart';
-import 'another_mypage.dart';
 
 class MyPageContent extends StatefulWidget {
   @override
@@ -99,7 +100,7 @@ class _MyPageContentState extends State<MyPageContent> {
 
           for (var jsonResult in jsonData) {
             MyUploadTest gather = MyUploadTest.fromJson(jsonResult);
-                        myPartiTest.add(gather);
+            myPartiTest.add(gather);
             print(gather);
           }
         }
@@ -124,33 +125,34 @@ class _MyPageContentState extends State<MyPageContent> {
         child: profileUrl == null
             ? CircularProgressIndicator()
             : Scaffold(
-                backgroundColor: CustomColor.grey1,
+            appBar: AppBar(
+              toolbarHeight: 80,
+              backgroundColor: CustomColor.grey1,
+              title: Row(
+                children: [
+                  ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: profileUrl!,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          Icon(Icons.error),
+                    ),
+                  ),
+                  Text(
+                    ' $name',
+                    style: const TextStyle(
+                        fontSize: 30, fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+            ),
+            backgroundColor: CustomColor.grey1,
                 body: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Row(
-                        children: [
-                          ClipOval(
-                            child: CachedNetworkImage(
-                              imageUrl: profileUrl!,
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(Icons.error),
-                            ),
-                          ),
-                          Text(
-                            ' $name',
-                            style: const TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      ),
-                    ),
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Row(
@@ -221,7 +223,15 @@ class _MyPageContentState extends State<MyPageContent> {
                                             itemCount: myUploadTest.length,
                                             itemBuilder: (context, index) {
                                               return joinMsgBox(
-                                                  myUploadTest[index].thumbnailUrl,myUploadTest[index].title,myUploadTest[index].introLine,myUploadTest[index].recruitmentNum,myUploadTest[index].participantNum);
+                                                  myUploadTest[index].id,
+                                                  myUploadTest[index]
+                                                      .thumbnailUrl,
+                                                  myUploadTest[index].title,
+                                                  myUploadTest[index].introLine,
+                                                  myUploadTest[index]
+                                                      .recruitmentNum,
+                                                  myUploadTest[index]
+                                                      .participantNum);
                                             }),
                                     myPartiTest.isEmpty
                                         ? const Center(
@@ -231,7 +241,15 @@ class _MyPageContentState extends State<MyPageContent> {
                                             itemCount: myPartiTest.length,
                                             itemBuilder: (context, index) {
                                               return joinMsgBox(
-                                                  myPartiTest[index].thumbnailUrl,myPartiTest[index].title,myPartiTest[index].introLine,myPartiTest[index].recruitmentNum,myPartiTest[index].participantNum);
+                                                  myPartiTest[index].id,
+                                                  myPartiTest[index]
+                                                      .thumbnailUrl,
+                                                  myPartiTest[index].title,
+                                                  myPartiTest[index].introLine,
+                                                  myPartiTest[index]
+                                                      .recruitmentNum,
+                                                  myPartiTest[index]
+                                                      .participantNum);
                                             }),
                                   ],
                                 ),
@@ -321,7 +339,39 @@ ElevatedButton CustomButton() {
   );
 }
 
-Widget joinMsgBox(String thumbnailUrl, String title, String introLine,int pariNum, int recruNum) {
+Widget joinMsgBox(int id, String thumbnailUrl, String title, String introLine,
+    int pariNum, int recruNum) {
+
+  late ListDetailInfo listDetailInfo;
+
+  Future<void> requestRecruitingDetail(id) async {
+    try {
+      String url = "${Common.url}boards/${id}";
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      var data = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+      );
+
+      if (data.statusCode == 200) {
+        if (data.body.isNotEmpty) {
+          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
+          listDetailInfo = ListDetailInfo.fromJson(jsonResults);
+        }
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   return Padding(
     padding: const EdgeInsets.all(12.0),
     child: Column(children: [

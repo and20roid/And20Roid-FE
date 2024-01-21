@@ -8,10 +8,7 @@ import '../../utility/common.dart';
 
 class NotiController extends GetxController {
   RxInt alarmCount = 0.obs;
-  List<NotificationList> notiRequestList = [];
-  List<NotificationList> notiJoinList = [];
-  List<NotificationList> notiStartList = [];
-  List<NotificationList> notiEndList = [];
+  List<NotificationList> notiData = [];
 
   Future<void> requestUserTestNum() async {
     try {
@@ -35,15 +32,7 @@ class NotiController extends GetxController {
           print('------------------fcmMessageResponses Start--------------------, ${jsonData.length}');
           for (int i = 0; i < jsonData.length; i++) {
             print(jsonData[i]);
-            if(jsonData[i]['type'] == 'request'){
-              notiRequestList.add(NotificationList.fromJson(jsonData[i]));
-            }else if(jsonData[i]['type'] == 'join'){
-              notiJoinList.add(NotificationList.fromJson(jsonData[i]));
-            }else if(jsonData[i]['type'] == 'start'){
-              notiStartList.add(NotificationList.fromJson(jsonData[i]));
-            }else if(jsonData[i]['type'] == 'end'){
-              notiEndList.add(NotificationList.fromJson(jsonData[i]));
-            }
+            notiData.add(NotificationList.fromJson(jsonData[i]));
           }
           print('------------------fcmMessageResponses End--------------------');
 
@@ -56,4 +45,11 @@ class NotiController extends GetxController {
       print('Error: $e');
     }
   }
+
+  @override
+  void onInit() {
+    requestUserTestNum();
+    super.onInit();
+  }
+
 }

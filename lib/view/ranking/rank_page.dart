@@ -125,20 +125,10 @@ class _RankingContentState extends State<RankingContent> {
             child: CircularProgressIndicator(),
           )
         : Scaffold(
+            appBar: _appBar(),
             backgroundColor: CustomColor.grey1,
             body: Column(
               children: [
-                const Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(20, 28, 0, 16.0),
-                      child: Text('랭킹',
-                          style: TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.bold)),
-                    ),
-                    Spacer()
-                  ],
-                ),
                 Container(
                   height: MediaQuery.of(context).size.height * 0.3,
                   child: Row(
@@ -332,6 +322,18 @@ class _RankingContentState extends State<RankingContent> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  AppBar _appBar() {
+    return AppBar(
+      toolbarHeight: 80,
+      backgroundColor: CustomColor.grey1,
+      title: const Text(
+        "랭킹",
+        style: TextStyle(
+            color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
       ),
     );
   }
