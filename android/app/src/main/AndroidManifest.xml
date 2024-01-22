@@ -6,7 +6,7 @@
         android:value="com.google.firebase.components.ComponentRegistrar" />
     <!-- ... other Firebase services -->
     <application
-        android:label="and20roid"
+        android:label="안단테"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

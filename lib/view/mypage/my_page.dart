@@ -23,17 +23,50 @@ class _MyPageContentState extends State<MyPageContent> {
   String? profileUrl;
   int lastBoardId = 0;
   int partilastBoardId = 0;
+  int completedTestCount = 0;
+  int uploadBoardCount = 0;
 
   List<MyUploadTest> myUploadTest = [];
   List<MyUploadTest> myPartiTest = [];
 
-  Future<void> _getUserName() async {
+  Future<void> getUserName() async {
     name = await sharedPreferences.getUserNick();
     profileUrl = await sharedPreferences.getUserProfile();
     await requestMyUploadTest();
     await requestMyParticipantTest();
+    await requestMyInfo();
     setState(() {});
   }
+
+  Future<void> requestMyInfo() async {
+    try {
+      String url = "${Common.url}users";
+      String? bearerToken =
+      await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      var data = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+      );
+
+      if (data.statusCode == 200) {
+        if (data.body.isNotEmpty) {
+          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
+          completedTestCount = jsonResults['completedTestCount'];
+          uploadBoardCount = jsonResults['uploadBoardCount'];
+        }
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
 
   Future<void> requestMyUploadTest() async {
     try {
@@ -115,7 +148,7 @@ class _MyPageContentState extends State<MyPageContent> {
 
   @override
   void initState() {
-    _getUserName();
+    getUserName();
     super.initState();
   }
 
@@ -158,21 +191,21 @@ class _MyPageContentState extends State<MyPageContent> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
+                          // Expanded(
+                          //     child: testInfo(" 랭킹", '100등',
+                          //         'assets/icons/trophyIcon.png')),
+                          // const SizedBox(
+                          //   width: 10,
+                          // ),
                           Expanded(
-                              child: testInfo(" 랭킹", '100등',
-                                  'assets/icons/trophyIcon.png')),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                              child: testInfo(" 게시물", '200P',
-                                  'assets/icons/pointIcon.png')),
+                              child: testInfo(" 완료한 테스트 수", completedTestCount.toString(),
+                                  Icons.done)),
                           const SizedBox(
                             width: 10,
                           ),
                           Expanded(
                               child: testInfo(
-                                  " 참여수", '200P', 'assets/icons/pointIcon.png'))
+                                  " 참여한 테스트 수", uploadBoardCount.toString(), Icons.install_mobile_outlined))
                         ],
                       ),
                     ),
@@ -263,7 +296,7 @@ class _MyPageContentState extends State<MyPageContent> {
                 )));
   }
 
-  Widget testInfo(String title, String num, String iconPath) {
+  Widget testInfo(String title, String num, IconData icon) {
     return Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0), color: Colors.white),
@@ -275,9 +308,9 @@ class _MyPageContentState extends State<MyPageContent> {
               padding: const EdgeInsets.all(12.0),
               child: Row(
                 children: [
-                  Image.asset(iconPath),
+                  Icon(icon),
                   Text(
-                    title,
+                    '$title',
                     style: TextStyle(fontWeight: FontWeight.w400, fontSize: 16),
                   ),
                 ],
@@ -286,7 +319,7 @@ class _MyPageContentState extends State<MyPageContent> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
-                num,
+                "$num회",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
               ),
             ),

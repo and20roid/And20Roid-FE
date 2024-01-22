@@ -92,18 +92,20 @@ class _ListContentState extends State<ListContent> {
             return InkWell(
               onTap: () {
                 print(gatherListItems[index].id);
-                Get.to(() => ListDetail(
-                      intValue: gatherListItems[index].id,
-                      title: gatherListItems[index].title,
-                      nickname: gatherListItems[index].nickname,
-                      createdDate: gatherListItems[index].createdDate,
-                      thumbnailUrl: gatherListItems[index].thumbnailUrl,
-                      likes: gatherListItems[index].likes,
-                      views: gatherListItems[index].views,
-                      urls: gatherListItems[index].imageUrls,
-                      introLine: gatherListItems[index].introLine,
-                      likedBoard: gatherListItems[index].likedBoard,
-                    ));
+                Get.to(
+                    () => ListDetail(
+                          intValue: gatherListItems[index].id,
+                          title: gatherListItems[index].title,
+                          nickname: gatherListItems[index].nickname,
+                          createdDate: gatherListItems[index].createdDate,
+                          thumbnailUrl: gatherListItems[index].thumbnailUrl,
+                          likes: gatherListItems[index].likes,
+                          views: gatherListItems[index].views,
+                          urls: gatherListItems[index].imageUrls,
+                          introLine: gatherListItems[index].introLine,
+                          likedBoard: gatherListItems[index].likedBoard,
+                        ),
+                    transition: Transition.leftToRight);
               },
               child: renderCard(
                 gatherListItems[index].participantNum.toString(),
@@ -125,82 +127,14 @@ class _ListContentState extends State<ListContent> {
   }
 
   AppBar _appBar() {
-    List<Widget> dropbox = [
-      Container(
-        width: 90,
-        padding: const EdgeInsets.all(12.0),
-        decoration: BoxDecoration(
-          border: Border.all(color: CustomColor.primary3),
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        child: Row(
-          children: [
-            Text(
-              "전체",
-              style: TextStyle(
-                color: CustomColor.primary3,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            SizedBox(width: 10, child: Image.asset("assets/icons/dropdown.png"))
-          ],
-        ),
-      ),
-      Container(
-        width: 110,
-        padding: const EdgeInsets.all(12.0),
-        decoration: BoxDecoration(
-          border: Border.all(color: CustomColor.primary3),
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        child: Row(
-          children: [
-            Text(
-              "모집 중",
-              style: TextStyle(
-                color: CustomColor.primary3,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            SizedBox(width: 10, child: Image.asset("assets/icons/dropdown.png"))
-          ],
-        ),
-      ),
-      Container(
-        width: 130,
-        padding: const EdgeInsets.all(12.0),
-        decoration: BoxDecoration(
-          border: Border.all(color: CustomColor.primary3),
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        child: Row(
-          children: [
-            Text(
-              "모집 완료",
-              style: TextStyle(
-                color: CustomColor.primary3,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            SizedBox(width: 10, child: Image.asset("assets/icons/dropdown.png"))
-          ],
-        ),
-      ),
-    ];
-
-    return AppBar(toolbarHeight: 80.0,backgroundColor: CustomColor.grey1, title: dropbox[0]);
+    return AppBar(
+        foregroundColor: CustomColor.grey1,
+        toolbarHeight: 80.0,
+        backgroundColor: CustomColor.grey1,
+        title: SizedBox(
+            width: 60,
+            height: 60,
+            child: Image.asset('assets/images/logoNoback.png')));
   }
 
   Card renderCard(
@@ -301,8 +235,7 @@ class _ListContentState extends State<ListContent> {
                 child: Container(
                   decoration: BoxDecoration(
                       border: Border.all(color: CustomColor.grey5, width: 1.5),
-                      borderRadius: BorderRadius.circular(12.0)
-                  ),
+                      borderRadius: BorderRadius.circular(12.0)),
                   child: CachedNetworkImage(
                     imageUrl: urls[index],
                     fit: BoxFit.fill,
@@ -310,7 +243,6 @@ class _ListContentState extends State<ListContent> {
                 ),
               ),
             ),
-
           );
         },
       ),

@@ -1,6 +1,8 @@
+import 'package:and20roid/utility/common.dart';
 import 'package:and20roid/view/list/list_page.dart';
 import 'package:and20roid/view/ranking/rank_page.dart';
 import 'package:and20roid/view/alarm/notification_page.dart';
+import 'package:and20roid/view/ranking/ranking_controller.dart';
 import 'package:and20roid/view/upload/upload_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -28,25 +30,26 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
           BottomNavigationBar(
             currentIndex: _currentIndex,
             type: BottomNavigationBarType.fixed,
-            items: [
+            selectedItemColor: CustomColor.grey5,
+            items: const [
               BottomNavigationBarItem(
-                icon: Image.asset("assets/icons/Vector.png"),
+                icon: Icon(Icons.home_outlined,size: 25,),
                 label: '홈',
               ),
               BottomNavigationBarItem(
-                icon: Image.asset("assets/icons/Vector-1.png"),
+                icon: Icon(Icons.emoji_events_outlined,size: 25,),
                 label: '랭킹',
               ),
               BottomNavigationBarItem(
-                icon: Image.asset("assets/icons/Vector-2.png"),
+                icon: Icon(Icons.add_box_outlined,size: 25,),
                 label: '업로드',
               ),
               BottomNavigationBarItem(
-                icon: Image.asset("assets/icons/Vector-3.png"),
+                icon: Icon(Icons.notifications_none_outlined,size: 25,),
                 label: '알림함',
               ),
               BottomNavigationBarItem(
-                icon: Image.asset("assets/icons/Vector-4.png"),
+                icon: Icon(Icons.person_outlined,size: 25,),
                 label: '내 정보',
               ),
             ],

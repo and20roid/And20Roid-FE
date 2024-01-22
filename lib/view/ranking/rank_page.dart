@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:and20roid/view/ranking/ranking_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,61 +10,10 @@ import '../../model/ranking_model.dart';
 import '../../utility/common.dart';
 import '../mypage/another_mypage.dart';
 
-class RankingContent extends StatefulWidget {
-  @override
-  State<RankingContent> createState() => _RankingContentState();
-}
-
-class _RankingContentState extends State<RankingContent> {
-  List<Rank> rankList = [];
-  List<Rank> dummyList = [
-    Rank(
-      rank: 1,
-      nickname: 'John Doe',
-      completedTestCount: 10,
-      userId: 1,
-      interactionCountAsTester: 5,
-      interactionCountAsUploader: 3,
-      relatedUser: true,
-    ),
-    Rank(
-      rank: 2,
-      nickname: 'John Doe',
-      completedTestCount: 10,
-      userId: 2,
-      interactionCountAsTester: 5,
-      interactionCountAsUploader: 3,
-      relatedUser: false,
-    ),
-    Rank(
-      rank: 3,
-      nickname: 'John Doe',
-      completedTestCount: 10,
-      userId: 3,
-      interactionCountAsTester: 5,
-      interactionCountAsUploader: 3,
-      relatedUser: true,
-    ),
-    Rank(
-      rank: 4,
-      nickname: 'John Doe',
-      completedTestCount: 10,
-      userId: 4,
-      interactionCountAsTester: 5,
-      interactionCountAsUploader: 3,
-      relatedUser: true,
-    ),
-    Rank(
-      rank: 5,
-      nickname: 'Kohn Doe',
-      completedTestCount: 8,
-      userId: 5,
-      interactionCountAsTester: 5,
-      interactionCountAsUploader: 3,
-      relatedUser: false,
-    ),
-  ];
-
+class RankingContent extends StatelessWidget {
+  
+  final rankCtrl = Get.find<RankingController>();
+  
   void movePage(
       String userName, int userId, String ranking, int helpEach, bool related) {
     Get.to(() => RequestTest(
@@ -71,56 +21,12 @@ class _RankingContentState extends State<RankingContent> {
         userId: userId,
         ranking: ranking,
         helpEach: helpEach,
-        related: related));
-  }
-
-  Future<void> requestTotalRanking() async {
-    try {
-      String url = "${Common.url}participation/ranking";
-      String? bearerToken =
-          await FirebaseAuth.instance.currentUser!.getIdToken();
-
-      var data = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $bearerToken',
-        },
-      );
-
-      if (data.statusCode == 200) {
-        if (data.body.isNotEmpty) {
-          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
-          var jsonData = jsonResults['rankInfos'];
-          for (var jsonResult in jsonData) {
-            print("ranking : $jsonResult");
-            Rank ranking = Rank.fromJson(jsonResult);
-            rankList.add(ranking);
-          }
-          setState(() {});
-        }
-      } else {
-        print("Status code: ${data.statusCode}");
-        print("Response body: ${data.body}");
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  @override
-  void initState() {
-    init();
-    super.initState();
-  }
-
-  init() async {
-    await requestTotalRanking();
+        related: related),transition: Transition.fadeIn);
   }
 
   @override
   Widget build(BuildContext context) {
-    return (rankList.isEmpty)
+    return (rankCtrl.rankList.isEmpty)
         ? Center(
             child: CircularProgressIndicator(),
           )
@@ -136,38 +42,38 @@ class _RankingContentState extends State<RankingContent> {
                     children: [
                       trophy(
                           '1',
-                          rankList.first.nickname,
-                          rankList.first.completedTestCount.toString(),
+                          rankCtrl.rankList.first.nickname,
+                          rankCtrl.rankList.first.completedTestCount.toString(),
                           "assets/images/Vector.png",
-                          rankList.first.userId,
-                          (rankList.first.interactionCountAsUploader +
-                              rankList.first.interactionCountAsTester),
-                          rankList.first.relatedUser),
-                      (rankList.length > 1)
+                          rankCtrl.rankList.first.userId,
+                          (rankCtrl.rankList.first.interactionCountAsUploader +
+                              rankCtrl.rankList.first.interactionCountAsTester),
+                          rankCtrl.rankList.first.relatedUser),
+                      (rankCtrl.rankList.length > 1)
                           ? trophy(
                               '2',
-                              rankList[1].nickname,
-                              rankList[1].completedTestCount.toString(),
+                              rankCtrl.rankList[1].nickname,
+                              rankCtrl.rankList[1].completedTestCount.toString(),
                               "assets/images/Vector-1.png",
-                              rankList[1].userId,
-                              (rankList[1].interactionCountAsUploader +
-                                  rankList[1].interactionCountAsTester),
-                              rankList[1].relatedUser,
+                              rankCtrl.rankList[1].userId,
+                              (rankCtrl.rankList[1].interactionCountAsUploader +
+                                  rankCtrl.rankList[1].interactionCountAsTester),
+                              rankCtrl.rankList[1].relatedUser,
                             )
                           : const SizedBox(
                               height: 220,
                               width: 120,
                             ),
-                      (rankList.length > 2)
+                      (rankCtrl.rankList.length > 2)
                           ? trophy(
                               '3',
-                              rankList[2].nickname,
-                              rankList[2].completedTestCount.toString(),
+                              rankCtrl.rankList[2].nickname,
+                              rankCtrl.rankList[2].completedTestCount.toString(),
                               "assets/images/Vector-2.png",
-                              rankList[2].userId,
-                              (rankList[2].interactionCountAsUploader +
-                                  rankList[2].interactionCountAsTester),
-                              rankList[2].relatedUser,
+                              rankCtrl.rankList[2].userId,
+                              (rankCtrl.rankList[2].interactionCountAsUploader +
+                                  rankCtrl.rankList[2].interactionCountAsTester),
+                              rankCtrl.rankList[2].relatedUser,
                             )
                           : const SizedBox(
                               height: 220,
@@ -203,7 +109,7 @@ class _RankingContentState extends State<RankingContent> {
                     itemBuilder: (context, index) {
                       // 4등부터의 데이터를 가져옴
                       Map<String, dynamic> playerData =
-                          rankList[index + 3] as Map<String, dynamic>;
+                          rankCtrl.rankList[index + 3] as Map<String, dynamic>;
                       String playerName = playerData['nickname'];
                       int ranking = playerData['rank'];
                       int testCount = playerData['completedTestCount'];
@@ -265,7 +171,7 @@ class _RankingContentState extends State<RankingContent> {
                       );
                     },
                     // itemCount: dummyList.length > 3 ? dummyList.length - 3 : 0,
-                    itemCount: rankList.length > 3 ? rankList.length - 3 : 0,
+                    itemCount: rankCtrl.rankList.length > 3 ? rankCtrl.rankList.length - 3 : 0,
                   ),
                 ),
               ],

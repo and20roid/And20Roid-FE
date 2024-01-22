@@ -32,7 +32,7 @@ class UploadView extends StatelessWidget {
         child: GetBuilder<UploadFirstController>(
           init: UploadFirstController(), // GetBuilder로 컨트롤러 초기화
           builder: (controller) {
-            return _body(controller);
+            return _body(controller,context);
           },
         ),
       ),
@@ -174,7 +174,7 @@ class _UploadSecondState extends State<UploadSecond> {
                   padding: const EdgeInsets.all(12.0),
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.to(() => UploadThird());
+                      Get.to(() => UploadThird(),transition: Transition.rightToLeftWithFade);
                     },
                     child: Text(
                       "다음",
@@ -233,10 +233,10 @@ AppBar _appbar(title, isback) {
   );
 }
 
-Column _body(UploadFirstController controller) {
+Column _body(UploadFirstController controller, BuildContext context) {
   return Column(
     children: [
-      CustomInputField("서비스 명", controller.titleController, "서비스의 이름을 입력해주세요"),
+      CustomInputField("서비스 명", controller.titleController, "서비스의 이름을 입력해 주세요"),
       CustomInputField(
           "한 줄 소개", controller.oneLineController, "20자 이내로 입력해주세요"),
       CustomInputField("모집인원", controller.recruitNumController, "20"),
@@ -246,7 +246,14 @@ Column _body(UploadFirstController controller) {
             padding: const EdgeInsets.all(12.0),
             child: ElevatedButton(
               onPressed: () {
-                Get.to(() => UploadSecond());
+                if(
+                controller.titleController.text.isEmpty ||controller.oneLineController.text.isEmpty ||controller.recruitNumController.text.isEmpty
+                ){
+                 Common().showToastN(context, "모든 정보를 입력해 주세요",1);
+                }
+                else{
+                  Get.to(() => UploadSecond(),transition: Transition.rightToLeftWithFade);
+                }
               },
               child: Text(
                 "다음",
@@ -334,7 +341,7 @@ Column _body3(UploadThirdController controller, context) {
           "서비스 소개", controller.contentController, "서비스를 자유롭게 소개해주세요"),
       Spacer(),
       Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.fromLTRB(12.0,12.0,12.0,36.0),
         child: ElevatedButton(
           onPressed: () async {
             File? appIconImageValue = total.appIconImage.value;

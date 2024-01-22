@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:and20roid/utility/common.dart';
 import 'package:and20roid/view/alarm/notification_controller.dart';
+import 'package:and20roid/view/alarm/notification_page.dart';
+import 'package:and20roid/view/ranking/ranking_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
@@ -18,6 +20,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await FirebaseMessaging.instance.getToken();
+  await initialization(null);
 
   runApp(const MyApp());
 }
@@ -31,8 +34,9 @@ class MyApp extends StatelessWidget {
     firebaseMessageSetting();
     firebaseMessageProc(context);
 
-    return const GetMaterialApp(
-      home: DirectingPage(),
+    return GetMaterialApp(
+      color: CustomColor.grey5,
+      home: const DirectingPage(),
     );
   }
 }
@@ -61,8 +65,7 @@ void firebaseMessageSetting() async {
     importance: Importance.max,
   );
 
-  var androidSetting =
-      const AndroidInitializationSettings('@drawable/ic_notification');
+  var androidSetting = const AndroidInitializationSettings('@drawable/appstore');
   var initializationSettings = InitializationSettings(android: androidSetting);
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -102,6 +105,7 @@ void firebaseMessageSetting() async {
 
 void firebaseMessageProc(context) {
   final notificationController = Get.put(NotiController());
+  final rankCtrl = Get.put(RankingController());
 
   ///알림 수신[앱 실행중]
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -175,14 +179,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 ///실행중 알림 수신 또는 알림 클릭을 통해 진입
 movePage(RemoteMessage message) async {
   print('-----------movePage 실행 mesage : $message');
-
-  // String clickAction = message.data['clickAction'];
-  // print('clickAction: $clickAction');
-  // Get.to(()=>NotificationContent());
-
-  // if(clickAction == "testRequest"){
-  //     Get.to(()=>NotificationContent());
-  // }
+  Get.to(()=>NotificationContent());
 }
 
 Future<void> deleteToken() async {
@@ -207,4 +204,8 @@ Future<void> deleteToken() async {
   } catch (e) {
     print('Error during token deletion: $e');
   }
+}
+
+Future initialization(BuildContext? context) async{
+  await Future.delayed(Duration(seconds: 3));
 }

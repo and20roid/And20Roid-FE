@@ -28,66 +28,111 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Container(
-          color: CustomColor.mainColor,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(30.0),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "And 20",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 150,
-              ),
-              Center(
-                child: Column(
-                  children: [
-                    const Text(
-                      "당신의 앱은 테스트가\n필요하니까",
-                      style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                      textAlign: TextAlign.left,
-                    ),
-                    const SizedBox(height: 100),
-                    ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          await signInWithGoogle();
-                        } catch (e) {
-                          print('Google Sign-In Error: $e');
-                        }
-                      },
-                      child: Text(
-                        "Sign up with Google",
-                        style: TextStyle(color: CustomColor.mainColor),
-                      ),
-                    ),
-                    const SizedBox(height: 200),
-                    Container(
-                      padding: EdgeInsets.all(20),
-                      alignment: Alignment.bottomRight,
-                      color: Colors.white,
-                      child: Image.asset(
-                        "assets/images/pngegg.png",
-                        width: 40,
-                        height: 40,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ],
+        backgroundColor: CustomColor.grey1,
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            logo(),
+            loginButton(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget loginButton() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: ElevatedButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(CustomColor.white),
+          minimumSize: MaterialStateProperty.all(Size(310, 56)),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              side: BorderSide(color: CustomColor.grey4),
+              borderRadius: BorderRadius.circular(12.0),
+            ),
           ),
+        ),
+        onPressed: () async {
+          try {
+            await signInWithGoogle();
+          } catch (e) {
+            Common().showToastN(context, e.toString(), 1);
+          }
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Image.asset('assets/images/googlelogo.png'),
+            const Text(
+              "구글 계정으로 로그인",
+              style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w400),
+            ),
+            Container(
+              width: 32,
+              height: 32,
+              color: Colors.transparent, // 배경 색을 투명하게 설정
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget logo() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          height: 140,
+          width: 140,
+          decoration: BoxDecoration(
+            color: CustomColor.white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Image.asset('assets/images/logo.png'),
+          ),
+        ),
+        slogan(),
+      ],
+    );
+  }
+
+  Widget slogan() {
+    return Padding(
+      padding: EdgeInsets.all(20.0),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(
+            fontSize: 24,
+            color: CustomColor.grey5,
+            fontWeight: FontWeight.w500,
+            height: 1.5,
+          ),
+          children: [
+            TextSpan(
+              text: '안',
+              style: TextStyle(color: CustomColor.primary1),
+            ),
+            TextSpan(text: '드로이드\n'),
+            TextSpan(
+              text: '단',
+              style: TextStyle(color: CustomColor.primary1),
+            ),
+            TextSpan(text: '숨에 20명\n'),
+            TextSpan(
+              text: '테',
+              style: TextStyle(color: CustomColor.primary1),
+            ),
+            TextSpan(text: '스터 모집'),
+          ],
         ),
       ),
     );
@@ -110,11 +155,10 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (data.statusCode == 200) {
-        if(data.body.isNotEmpty) {
+        if (data.body.isNotEmpty) {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
           print(jsonResults.toString());
           print(jsonEncode(jsonResults));
-
         }
 
         print("~~~~~~~Success sign up request");
@@ -141,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       String url = "${Common.url}users/tokens";
       String? bearerToken =
-      await FirebaseAuth.instance.currentUser!.getIdToken();
+          await FirebaseAuth.instance.currentUser!.getIdToken();
 
       Map<String, dynamic> body = {
         "token": token,
@@ -205,13 +249,13 @@ class _LoginPageState extends State<LoginPage> {
       sharedPreferences.setUserToken(_auth.currentUser!.uid);
       sharedPreferences.setUserNick(userNick);
 
-      sharedPreferences.getUserNick().then((value) => {
-      print("~~~~~~~~~~~저장된 유저 닉 : $value")
-      });
+      sharedPreferences
+          .getUserNick()
+          .then((value) => {print("~~~~~~~~~~~저장된 유저 닉 : $value")});
 
-      sharedPreferences.getUserToken().then((value) => {
-        print("~~~~~~~~~~~저장된 유저 token : $value")
-      });
+      sharedPreferences
+          .getUserToken()
+          .then((value) => {print("~~~~~~~~~~~저장된 유저 token : $value")});
 
       _auth.currentUser?.getIdToken().then((token) {
         print("firebase token : $token");
@@ -223,17 +267,13 @@ class _LoginPageState extends State<LoginPage> {
       //회원가입시 서버에 저장
       await requestSignup(uId, userNick);
 
-      if(_auth.currentUser != null)
-        {
-          _requestToken();
-          print("~~~~~~~~~null은 아니라서 넘어가유 ~");
-          Get.offAll(() => const BottomNavigatorPage());
-        }
-      else{
+      if (_auth.currentUser != null) {
+        _requestToken();
+        print("~~~~~~~~~null은 아니라서 넘어가유 ~");
+        Get.offAll(() => const BottomNavigatorPage());
+      } else {
         print("-----------------안넘어가유 ~");
       }
-
-
     } on FirebaseAuthException catch (e) {
       // FirebaseAuthException 예외 발생 시 처리
       print('Firebase Authentication Error: $e');
@@ -250,5 +290,4 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     super.dispose();
   }
-
 }
