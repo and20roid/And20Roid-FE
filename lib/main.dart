@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 bool kIsWeb = false;
 
 void init() async {
@@ -65,7 +66,8 @@ void firebaseMessageSetting() async {
     importance: Importance.max,
   );
 
-  var androidSetting = const AndroidInitializationSettings('@drawable/appstore');
+  var androidSetting =
+      const AndroidInitializationSettings('@drawable/appstore');
   var initializationSettings = InitializationSettings(android: androidSetting);
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -133,15 +135,12 @@ void firebaseMessageProc(context) {
         notificationController.alarmCount.value++;
 
         print('requestTest');
-
       } else if (msgAction == 'joinTest') {
         notificationController.alarmCount.value++;
         print('joinTest');
-
       } else if (msgAction == 'startTest') {
         notificationController.alarmCount.value++;
         print('startTest');
-
       } else if (msgAction == 'endTest') {
         notificationController.alarmCount.value++;
         print('endTest');
@@ -154,6 +153,8 @@ void firebaseMessageProc(context) {
     if (message.notification != null) {
       print(message.notification!.title);
       print(message.notification!.body);
+
+      Get.to(() => NotificationContent());
     }
   });
 
@@ -165,7 +166,7 @@ void firebaseMessageProc(context) {
       print(message.notification!.body);
 
       Future.delayed(const Duration(seconds: 5), () {
-        movePage(message);
+        Get.to(() => NotificationContent());
       });
     }
   });
@@ -176,22 +177,15 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 }
 
-///실행중 알림 수신 또는 알림 클릭을 통해 진입
-movePage(RemoteMessage message) async {
-  print('-----------movePage 실행 mesage : $message');
-  Get.to(()=>NotificationContent());
-}
-
 Future<void> deleteToken() async {
   final url = Uri.parse('${Common.url}users/tokens');
-  String? bearerToken =
-  await FirebaseAuth.instance.currentUser!.getIdToken();
+  String? bearerToken = await FirebaseAuth.instance.currentUser!.getIdToken();
   try {
     final response = await http.delete(
       url,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $bearerToken',  // 토큰을 헤더에 포함
+        'Authorization': 'Bearer $bearerToken', // 토큰을 헤더에 포함
       },
     );
 
@@ -206,6 +200,6 @@ Future<void> deleteToken() async {
   }
 }
 
-Future initialization(BuildContext? context) async{
-  await Future.delayed(Duration(seconds: 3));
+Future initialization(BuildContext? context) async {
+  await Future.delayed(const Duration(seconds: 2));
 }

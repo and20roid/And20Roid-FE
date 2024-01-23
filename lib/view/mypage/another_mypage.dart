@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../../model/another_page_list_my_tests.dart';
 import '../../model/user_model.dart';
 import '../../utility/common.dart';
 
@@ -34,6 +35,9 @@ class _RequestTestState extends State<RequestTest> {
   UserTestInfo? userTestInfo;
 
   List<MyUploadTest> myTestList = [];
+  List<MyListForRequest> myListForRequest = [];
+
+  int? lastBoardId;
 
   Future<void> requestUserTestNum() async {
     try {
@@ -68,6 +72,42 @@ class _RequestTestState extends State<RequestTest> {
     }
   }
 
+  Future<void> requestMyListForRequest() async {
+    try {
+      String url = "${Common.url}participation/invite/${widget.userId}";
+
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      Map<String, dynamic> queryParameters = {
+        if (lastBoardId != null) 'lastBoardId': lastBoardId.toString(),
+      };
+
+      var data = await http.get(
+        Uri.parse(url).replace(queryParameters: queryParameters),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+      );
+
+      if (data.statusCode == 200) {
+        if (data.body.isNotEmpty) {
+          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
+          var jsonData = jsonResults['readBoardWithInviteInfoResponses'];
+          for (var jd in jsonData) {
+            myListForRequest.add(MyListForRequest.fromJson(jd));
+          }
+        }
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   @override
   void initState() {
     init();
@@ -76,19 +116,20 @@ class _RequestTestState extends State<RequestTest> {
 
   init() async {
     await requestUserTestNum();
+    requestMyListForRequest();
   }
 
-  void _showMyTestListDialog(BuildContext context) {
+  void _showMyTestListDialog(
+      BuildContext context, List<MyListForRequest> myTestList) {
     const maxListLength = 400;
-    final calculatedHeight = 100 + myTestList.length.clamp(0, maxListLength) * 100;
+    final calculatedHeight =
+        100 + myTestList.length.clamp(0, maxListLength) * 100;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Theme(
-          data: ThemeData(
-              // ThemeData를 사용하여 DialogTheme을 수정
-              dialogBackgroundColor: Colors.white),
+          data: ThemeData(dialogBackgroundColor: Colors.white),
           child: Dialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
@@ -98,24 +139,32 @@ class _RequestTestState extends State<RequestTest> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Padding(
-                  padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 12),
+                  padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0),
                   child: Text(
-                    "어떤 테스트를 요청할까요?",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    "테스트 목록",
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Container(
-                    height: calculatedHeight.toDouble(),
-                    child: ListView.builder(
-                        itemCount: myTestList.length,
-                        itemBuilder: (context,index){
-                      return joinMsgBox(myTestList[index].thumbnailUrl, myTestList[index].title, myTestList[index].introLine, myTestList[index].participantNum, myTestList[index].recruitmentNum,context);
-                    }),
-                  )
-                )
+                    padding: const EdgeInsets.all(12.0),
+                    child: Container(
+                      height: calculatedHeight.toDouble(),
+                      child: ListView.builder(
+                          itemCount: myTestList.length,
+                          itemBuilder: (context, index) {
+                            return joinMsgBox(
+                                myTestList[index].thumbnailUrl,
+                                myTestList[index].title,
+                                myTestList[index].introLine,
+                                myTestList[index].participantNum,
+                                myTestList[index].recruitmentNum,
+                                context,
+                                widget.userId,
+                                myTestList[index].id
+                            );
+                          }),
+                    ))
               ],
             ),
           ),
@@ -180,7 +229,7 @@ class _RequestTestState extends State<RequestTest> {
                                       child: testInfo(
                                           " 테스트 수",
                                           '${userTestInfo!.uploadBoardCount.toString()}회',
-                                          'assets/icons/trophyIcon.png')),
+                                          'assets/icons/testing.png')),
                                   const SizedBox(
                                     width: 10,
                                   ),
@@ -202,7 +251,7 @@ class _RequestTestState extends State<RequestTest> {
                     padding: const EdgeInsets.all(16.0),
                     child: ElevatedButton(
                       onPressed: () {
-                        _showMyTestListDialog(context);
+                        _showMyTestListDialog(context, myListForRequest);
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: CustomColor.primary1,
@@ -276,13 +325,50 @@ AppBar _appBar() {
     backgroundColor: CustomColor.grey1,
     title: Text(
       "다른 테스터 정보",
-      style: TextStyle(fontSize: 18, color: CustomColor.grey5,fontWeight: FontWeight.w500),
+      style: TextStyle(
+          fontSize: 18, color: CustomColor.grey5, fontWeight: FontWeight.w500),
     ),
   );
 }
 
 Widget joinMsgBox(String thumbnailUrl, String title, String introLine,
-    int pariNum, int recruNum,BuildContext context) {
+    int pariNum, int recruNum, BuildContext context,int? userId, int boardId) {
+
+  String message = '요청이 완료됐습니다';
+
+  Future<bool> requestMyListRequest() async {
+    try {
+      String url = "${Common.url}participation/invite/${userId.toString()}";
+
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      var data = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+        body: jsonEncode({'boardId': boardId}),
+
+      );
+
+      if (data.statusCode == 200) {
+        return true;
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${utf8.decode(data.bodyBytes)}");
+
+        Map<String, dynamic> jsonResponse = jsonDecode(utf8.decode(data.bodyBytes));
+        message = jsonResponse['message'] ?? '';
+      }
+
+    } catch (e) {
+      print('Error: $e');
+    }
+    return false;
+  }
+
   return Padding(
     padding: const EdgeInsets.all(12.0),
     child: Column(children: [
@@ -337,20 +423,20 @@ Widget joinMsgBox(String thumbnailUrl, String title, String introLine,
                             ),
                           ),
                         ),
-                        onPressed: () {
-                          Common().showToastN(context, '요청이 완료됐습니다', 1);
+                        onPressed: () async{
+                          await requestMyListRequest();
+                          Common().showToastN(context, message, 1);
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset("assets/icons/email.png"),
-                            // 아이콘 색상 설정
                             const SizedBox(width: 8.0),
                             Text(
                               '테스트 요청하기',
                               style: TextStyle(
                                   color: CustomColor.grey5,
-                                  fontSize: 20,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w400),
                             ),
                           ],

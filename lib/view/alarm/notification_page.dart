@@ -1,13 +1,19 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../../model/list_detail.dart';
 import '../../model/noti_model.dart';
 import '../../utility/common.dart';
+import '../list/list_detail.dart';
 import 'notification_controller.dart';
 
 class NotificationContent extends StatelessWidget {
-
   final noti = Get.find<NotiController>();
 
   @override
@@ -16,23 +22,37 @@ class NotificationContent extends StatelessWidget {
       appBar: _appBar(),
       body: Container(
         color: CustomColor.grey1,
-        child: ListView.builder(
-          itemCount: noti.notiData.length,
-          itemBuilder: (context, index) {
-            NotificationList data = noti.notiData[index];
-            switch (data.type) {
-              case 'request':
-                return requestMsgBox(data.content, data.thumbnailUrl!, data.boardTitle!, data.introLine!);
-              case 'join':
-                return joinMsgBox(data.content, data.thumbnailUrl!, data.boardTitle!, data.introLine!);
-              case 'start':
-                return startMsgBox(data.content, data.thumbnailUrl!,data.boardTitle!, data.introLine!, data.appTestLink!, data.webTestLink!);
-              case 'end':
-                return endMsgBox(data.content, data.thumbnailUrl!, data.boardTitle!, data.introLine!,context);
-              default:
-                return Container(); // 예외 처리
-            }
-          },
+        child: SmartRefresher(
+          enablePullDown: true,
+          controller: noti.refreshController,
+          onRefresh: noti.requestUserTestNum,
+          child: ListView.builder(
+            itemCount: noti.notiData.length,
+            itemBuilder: (context, index) {
+              NotificationList data = noti.notiData[index];
+              switch (data.type) {
+                case 'request':
+                  return requestMsgBox(data.content, data.thumbnailUrl!,
+                      data.boardTitle!, data.introLine!, data.boardId!);
+                case 'join':
+                  return joinMsgBox(data.content, data.thumbnailUrl!,
+                      data.boardTitle!, data.introLine!, data.boardId!);
+                case 'start':
+                  return startMsgBox(
+                      data.content,
+                      data.thumbnailUrl!,
+                      data.boardTitle!,
+                      data.introLine!,
+                      data.appTestLink!,
+                      data.webTestLink!);
+                case 'end':
+                  return endMsgBox(data.content, data.thumbnailUrl!,
+                      data.boardTitle!, data.introLine!, context);
+                default:
+                  return Container(); // 예외 처리
+              }
+            },
+          ),
         ),
       ),
     );
@@ -51,8 +71,52 @@ class NotificationContent extends StatelessWidget {
   }
 }
 
-Widget requestMsgBox(
-    String name, String thumbnailUrl, String title, String introLine) {
+Widget requestMsgBox(String name, String thumbnailUrl, String title,
+    String introLine, int boardId) {
+  ListDetailInfo listDetailInfo;
+
+  Future<ListDetailInfo> requestRecruitingDetail(id) async {
+    try {
+      String url = "${Common.url}boards/${id}";
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      var data = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+      );
+
+      if (data.statusCode == 200) {
+        if (data.body.isNotEmpty) {
+          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
+
+          listDetailInfo = ListDetailInfo.fromJson(jsonResults);
+
+          return listDetailInfo;
+        }
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+
+    return ListDetailInfo(
+        content: 'content',
+        appTestLink: 'appTestLink',
+        webTestLink: 'webTestLink',
+        participantNum: 0,
+        imageUrls: ['imageUrls'],
+        nickName: 'nickName',
+        views: 0,
+        likes: 0,
+        likedBoard: false);
+  }
+
   return Padding(
     padding: const EdgeInsets.all(12.0),
     child: Column(children: [
@@ -66,7 +130,9 @@ Widget requestMsgBox(
               fontWeight: FontWeight.w400),
         )
       ]),
-      const SizedBox(height: 8,),
+      const SizedBox(
+        height: 8,
+      ),
       Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -119,11 +185,27 @@ Widget requestMsgBox(
                             ),
                           ),
                         ),
-                        onPressed: () async {},
+                        onPressed: () async {
+                          await requestRecruitingDetail(boardId)
+                              .then((listDetailInfo) {
+                            Get.to(() => ListDetail(
+                                intValue: boardId,
+                                title: title,
+                                nickname: listDetailInfo.nickName,
+                                createdDate: 'createdDate',
+                                thumbnailUrl: thumbnailUrl,
+                                likes: listDetailInfo.likes,
+                                views: listDetailInfo.views,
+                                urls: listDetailInfo.imageUrls,
+                                introLine: introLine,
+                                likedBoard: listDetailInfo.likedBoard));
+                          });
+                        },
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.list_alt_outlined, color: CustomColor.grey5),
+                            Icon(Icons.list_alt_outlined,
+                                color: CustomColor.grey5),
                             const SizedBox(
                               width: 5,
                             ),
@@ -150,8 +232,50 @@ Widget requestMsgBox(
 }
 
 Widget joinMsgBox(
-    String name, String thumbnailUrl, String title, String introLine) {
+    String name, String thumbnailUrl, String title, String introLine, int boardId) {
+  ListDetailInfo listDetailInfo;
 
+  Future<ListDetailInfo> requestRecruitingDetail(id) async {
+    try {
+      String url = "${Common.url}boards/${id}";
+      String? bearerToken =
+      await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      var data = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+      );
+
+      if (data.statusCode == 200) {
+        if (data.body.isNotEmpty) {
+          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
+
+          listDetailInfo = ListDetailInfo.fromJson(jsonResults);
+
+          return listDetailInfo;
+        }
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+
+    return ListDetailInfo(
+        content: 'content',
+        appTestLink: 'appTestLink',
+        webTestLink: 'webTestLink',
+        participantNum: 0,
+        imageUrls: ['imageUrls'],
+        nickName: 'nickName',
+        views: 0,
+        likes: 0,
+        likedBoard: false);
+  }
   return Padding(
     padding: const EdgeInsets.all(12.0),
     child: Column(children: [
@@ -165,8 +289,9 @@ Widget joinMsgBox(
               fontWeight: FontWeight.w400),
         )
       ]),
-      const SizedBox(height: 8,),
-
+      const SizedBox(
+        height: 8,
+      ),
       Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -218,11 +343,27 @@ Widget joinMsgBox(
                             ),
                           ),
                         ),
-                        onPressed: () async {},
+                        onPressed: () async {
+                          await requestRecruitingDetail(boardId)
+                              .then((listDetailInfo) {
+                            Get.to(() => ListDetail(
+                                intValue: boardId,
+                                title: title,
+                                nickname: listDetailInfo.nickName,
+                                createdDate: 'createdDate',
+                                thumbnailUrl: thumbnailUrl,
+                                likes: listDetailInfo.likes,
+                                views: listDetailInfo.views,
+                                urls: listDetailInfo.imageUrls,
+                                introLine: introLine,
+                                likedBoard: listDetailInfo.likedBoard));
+                          });
+                        },
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.list_alt_outlined, color: CustomColor.grey5),
+                            Icon(Icons.list_alt_outlined,
+                                color: CustomColor.grey5),
                             const SizedBox(
                               width: 5,
                             ),
@@ -248,13 +389,15 @@ Widget joinMsgBox(
   );
 }
 
-Widget startMsgBox(
-    String name, String thumbnailUrl, String title, String introLine , String appLink, String webLink) {
+Widget startMsgBox(String name, String thumbnailUrl, String title,
+    String introLine, String appLink, String webLink) {
   return Padding(
     padding: const EdgeInsets.all(12.0),
     child: Column(children: [
       Row(children: [
-        Icon(Icons.play_arrow_outlined,),
+        Icon(
+          Icons.play_arrow_outlined,
+        ),
         Text(
           ' $name',
           style: TextStyle(
@@ -263,8 +406,9 @@ Widget startMsgBox(
               fontWeight: FontWeight.w400),
         )
       ]),
-      const SizedBox(height: 8,),
-
+      const SizedBox(
+        height: 8,
+      ),
       Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -301,14 +445,17 @@ Widget startMsgBox(
                   )
                 ],
               ),
-              const SizedBox(height: 10,),
+              const SizedBox(
+                height: 10,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Expanded(
                     child: TextButton(
-                      style:ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(CustomColor.primary1),
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(CustomColor.primary1),
                         shape: MaterialStateProperty.all(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
@@ -349,7 +496,8 @@ Widget startMsgBox(
                         shape: MaterialStateProperty.all(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
-                            side: BorderSide(color: CustomColor.primary1), // 여기에 테두리 색 지정
+                            side: BorderSide(
+                                color: CustomColor.primary1), // 여기에 테두리 색 지정
                           ),
                         ),
                       ),
@@ -386,8 +534,8 @@ Widget startMsgBox(
   );
 }
 
-Widget endMsgBox(
-    String name, String thumbnailUrl, String title, String introLine, BuildContext context) {
+Widget endMsgBox(String name, String thumbnailUrl, String title,
+    String introLine, BuildContext context) {
   return Padding(
     padding: const EdgeInsets.all(12.0),
     child: Column(children: [
@@ -401,7 +549,9 @@ Widget endMsgBox(
               fontWeight: FontWeight.w400),
         )
       ]),
-      const SizedBox(height: 8,),
+      const SizedBox(
+        height: 8,
+      ),
       Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -446,7 +596,7 @@ Widget endMsgBox(
                       child: TextButton(
                         style: ButtonStyle(
                           backgroundColor:
-                          MaterialStateProperty.all(CustomColor.primary2),
+                              MaterialStateProperty.all(CustomColor.primary2),
                           shape: MaterialStateProperty.all(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
@@ -454,7 +604,7 @@ Widget endMsgBox(
                           ),
                         ),
                         onPressed: () {
-                          Common().showToastN(context,'테스트가 완료되었습니다!',1);
+                          Common().showToastN(context, '테스트가 완료되었습니다!', 1);
                         },
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -480,7 +630,8 @@ Widget endMsgBox(
                     ),
                   ],
                 ),
-              )            ],
+              )
+            ],
           ),
         ),
       )

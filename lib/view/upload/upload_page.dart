@@ -347,7 +347,7 @@ Column _body3(UploadThirdController controller, context) {
             File? appIconImageValue = total.appIconImage.value;
             int totalSize = await total.calculateTotalSize(total.appPhotoImage);
             if (appIconImageValue != null){
-              if(totalSize < 15 * 1024 * 1024){
+              if(totalSize < 15 * 1024 * 1024 && totalSize > 0){
                 // appIconImageValue 사용 가능
                 total.uploadImages(
                   first.titleController.text,
@@ -359,6 +359,13 @@ Column _body3(UploadThirdController controller, context) {
                   third.webLinkController.text,
                   third.contentController.text,
                 );
+                Common().showToastN(context, '업로드 중 입니다', 4);
+                first.titleController.dispose();
+                first.oneLineController.dispose();
+                first.recruitNumController.dispose();
+                third.appLinkController.dispose();
+                third.webLinkController.dispose();
+                third.contentController.dispose();
                 Get.offAll(() => const BottomNavigatorPage());
               }else{
                 Common().showToastN(context, '사진 크기를 확인해 주세요', 1);

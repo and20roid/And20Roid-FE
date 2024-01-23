@@ -95,10 +95,7 @@ class _ListDetailState extends State<ListDetail> {
       if (data.statusCode == 200) {
         Common().showToastN(context,'이메일을 성공적으로 전송했습니다',1);
       } else {
-        // JSON 파싱
         Map<String, dynamic> parsedResponse = jsonDecode(utf8.decode(data.bodyBytes));
-
-        // "message" 필드 가져오기
         String message = parsedResponse['message'];
 
         if(data.statusCode == 400 ){
@@ -165,10 +162,10 @@ class _ListDetailState extends State<ListDetail> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Padding(
-                  padding: EdgeInsets.fromLTRB(20.0,20.0,20.0,12),
+                  padding: EdgeInsets.fromLTRB(20.0,20.0,20.0,10.0),
                   child: Text(
                     "이메일 전송하기",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 ),

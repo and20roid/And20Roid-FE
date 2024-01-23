@@ -4,11 +4,14 @@ import 'package:and20roid/model/noti_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../utility/common.dart';
 
 class NotiController extends GetxController {
   RxInt alarmCount = 0.obs;
   List<NotificationList> notiData = [];
+  final RefreshController refreshController =
+      RefreshController(initialRefresh: false);
 
   Future<void> requestUserTestNum() async {
     try {
@@ -29,13 +32,14 @@ class NotiController extends GetxController {
         if (data.body.isNotEmpty) {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
           var jsonData = jsonResults['fcmMessageResponses'];
-          print('------------------fcmMessageResponses Start--------------------, ${jsonData.length}');
+          print(
+              '------------------fcmMessageResponses Start--------------------, ${jsonData.length}');
           for (int i = 0; i < jsonData.length; i++) {
             print(jsonData[i]);
             notiData.add(NotificationList.fromJson(jsonData[i]));
           }
-          print('------------------fcmMessageResponses End--------------------');
-
+          print(
+              '------------------fcmMessageResponses End--------------------');
         }
       } else {
         print("Status code: ${data.statusCode}");
@@ -44,12 +48,12 @@ class NotiController extends GetxController {
     } catch (e) {
       print('Error: $e');
     }
-  }
+    refreshController.refreshCompleted();
+    }
 
   @override
   void onInit() {
     requestUserTestNum();
     super.onInit();
   }
-
 }

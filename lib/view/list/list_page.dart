@@ -21,7 +21,6 @@ class _ListContentState extends State<ListContent> {
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   int lastBoardId = 0;
-  bool isWaiting = true;
 
   init() async {
     await requestRecruitingList();
@@ -48,17 +47,18 @@ class _ListContentState extends State<ListContent> {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
           var jsonData = jsonResults['readBoardResponses'];
-
           for (var jsonResult in jsonData) {
             GatherList gatherList = GatherList.fromJson(jsonResult);
             gatherListItems.add(gatherList);
           }
 
-          lastBoardId += 10;
+          if(gatherListItems.length >= 10){
+            lastBoardId += 10;
+          }
+          print('$lastBoardId 번 째 게시글을 가져옴');
 
-          setState(() {
-            isWaiting = false;
-          });
+          setState(() {});
+
         }
       } else {
         print("Status code: ${data.statusCode}");

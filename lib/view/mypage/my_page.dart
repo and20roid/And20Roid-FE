@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:and20roid/model/partici_member.dart';
 import 'package:and20roid/view/list/list_detail.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../model/list_detail.dart';
 import '../../model/mypage_tests.dart';
@@ -18,6 +20,10 @@ class MyPageContent extends StatefulWidget {
 
 class _MyPageContentState extends State<MyPageContent> {
   final SaveSharedPreferences sharedPreferences = SaveSharedPreferences();
+  final RefreshController _refreshController1 =
+  RefreshController(initialRefresh: false);
+  final RefreshController _refreshController2 =
+  RefreshController(initialRefresh: false);
 
   String? name;
   String? profileUrl;
@@ -67,12 +73,11 @@ class _MyPageContentState extends State<MyPageContent> {
     }
   }
 
-
   Future<void> requestMyUploadTest() async {
     try {
       String url = "${Common.url}myPages/boards/upload";
       String? bearerToken =
-          await FirebaseAuth.instance.currentUser!.getIdToken();
+      await FirebaseAuth.instance.currentUser!.getIdToken();
 
       Map<String, dynamic> queryParameters = {
         'lastBoardId': lastBoardId.toString(),
@@ -90,13 +95,18 @@ class _MyPageContentState extends State<MyPageContent> {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
           var jsonData = jsonResults['readBoardResponses'];
-
+          myUploadTest.clear();
           for (var jsonResult in jsonData) {
+            print(jsonResult);
             MyUploadTest gather = MyUploadTest.fromJson(jsonResult);
             print(
                 '----------------------------업로드한 테스트 ------------------------');
+
             myUploadTest.add(gather);
           }
+        }
+        if (myUploadTest.length > 9) {
+          lastBoardId += 10;
         }
       } else {
         print("Status code: ${data.statusCode}");
@@ -105,13 +115,15 @@ class _MyPageContentState extends State<MyPageContent> {
     } catch (e) {
       print('Error: $e');
     }
+    _refreshController1.refreshCompleted();
+    setState(() {});
   }
 
   Future<void> requestMyParticipantTest() async {
     try {
       String url = "${Common.url}myPages/boards/participation";
       String? bearerToken =
-          await FirebaseAuth.instance.currentUser!.getIdToken();
+      await FirebaseAuth.instance.currentUser!.getIdToken();
 
       Map<String, dynamic> queryParameters = {
         'lastBoardId': partilastBoardId.toString(),
@@ -129,12 +141,13 @@ class _MyPageContentState extends State<MyPageContent> {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
           var jsonData = jsonResults['readBoardResponses'];
-          print('----------------------------참여한 테스트 ------------------------');
-
+          myPartiTest.clear();
           for (var jsonResult in jsonData) {
             MyUploadTest gather = MyUploadTest.fromJson(jsonResult);
             myPartiTest.add(gather);
-            print(gather);
+          }
+          if (myPartiTest.length > 9) {
+            partilastBoardId += 10;
           }
         }
       } else {
@@ -144,6 +157,8 @@ class _MyPageContentState extends State<MyPageContent> {
     } catch (e) {
       print('Error: $e');
     }
+    _refreshController2.refreshCompleted();
+    setState(() {});
   }
 
   @override
@@ -182,118 +197,148 @@ class _MyPageContentState extends State<MyPageContent> {
                   )
                 ],
               ),
+              actions: [
+                IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.settings,
+                      size: 30,
+                    ))
+              ],
             ),
             backgroundColor: CustomColor.grey1,
-                body: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // Expanded(
-                          //     child: testInfo(" 랭킹", '100등',
-                          //         'assets/icons/trophyIcon.png')),
-                          // const SizedBox(
-                          //   width: 10,
-                          // ),
-                          Expanded(
-                              child: testInfo(" 완료한 테스트 수", completedTestCount.toString(),
-                                  Icons.done)),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                              child: testInfo(
-                                  " 참여한 테스트 수", uploadBoardCount.toString(), Icons.install_mobile_outlined))
-                        ],
+            body: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Expanded(
+                      //     child: testInfo(" 랭킹", '100등',
+                      //         'assets/icons/trophyIcon.png')),
+                      // const SizedBox(
+                      //   width: 10,
+                      // ),
+                      Expanded(
+                          child: testInfo(
+                              " 업로드한 테스트",
+                              uploadBoardCount.toString(),
+                              Icons.upload_file_outlined)),
+                      const SizedBox(
+                        width: 10,
                       ),
+                      Expanded(
+                          child: testInfo(" 완료한 테스트",
+                              completedTestCount.toString(), Icons.done)),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(30.0),
+                        topRight: Radius.circular(30.0),
+                      ),
+                      color: CustomColor.white,
                     ),
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(30.0),
-                            topRight: Radius.circular(30.0),
-                          ),
-                          color: CustomColor.white,
-                        ),
-                        child: DefaultTabController(
-                          length: 2,
-                          child: Column(
-                            children: [
-                              TabBar(
-                                indicatorColor: CustomColor.primary1,
-                                tabs: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Text(
-                                      '업로드한 테스트',
-                                      style: TextStyle(
-                                          color: CustomColor.grey4,
-                                          fontSize: 18),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Text(
-                                      '참여한 테스트',
-                                      style: TextStyle(
-                                          color: CustomColor.grey4,
-                                          fontSize: 18),
-                                    ),
-                                  ),
-                                ],
+                    child: DefaultTabController(
+                      length: 2,
+                      child: Column(
+                        children: [
+                          TabBar(
+                            indicatorColor: CustomColor.primary1,
+                            tabs: [
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(
+                                  '업로드한 테스트',
+                                  style: TextStyle(
+                                      color: CustomColor.grey4,
+                                      fontSize: 18),
+                                ),
                               ),
-                              Expanded(
-                                child: TabBarView(
-                                  children: [
-                                    myUploadTest.isEmpty
-                                        ? const Center(
-                                            child: Text("업로드한 테스트가 없어요"),
-                                          )
-                                        : ListView.builder(
-                                            itemCount: myUploadTest.length,
-                                            itemBuilder: (context, index) {
-                                              return joinMsgBox(
-                                                  myUploadTest[index].id,
-                                                  myUploadTest[index]
-                                                      .thumbnailUrl,
-                                                  myUploadTest[index].title,
-                                                  myUploadTest[index].introLine,
-                                                  myUploadTest[index]
-                                                      .recruitmentNum,
-                                                  myUploadTest[index]
-                                                      .participantNum);
-                                            }),
-                                    myPartiTest.isEmpty
-                                        ? const Center(
-                                            child: Text("참여한 테스트가 없어요"),
-                                          )
-                                        : ListView.builder(
-                                            itemCount: myPartiTest.length,
-                                            itemBuilder: (context, index) {
-                                              return joinMsgBox(
-                                                  myPartiTest[index].id,
-                                                  myPartiTest[index]
-                                                      .thumbnailUrl,
-                                                  myPartiTest[index].title,
-                                                  myPartiTest[index].introLine,
-                                                  myPartiTest[index]
-                                                      .recruitmentNum,
-                                                  myPartiTest[index]
-                                                      .participantNum);
-                                            }),
-                                  ],
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(
+                                  '참여한 테스트',
+                                  style: TextStyle(
+                                      color: CustomColor.grey4,
+                                      fontSize: 18),
                                 ),
                               ),
                             ],
                           ),
-                        ),
+                          Expanded(
+                            child: TabBarView(
+                              children: [
+                                myUploadTest.isEmpty
+                                    ? const Center(
+                                  child: Text("업로드한 테스트가 없어요"),
+                                )
+                                    : SmartRefresher(
+                                  controller: _refreshController1,
+                                  enablePullDown: true,
+                                  onRefresh: requestMyUploadTest,
+                                  child: ListView.builder(
+                                      itemCount: myUploadTest.length,
+                                      itemBuilder: (context, index) {
+                                        return joinMsgBox(
+                                            true,
+                                            myUploadTest[index].id,
+                                            myUploadTest[index]
+                                                .thumbnailUrl,
+                                            myUploadTest[index].title,
+                                            myUploadTest[index]
+                                                .introLine,
+                                            myUploadTest[index]
+                                                .recruitmentNum,
+                                            myUploadTest[index]
+                                                .participantNum,
+                                            myUploadTest[index]
+                                                .createdDate,
+                                            context);
+                                      }),
+                                ),
+                                myPartiTest.isEmpty
+                                    ? const Center(
+                                  child: Text("참여한 테스트가 없어요"),
+                                )
+                                    : SmartRefresher(
+                                  controller: _refreshController2,
+                                  enablePullDown: true,
+                                  onRefresh: requestMyParticipantTest,
+                                  child: ListView.builder(
+                                      itemCount: myPartiTest.length,
+                                      itemBuilder: (context, index) {
+                                        return joinMsgBox(
+                                            false,
+                                            myPartiTest[index].id,
+                                            myPartiTest[index]
+                                                .thumbnailUrl,
+                                            myPartiTest[index].title,
+                                            myPartiTest[index]
+                                                .introLine,
+                                            myPartiTest[index]
+                                                .recruitmentNum,
+                                            myPartiTest[index]
+                                                .participantNum,
+                                            myPartiTest[index]
+                                                .createdDate,
+                                            context);
+                                      }),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    )
-                  ],
-                )));
+                    ),
+                  ),
+                )
+              ],
+            )));
   }
 
   Widget testInfo(String title, String num, IconData icon) {
@@ -372,16 +417,23 @@ ElevatedButton CustomButton() {
   );
 }
 
-Widget joinMsgBox(int id, String thumbnailUrl, String title, String introLine,
-    int pariNum, int recruNum) {
+Widget joinMsgBox(bool isUp,
+    int id,
+    String thumbnailUrl,
+    String title,
+    String introLine,
+    int pariNum,
+    int recruNum,
+    String createdDate,
+    BuildContext context) {
+  ListDetailInfo listDetailInfo;
+  List<PartiMember> partiMemberList = [];
 
-  late ListDetailInfo listDetailInfo;
-
-  Future<void> requestRecruitingDetail(id) async {
+  Future<ListDetailInfo> requestRecruitingDetail(id) async {
     try {
       String url = "${Common.url}boards/${id}";
-      String? bearerToken =
-          await FirebaseAuth.instance.currentUser!.getIdToken();
+      String? bearerToken = await FirebaseAuth.instance.currentUser!
+          .getIdToken();
 
       var data = await http.get(
         Uri.parse(url),
@@ -394,7 +446,56 @@ Widget joinMsgBox(int id, String thumbnailUrl, String title, String introLine,
       if (data.statusCode == 200) {
         if (data.body.isNotEmpty) {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
+
+
           listDetailInfo = ListDetailInfo.fromJson(jsonResults);
+
+          return listDetailInfo;
+        }
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+
+    return ListDetailInfo(content: 'content',
+        appTestLink: 'appTestLink',
+        webTestLink: 'webTestLink',
+        participantNum: 0,
+        imageUrls: ['imageUrls'],
+        nickName: 'nickName',
+        views: 0,
+        likes: 0,
+        likedBoard : false
+    );
+  }
+
+
+  Future<void> requestSeeMozipOne(id) async {
+    try {
+      String url = "${Common.url}participation/$id/participants";
+      String? bearerToken =
+      await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      var data = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+      );
+
+      if (data.statusCode == 200) {
+        if (data.body.isNotEmpty) {
+          partiMemberList.clear();
+          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
+          var jsonData = jsonResults['readParticipantResponses'];
+          for (int i = 0; i < jsonData.length; i++) {
+            partiMemberList.add(PartiMember.fromJson(jsonData[i]));
+            print(jsonData[i]);
+          }
         }
       } else {
         print("Status code: ${data.statusCode}");
@@ -404,6 +505,47 @@ Widget joinMsgBox(int id, String thumbnailUrl, String title, String introLine,
       print('Error: $e');
     }
   }
+
+  void showBottomModalSheet(context, partiMemberList) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Set to true for full width
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery
+                .of(context)
+                .viewInsets
+                .bottom,
+          ),
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: partiMemberList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      leading: Text(partiMemberList[index].userId.toString()),
+                      title: Text(partiMemberList[index].email),
+
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 
   return Padding(
     padding: const EdgeInsets.all(12.0),
@@ -431,6 +573,7 @@ Widget joinMsgBox(int id, String thumbnailUrl, String title, String introLine,
                               color: CustomColor.grey5,
                               fontSize: 18,
                               fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           introLine,
@@ -438,10 +581,41 @@ Widget joinMsgBox(int id, String thumbnailUrl, String title, String introLine,
                               color: CustomColor.grey5,
                               fontSize: 15,
                               fontWeight: FontWeight.w400),
+                          overflow: TextOverflow.ellipsis,
                         )
                       ],
                     ),
+                  ),
+                  isUp ? Spacer() : Container(),
+                  isUp
+                      ? InkWell(
+                    onTap: () async {
+                      await requestSeeMozipOne(id);
+                      showBottomModalSheet(context, partiMemberList);
+                    },
+                    child: Container(
+                      height: 28,
+                      width: 67,
+                      padding: const EdgeInsets.only(left: 3),
+                      child: Center(
+                        child: Row(
+                          children: [
+                            Icon(Icons.people),
+                            Text(
+                              " $recruNum/$pariNum",
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                      decoration: BoxDecoration(
+                          color: CustomColor.primary1,
+                          borderRadius: BorderRadius.circular(8.0)),
+                    ),
                   )
+                      : Container()
                 ],
               ),
               Padding(
@@ -452,19 +626,35 @@ Widget joinMsgBox(int id, String thumbnailUrl, String title, String introLine,
                       child: TextButton(
                         style: ButtonStyle(
                           backgroundColor:
-                              MaterialStateProperty.all(CustomColor.primary1),
+                          MaterialStateProperty.all(CustomColor.primary1),
                           shape: MaterialStateProperty.all(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () async {
+                          await requestRecruitingDetail(id).then((listDetailInfo){
+                            Get.to(() =>
+                                ListDetail(
+                                    intValue: id,
+                                    title: title,
+                                    nickname: listDetailInfo.nickName,
+                                    createdDate: createdDate,
+                                    thumbnailUrl: thumbnailUrl,
+                                    likes: listDetailInfo.likes,
+                                    views: listDetailInfo.views,
+                                    urls: listDetailInfo.imageUrls,
+                                    introLine: introLine,
+                                    likedBoard: listDetailInfo.likedBoard));
+                          });
+
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Image.asset("assets/icons/email.png"),
-                            // 아이콘 색상 설정
+                            Icon(Icons.list_alt_outlined,
+                                color: CustomColor.grey5),
                             const SizedBox(width: 8.0),
                             Text(
                               '글 보러가기',
