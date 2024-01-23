@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:and20roid/utility/common.dart';
 import 'package:dio/dio.dart' show MultipartFile, FormData, Options, Dio;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart' as getx;
 import 'package:http_parser/http_parser.dart';
 
@@ -11,6 +12,8 @@ class UploadGetx extends getx.GetxController {
   List<File> appPhotoImage = [];
 
   getx.RxInt totalFileSize = 0.obs;
+  final GlobalKey<FormState> uploadFormKey1 = GlobalKey<FormState>();
+  final GlobalKey<FormState> uploadFormKey2 = GlobalKey<FormState>();
 
   Future<void> uploadImages(
     String title,

@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'bottom_navigator.dart';
 import 'direct_page.dart';
 
 Future<void> main() async {
@@ -130,18 +131,16 @@ void firebaseMessageProc(context) {
 
     if (!kIsWeb && message.data["clickAction"] != null) {
       String msgAction = message.data["clickAction"].toString();
-      print("Action: ${message.data["clickAction"].toString()}");
-      if (msgAction == 'requestTest') {
+      if (msgAction == 'request') {
         notificationController.alarmCount.value++;
-
         print('requestTest');
-      } else if (msgAction == 'joinTest') {
+      } else if (msgAction == 'join') {
         notificationController.alarmCount.value++;
         print('joinTest');
-      } else if (msgAction == 'startTest') {
+      } else if (msgAction == 'start') {
         notificationController.alarmCount.value++;
         print('startTest');
-      } else if (msgAction == 'endTest') {
+      } else if (msgAction == 'endUploader') {
         notificationController.alarmCount.value++;
         print('endTest');
       }
@@ -162,11 +161,9 @@ void firebaseMessageProc(context) {
   FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
     print("message from 앱이 완전히 종료된 상태");
     if (message != null && message.notification != null) {
-      print(message.notification!.title);
-      print(message.notification!.body);
-
-      Future.delayed(const Duration(seconds: 5), () {
-        Get.to(() => NotificationContent());
+      Future.delayed(const Duration(seconds: 3), () {
+        Get.to(() => BottomNavigatorPage());
+        notificationController.alarmCount.value++;
       });
     }
   });

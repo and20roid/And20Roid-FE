@@ -43,6 +43,7 @@ class _ListDetailState extends State<ListDetail> {
   int participantNum = 0;
   TextEditingController emailController = TextEditingController();
   bool isWaiting = true;
+  final _formKey = GlobalKey<FormState>();
 
   late bool isLiked = widget.likedBoard;
 
@@ -151,8 +152,8 @@ class _ListDetailState extends State<ListDetail> {
       builder: (BuildContext context) {
         return Theme(
           data: ThemeData(
-              // ThemeData를 사용하여 DialogTheme을 수정
-              dialogBackgroundColor: Colors.white),
+            dialogBackgroundColor: Colors.white,
+          ),
           child: Dialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
@@ -161,8 +162,8 @@ class _ListDetailState extends State<ListDetail> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(20.0,20.0,20.0,10.0),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
                   child: Text(
                     "이메일 전송하기",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -175,20 +176,25 @@ class _ListDetailState extends State<ListDetail> {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 0),
-                  child: TextField(
-                    controller: emailController,
-                    decoration: InputDecoration(
-                      labelText: '이메일 입력하기',
-                      filled: true,
-                      fillColor: CustomColor.grey2,
-                      // 텍스트 필드의 배경색을 변경
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.transparent),
+                  child: Form(
+                    key: _formKey,
+                    autovalidateMode: AutovalidateMode.always,
+                    child: TextFormField(
+                      validator: validateEmail,
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        labelText: '이메일 입력하기',
+                        filled: true,
+                        fillColor: CustomColor.grey2,
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.transparent),
+                        ),
+                        enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.transparent),
+                        ),
+                        contentPadding: const EdgeInsets.all(12.0),
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.transparent),
-                      ),
-                      contentPadding: EdgeInsets.all(12.0),
+                      keyboardType: TextInputType.emailAddress,
                     ),
                   ),
                 ),
@@ -204,11 +210,12 @@ class _ListDetailState extends State<ListDetail> {
                         },
                         style: ButtonStyle(
                           backgroundColor:
-                              MaterialStateProperty.all(CustomColor.white),
+                          MaterialStateProperty.all(CustomColor.white),
                           minimumSize:
-                              MaterialStateProperty.all(const Size(135, 40)),
+                          MaterialStateProperty.all(const Size(135, 40)),
                           side: MaterialStateProperty.all(
-                              BorderSide(color: CustomColor.grey3, width: 1.0)),
+                            BorderSide(color: CustomColor.grey3, width: 1.0),
+                          ),
                           shape: MaterialStateProperty.all(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
@@ -217,18 +224,19 @@ class _ListDetailState extends State<ListDetail> {
                         ),
                         child: Text(
                           '취소',
-                          style:
-                              TextStyle(color: CustomColor.grey3, fontSize: 18),
+                          style: TextStyle(
+                            color: CustomColor.grey3,
+                            fontSize: 18,
+                          ),
                         ),
                       ),
-                      const SizedBox(
-                        width: 5,
-                      ),
+                      const SizedBox(width: 5),
                       TextButton(
                         style: ButtonStyle(
                           backgroundColor:
-                              MaterialStateProperty.all(CustomColor.primary1),
-                          minimumSize: MaterialStateProperty.all(Size(135, 40)),
+                          MaterialStateProperty.all(CustomColor.primary1),
+                          minimumSize:
+                          MaterialStateProperty.all(Size(135, 40)),
                           shape: MaterialStateProperty.all(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
@@ -236,14 +244,20 @@ class _ListDetailState extends State<ListDetail> {
                           ),
                         ),
                         onPressed: () async {
-                          String userEmail = emailController.text;
-                          requestClickPartButton(userEmail);
-                          Navigator.of(context).pop();
-                          emailController.clear();
+                          if (_formKey.currentState!.validate()) {
+                            print('----------------------------유효함');
+                            String userEmail = emailController.text;
+                            requestClickPartButton(userEmail);
+                            Navigator.of(context).pop();
+                            emailController.clear();
+                          }
                         },
                         child: Text(
                           '전송',
-                          style: TextStyle(color: Colors.black, fontSize: 18),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                          ),
                         ),
                       ),
                     ],
@@ -475,5 +489,20 @@ class _ListDetailState extends State<ListDetail> {
         },
       ),
     );
+  }
+
+  String? validateEmail(String? value) {
+    const pattern = r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
+        r'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-'
+        r'\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*'
+        r'[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4]'
+        r'[0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9]'
+        r'[0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\'
+        r'x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])';
+    final regex = RegExp(pattern);
+
+    return value!.isNotEmpty && !regex.hasMatch(value)
+        ? '올바른 이메일 형식을 입력해주세요'
+        : null;
   }
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:and20roid/model/partici_member.dart';
 import 'package:and20roid/view/list/list_detail.dart';
+import 'package:and20roid/view/mypage/my_page_change.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -199,7 +200,10 @@ class _MyPageContentState extends State<MyPageContent> {
               ),
               actions: [
                 IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.to(()=>const ChangeInfo(),
+                      transition: Transition.rightToLeftWithFade);
+                    },
                     icon: Icon(
                       Icons.settings,
                       size: 30,
@@ -298,6 +302,7 @@ class _MyPageContentState extends State<MyPageContent> {
                                                 .participantNum,
                                             myUploadTest[index]
                                                 .createdDate,
+                                            myUploadTest[index].state,
                                             context);
                                       }),
                                 ),
@@ -326,6 +331,7 @@ class _MyPageContentState extends State<MyPageContent> {
                                                 .participantNum,
                                             myPartiTest[index]
                                                 .createdDate,
+                                            myPartiTest[index].state,
                                             context);
                                       }),
                                 ),
@@ -373,49 +379,6 @@ class _MyPageContentState extends State<MyPageContent> {
   }
 }
 
-Widget CustomListTile(List<MyUploadTest> testList, int index) {
-  return Column(
-    children: [
-      ListTile(
-        leading: ClipOval(
-          child: CircleAvatar(
-            radius: 30, // 프로필 사진 크기 조절
-            backgroundImage: NetworkImage(testList[index].thumbnailUrl),
-          ),
-        ),
-        title: Text(testList[index].title),
-        subtitle: Text(testList[index].introLine),
-      ),
-      CustomButton()
-    ],
-  );
-}
-
-ElevatedButton CustomButton() {
-  return ElevatedButton(
-    onPressed: () {},
-    style: ElevatedButton.styleFrom(
-        backgroundColor: CustomColor.primary1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0), // 모서리 radius 설정
-        ),
-        minimumSize: const Size.fromHeight(60)),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset("assets/icons/email.png"),
-        // 아이콘 색상 설정
-        const SizedBox(width: 8.0),
-        // 아이콘과 텍스트 사이의 간격 조절
-        const Text(
-          "참여하기",
-          style: TextStyle(color: Colors.black, fontSize: 20),
-        ),
-        // 글자색 설정
-      ],
-    ),
-  );
-}
 
 Widget joinMsgBox(bool isUp,
     int id,
@@ -425,6 +388,7 @@ Widget joinMsgBox(bool isUp,
     int pariNum,
     int recruNum,
     String createdDate,
+    String state,
     BuildContext context) {
   ListDetailInfo listDetailInfo;
   List<PartiMember> partiMemberList = [];
@@ -596,7 +560,10 @@ Widget joinMsgBox(bool isUp,
                     child: Container(
                       height: 28,
                       width: 67,
-                      padding: const EdgeInsets.only(left: 3),
+                      padding: const EdgeInsets.only(left: 5),
+                      decoration: BoxDecoration(
+                          color: CustomColor.primary1,
+                          borderRadius: BorderRadius.circular(8.0)),
                       child: Center(
                         child: Row(
                           children: [
@@ -610,9 +577,6 @@ Widget joinMsgBox(bool isUp,
                           ],
                         ),
                       ),
-                      decoration: BoxDecoration(
-                          color: CustomColor.primary1,
-                          borderRadius: BorderRadius.circular(8.0)),
                     ),
                   )
                       : Container()
@@ -622,7 +586,7 @@ Widget joinMsgBox(bool isUp,
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Row(
                   children: [
-                    Expanded(
+                    (state == '모집중')?Expanded(
                       child: TextButton(
                         style: ButtonStyle(
                           backgroundColor:
@@ -660,6 +624,50 @@ Widget joinMsgBox(bool isUp,
                               '글 보러가기',
                               style: TextStyle(
                                   color: CustomColor.grey5,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ):Expanded(
+                      child: TextButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                          MaterialStateProperty.all(CustomColor.primary2),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                        onPressed: () async {
+                          await requestRecruitingDetail(id).then((listDetailInfo){
+                            Get.to(() =>
+                                ListDetail(
+                                    intValue: id,
+                                    title: title,
+                                    nickname: listDetailInfo.nickName,
+                                    createdDate: createdDate,
+                                    thumbnailUrl: thumbnailUrl,
+                                    likes: listDetailInfo.likes,
+                                    views: listDetailInfo.views,
+                                    urls: listDetailInfo.imageUrls,
+                                    introLine: introLine,
+                                    likedBoard: listDetailInfo.likedBoard));
+                          });
+
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.science_outlined,
+                                color: CustomColor.primary1),
+                            const SizedBox(width: 8.0),
+                            Text(
+                              '테스트 중',
+                              style: TextStyle(
+                                  color: CustomColor.primary1,
                                   fontSize: 20,
                                   fontWeight: FontWeight.w400),
                             ),

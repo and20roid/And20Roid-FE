@@ -1,11 +1,11 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../model/list_detail.dart';
 import '../../model/noti_model.dart';
@@ -45,7 +45,10 @@ class NotificationContent extends StatelessWidget {
                       data.introLine!,
                       data.appTestLink!,
                       data.webTestLink!);
-                case 'end':
+                case 'endUploader':
+                  return endMsgBox(data.content, data.thumbnailUrl!,
+                      data.boardTitle!, data.introLine!, context);
+                case 'endTester':
                   return endMsgBox(data.content, data.thumbnailUrl!,
                       data.boardTitle!, data.introLine!, context);
                 default:
@@ -92,7 +95,7 @@ Widget requestMsgBox(String name, String thumbnailUrl, String title,
       if (data.statusCode == 200) {
         if (data.body.isNotEmpty) {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
-
+          print(jsonResults);
           listDetailInfo = ListDetailInfo.fromJson(jsonResults);
 
           return listDetailInfo;
@@ -394,18 +397,26 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
   return Padding(
     padding: const EdgeInsets.all(12.0),
     child: Column(children: [
-      Row(children: [
-        Icon(
-          Icons.play_arrow_outlined,
-        ),
-        Text(
-          ' $name',
-          style: TextStyle(
-              color: CustomColor.grey5,
-              fontSize: 16,
-              fontWeight: FontWeight.w400),
-        )
-      ]),
+      Row(
+        children: [
+          Icon(
+            Icons.play_arrow_outlined,
+          ),
+          const SizedBox(width: 8), // 아이콘과 텍스트 간격 조절
+          Expanded(
+            child: Text(
+              '${name.contains('.') ? name.replaceAll('.', '.\n') : name}',
+              style: TextStyle(
+                color: CustomColor.grey5,
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+              ),
+              maxLines: 2, // 최대 두 줄까지 표시
+              overflow: TextOverflow.ellipsis, // 오버플로우 된 경우 '...'으로 표시
+            ),
+          ),
+        ],
+      ),
       const SizedBox(
         height: 8,
       ),
@@ -462,7 +473,10 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
                           ),
                         ),
                       ),
-                      onPressed: () async {},
+                      onPressed: ()  {
+                        Uri uri = Uri.parse(appLink);
+                        openLink(uri);
+                      },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -501,7 +515,10 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
                           ),
                         ),
                       ),
-                      onPressed: () async {},
+                      onPressed: () async {
+                        Uri uri = Uri.parse(webLink);
+                        openLink(uri);
+                      },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -651,4 +668,12 @@ Widget appIcon(String thumbnailUrl) {
       ),
     ),
   );
+}
+
+void openLink(Uri url) async {
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url);
+  } else {
+    print('Could not launch $url');
+  }
 }

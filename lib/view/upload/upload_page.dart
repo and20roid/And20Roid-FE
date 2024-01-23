@@ -32,7 +32,7 @@ class UploadView extends StatelessWidget {
         child: GetBuilder<UploadFirstController>(
           init: UploadFirstController(), // GetBuilder로 컨트롤러 초기화
           builder: (controller) {
-            return _body(controller,context);
+            return _body(controller, context);
           },
         ),
       ),
@@ -74,7 +74,6 @@ class _UploadSecondState extends State<UploadSecond> {
     await total.calculateTotalSize(total.appPhotoImage);
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,7 +102,12 @@ class _UploadSecondState extends State<UploadSecond> {
               padding: EdgeInsets.symmetric(vertical: 12.0),
               child: Text(
                 ' 앱 사진 ${total.totalFileSize.value ~/ (1000000)}MB / 15MB',
-                style:TextStyle(fontSize: 16, fontWeight: FontWeight.bold ,color:  total.totalFileSize.value ~/ (1000000) < 15 ? CustomColor.grey5 : Colors.red),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: total.totalFileSize.value ~/ (1000000) < 15
+                        ? CustomColor.grey5
+                        : Colors.red),
               ),
             ),
             SizedBox(
@@ -174,7 +178,8 @@ class _UploadSecondState extends State<UploadSecond> {
                   padding: const EdgeInsets.all(12.0),
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.to(() => UploadThird(),transition: Transition.rightToLeftWithFade);
+                      Get.to(() => UploadThird(),
+                          transition: Transition.rightToLeftWithFade);
                     },
                     child: Text(
                       "다음",
@@ -213,7 +218,8 @@ class UploadThird extends StatelessWidget {
         builder: (controller) {
           return SingleChildScrollView(
               child: SizedBox(
-                  height: screenHeight - 80, child: _body3(controller,context)));
+                  height: screenHeight - 80,
+                  child: _body3(controller, context)));
         },
       ),
     );
@@ -246,13 +252,13 @@ Column _body(UploadFirstController controller, BuildContext context) {
             padding: const EdgeInsets.all(12.0),
             child: ElevatedButton(
               onPressed: () {
-                if(
-                controller.titleController.text.isEmpty ||controller.oneLineController.text.isEmpty ||controller.recruitNumController.text.isEmpty
-                ){
-                 Common().showToastN(context, "모든 정보를 입력해 주세요",1);
-                }
-                else{
-                  Get.to(() => UploadSecond(),transition: Transition.rightToLeftWithFade);
+                if (controller.titleController.text.isEmpty ||
+                    controller.oneLineController.text.isEmpty ||
+                    controller.recruitNumController.text.isEmpty) {
+                  Common().showToastN(context, "모든 정보를 입력해 주세요", 1);
+                } else {
+                  Get.to(() => UploadSecond(),
+                      transition: Transition.rightToLeftWithFade);
                 }
               },
               child: Text(
@@ -336,18 +342,20 @@ Column _body3(UploadThirdController controller, context) {
   return Column(
     children: [
       CustomInputField("앱 링크", controller.appLinkController, "스토어 url을 입력해주세요"),
-      CustomInputField("앱 링크", controller.webLinkController, "웹 url을 입력해주세요"),
+      CustomInputField("웹 링크", controller.webLinkController, "웹 url을 입력해주세요"),
       CustomInputField(
           "서비스 소개", controller.contentController, "서비스를 자유롭게 소개해주세요"),
       Spacer(),
       Padding(
-        padding: const EdgeInsets.fromLTRB(12.0,12.0,12.0,36.0),
+        padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 36.0),
         child: ElevatedButton(
-          onPressed: () async {
+          onPressed:
+          // (total.uploadFormKey1.currentState!.validate() && total.uploadFormKey2.currentState!.validate()) ?
+              () async {
             File? appIconImageValue = total.appIconImage.value;
             int totalSize = await total.calculateTotalSize(total.appPhotoImage);
-            if (appIconImageValue != null){
-              if(totalSize < 15 * 1024 * 1024 && totalSize > 0){
+            if (appIconImageValue != null) {
+              if (totalSize < 15 * 1024 * 1024 && totalSize > 0) {
                 // appIconImageValue 사용 가능
                 total.uploadImages(
                   first.titleController.text,
@@ -367,15 +375,17 @@ Column _body3(UploadThirdController controller, context) {
                 third.webLinkController.dispose();
                 third.contentController.dispose();
                 Get.offAll(() => const BottomNavigatorPage());
-              }else{
+              } else {
                 Common().showToastN(context, '사진 크기를 확인해 주세요', 1);
                 Get.back();
               }
-            }else {
+            } else {
               Common().showToastN(context, '앱 아이콘을 확인해 주세요', 1);
               Get.back();
             }
-            },
+          }
+          // :null
+          ,
           child: Text(
             "업로드 하기",
             style: TextStyle(fontSize: 18),
@@ -396,6 +406,8 @@ Column _body3(UploadThirdController controller, context) {
 }
 
 Widget CustomInputField(title, TextEditingController testController, hintText) {
+  final UploadGetx total = Get.put(UploadGetx());
+
   return Padding(
     padding: const EdgeInsets.all(12.0),
     child: Column(
@@ -440,26 +452,72 @@ Widget CustomInputField(title, TextEditingController testController, hintText) {
                   )
                 ],
               )
-            : TextFormField(
-                controller: testController,
-                style: TextStyle(fontSize: 16, color: CustomColor.grey5),
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(12),
-                  hintText: hintText,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                    borderSide: BorderSide(color: CustomColor.grey1, width: 1),
+            : (title == '앱 링크' || title == '웹 링크')
+                ? Form(
+                    key: (title == '앱 링크') ? total.uploadFormKey1 : total.uploadFormKey2,
+                    autovalidateMode: AutovalidateMode.always,
+                    child: TextFormField(
+                      controller: testController,
+                      validator: validateURL,
+                      style: TextStyle(fontSize: 16, color: CustomColor.grey5),
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.all(12),
+                        hintText: hintText,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide:
+                              BorderSide(color: CustomColor.grey1, width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          // 포커스가 있을 때의 테두리 설정
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide:
+                              BorderSide(color: CustomColor.primary1, width: 1),
+                        ),
+                      ),
+                      maxLines: 1,
+                    ),
+                  )
+                : TextFormField(
+                    controller: testController,
+                    style: TextStyle(fontSize: 16, color: CustomColor.grey5),
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.all(12),
+                      hintText: hintText,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                        borderSide:
+                            BorderSide(color: CustomColor.grey1, width: 1),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        // 포커스가 있을 때의 테두리 설정
+                        borderRadius: BorderRadius.circular(12.0),
+                        borderSide:
+                            BorderSide(color: CustomColor.primary1, width: 1),
+                      ),
+                    ),
+                    maxLines: (title != '서비스 소개') ? 1 : 6,
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    // 포커스가 있을 때의 테두리 설정
-                    borderRadius: BorderRadius.circular(12.0),
-                    borderSide:
-                        BorderSide(color: CustomColor.primary1, width: 1),
-                  ),
-                ),
-                maxLines: (title != '서비스 소개') ? 1 : 6,
-              ),
       ],
     ),
   );
+}
+
+String? validateURL(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'https로 시작하는 URL을 입력해주세요.';
+  }
+
+  // URL 형식의 정규식
+  final RegExp urlRegExp = RegExp(
+    r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$',
+    caseSensitive: false,
+    multiLine: false,
+  );
+
+  if (!urlRegExp.hasMatch(value)) {
+    return '올바른 URL 형식이 아닙니다.';
+  }
+
+  return null;
 }
