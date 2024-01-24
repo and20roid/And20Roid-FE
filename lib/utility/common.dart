@@ -66,7 +66,7 @@ class Common {
               width: 30,
               height: 50,
               margin: EdgeInsets.zero,
-              child: Image.asset('assets/images/logo.png'),
+              child: Image.asset('assets/images/logoNoback.png'),
             )),
         Container(
           padding:

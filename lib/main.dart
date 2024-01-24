@@ -162,7 +162,7 @@ void firebaseMessageProc(context) {
     print("message from 앱이 완전히 종료된 상태");
     if (message != null && message.notification != null) {
       Future.delayed(const Duration(seconds: 3), () {
-        Get.to(() => BottomNavigatorPage());
+        Get.to(() => DirectingPage());
         notificationController.alarmCount.value++;
       });
     }

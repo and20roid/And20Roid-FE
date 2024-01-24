@@ -293,11 +293,11 @@ class _ListDetailState extends State<ListDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: CustomColor.grey1,
-        body: Column(
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: CustomColor.grey1,
+      body: SafeArea(
+        child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.all(12.0),

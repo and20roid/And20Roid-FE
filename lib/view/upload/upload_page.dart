@@ -59,7 +59,7 @@ class _UploadSecondState extends State<UploadSecond> {
     setState(() {});
   }
 
-  void pickPhotoFromGallery() async {
+  Future<void> pickPhotoFromGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -101,7 +101,7 @@ class _UploadSecondState extends State<UploadSecond> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 12.0),
               child: Text(
-                ' 앱 사진 ${total.totalFileSize.value ~/ (1000000)}MB / 15MB',
+                ' 앱 사진 ${total.totalFileSize.value >= 1000000 ? '${total.totalFileSize.value ~/ 1000000}MB' : '${total.totalFileSize.value ~/ 1000}KB'} / 15MB',
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -140,8 +140,9 @@ class _UploadSecondState extends State<UploadSecond> {
                     );
                   } else if (index == total.appPhotoImage.length && index < 3) {
                     return InkWell(
-                      onTap: () {
-                        pickPhotoFromGallery();
+                      onTap: () async {
+                        await pickPhotoFromGallery();
+                        setState(() {});
                       },
                       child: Stack(
                         children: [

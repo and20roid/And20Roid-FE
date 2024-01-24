@@ -44,12 +44,13 @@ class NotificationContent extends StatelessWidget {
                       data.boardTitle!,
                       data.introLine!,
                       data.appTestLink!,
-                      data.webTestLink!);
+                      data.webTestLink!,
+                  context);
                 case 'endUploader':
-                  return endMsgBox(data.content, data.thumbnailUrl!,
-                      data.boardTitle!, data.introLine!, context);
+                  return endUploaderBox(data.content, data.thumbnailUrl!,
+                      data.boardTitle!, data.introLine!, data.boardId!,context);
                 case 'endTester':
-                  return endMsgBox(data.content, data.thumbnailUrl!,
+                  return endTesterBox(data.content, data.thumbnailUrl!,
                       data.boardTitle!, data.introLine!, context);
                 default:
                   return Container(); // 예외 처리
@@ -393,7 +394,7 @@ Widget joinMsgBox(
 }
 
 Widget startMsgBox(String name, String thumbnailUrl, String title,
-    String introLine, String appLink, String webLink) {
+    String introLine, String appLink, String webLink, BuildContext context) {
   return Padding(
     padding: const EdgeInsets.all(12.0),
     child: Column(children: [
@@ -473,9 +474,12 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
                           ),
                         ),
                       ),
-                      onPressed: ()  {
+                      onPressed: ()  async{
                         Uri uri = Uri.parse(appLink);
-                        openLink(uri);
+                        bool isOpen = await openLink(uri);
+                        if(!isOpen){
+                          Common().showToastN(context, '$appLink를 열 수 없습니다', 1);
+                        }
                       },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -517,7 +521,10 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
                       ),
                       onPressed: () async {
                         Uri uri = Uri.parse(webLink);
-                        openLink(uri);
+                        bool isOpen = await openLink(uri);
+                        if(!isOpen){
+                          Common().showToastN(context, '$webLink를 열 수 없습니다', 1);
+                        }
                       },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -550,8 +557,138 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
     ]),
   );
 }
+Widget endUploaderBox(String name, String thumbnailUrl, String title,
+    String introLine,int boardId, BuildContext context) {
 
-Widget endMsgBox(String name, String thumbnailUrl, String title,
+  void requestTestEndBroadCast(int boardId) async {
+    try {
+      String url = '${Common.url}boards/${boardId.toString()}/end';
+      String? bearerToken = await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      var data = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+      );
+
+      if (data.statusCode == 200) {
+        print('Test end broadcast successful');
+      } else {
+        print('Failed to end test broadcast. Status code: ${data.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+
+  return Padding(
+    padding: const EdgeInsets.all(12.0),
+    child: Column(children: [
+      Row(children: [
+        const Icon(Icons.cloud_done_outlined),
+        Text(
+          ' $name',
+          style: TextStyle(
+              color: CustomColor.grey5,
+              fontSize: 16,
+              fontWeight: FontWeight.w400),
+        )
+      ]),
+      const SizedBox(
+        height: 8,
+      ),
+      Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+            color: CustomColor.white,
+            borderRadius: BorderRadius.circular(12.0)),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  appIcon(thumbnailUrl),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                              color: CustomColor.grey5,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          introLine,
+                          style: TextStyle(
+                              color: CustomColor.grey5,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                          MaterialStateProperty.all(CustomColor.primary2),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          requestTestEndBroadCast(boardId);
+                          Common().showToastN(context, '테스트가 종료되었습니다!', 1);
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.done,
+                              color: CustomColor.primary1,
+                              size: 25,
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              '테스트 종료하기',
+                              style: TextStyle(
+                                  color: CustomColor.primary1,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      )
+    ]),
+  );
+}
+
+Widget endTesterBox(String name, String thumbnailUrl, String title,
     String introLine, BuildContext context) {
   return Padding(
     padding: const EdgeInsets.all(12.0),
@@ -670,10 +807,12 @@ Widget appIcon(String thumbnailUrl) {
   );
 }
 
-void openLink(Uri url) async {
+Future<bool> openLink(Uri url) async {
   if (await canLaunchUrl(url)) {
     await launchUrl(url);
+    return true;
   } else {
     print('Could not launch $url');
+    return false;
   }
 }

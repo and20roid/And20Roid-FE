@@ -97,6 +97,7 @@ class UploadGetx extends getx.GetxController {
       totalSize += fileSize;
     }
     totalFileSize.value = totalSize;
+    print('------------------------------------------------사진 크기 : ${totalFileSize.value}');
     return totalSize;
   }
 }

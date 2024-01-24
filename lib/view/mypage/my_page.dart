@@ -22,9 +22,9 @@ class MyPageContent extends StatefulWidget {
 class _MyPageContentState extends State<MyPageContent> {
   final SaveSharedPreferences sharedPreferences = SaveSharedPreferences();
   final RefreshController _refreshController1 =
-  RefreshController(initialRefresh: false);
+      RefreshController(initialRefresh: false);
   final RefreshController _refreshController2 =
-  RefreshController(initialRefresh: false);
+      RefreshController(initialRefresh: false);
 
   String? name;
   String? profileUrl;
@@ -49,7 +49,7 @@ class _MyPageContentState extends State<MyPageContent> {
     try {
       String url = "${Common.url}users";
       String? bearerToken =
-      await FirebaseAuth.instance.currentUser!.getIdToken();
+          await FirebaseAuth.instance.currentUser!.getIdToken();
 
       var data = await http.get(
         Uri.parse(url),
@@ -78,7 +78,7 @@ class _MyPageContentState extends State<MyPageContent> {
     try {
       String url = "${Common.url}myPages/boards/upload";
       String? bearerToken =
-      await FirebaseAuth.instance.currentUser!.getIdToken();
+          await FirebaseAuth.instance.currentUser!.getIdToken();
 
       Map<String, dynamic> queryParameters = {
         'lastBoardId': lastBoardId.toString(),
@@ -124,7 +124,7 @@ class _MyPageContentState extends State<MyPageContent> {
     try {
       String url = "${Common.url}myPages/boards/participation";
       String? bearerToken =
-      await FirebaseAuth.instance.currentUser!.getIdToken();
+          await FirebaseAuth.instance.currentUser!.getIdToken();
 
       Map<String, dynamic> queryParameters = {
         'lastBoardId': partilastBoardId.toString(),
@@ -171,38 +171,35 @@ class _MyPageContentState extends State<MyPageContent> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: profileUrl == null
-            ? CircularProgressIndicator()
-            : Scaffold(
+        child: Scaffold(
             appBar: AppBar(
               toolbarHeight: 80,
               backgroundColor: CustomColor.grey1,
-              title: Row(
-                children: [
-                  ClipOval(
-                    child: CachedNetworkImage(
-                      imageUrl: profileUrl!,
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) =>
-                          CircularProgressIndicator(),
-                      errorWidget: (context, url, error) =>
-                          Icon(Icons.error),
+              title: RichText(
+                text: TextSpan(
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: '$name',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: CustomColor
+                            .primary1, // You can customize the color if needed
+                      ),
                     ),
-                  ),
-                  Text(
-                    ' $name',
-                    style: const TextStyle(
-                        fontSize: 30, fontWeight: FontWeight.bold),
-                  )
-                ],
+                    TextSpan(
+                      text: ' 님의 페이지',
+                      style: TextStyle(fontSize: 15, color: Colors.black),
+                    ),
+                  ],
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
               actions: [
                 IconButton(
                     onPressed: () {
-                      Get.to(()=>const ChangeInfo(),
-                      transition: Transition.rightToLeftWithFade);
+                      Get.to(() => const ChangeInfo(),
+                          transition: Transition.rightToLeftWithFade);
                     },
                     icon: Icon(
                       Icons.settings,
@@ -259,8 +256,7 @@ class _MyPageContentState extends State<MyPageContent> {
                                 child: Text(
                                   '업로드한 테스트',
                                   style: TextStyle(
-                                      color: CustomColor.grey4,
-                                      fontSize: 18),
+                                      color: CustomColor.grey4, fontSize: 18),
                                 ),
                               ),
                               Padding(
@@ -268,8 +264,7 @@ class _MyPageContentState extends State<MyPageContent> {
                                 child: Text(
                                   '참여한 테스트',
                                   style: TextStyle(
-                                      color: CustomColor.grey4,
-                                      fontSize: 18),
+                                      color: CustomColor.grey4, fontSize: 18),
                                 ),
                               ),
                             ],
@@ -279,62 +274,60 @@ class _MyPageContentState extends State<MyPageContent> {
                               children: [
                                 myUploadTest.isEmpty
                                     ? const Center(
-                                  child: Text("업로드한 테스트가 없어요"),
-                                )
+                                        child: Text("업로드한 테스트가 없어요"),
+                                      )
                                     : SmartRefresher(
-                                  controller: _refreshController1,
-                                  enablePullDown: true,
-                                  onRefresh: requestMyUploadTest,
-                                  child: ListView.builder(
-                                      itemCount: myUploadTest.length,
-                                      itemBuilder: (context, index) {
-                                        return joinMsgBox(
-                                            true,
-                                            myUploadTest[index].id,
-                                            myUploadTest[index]
-                                                .thumbnailUrl,
-                                            myUploadTest[index].title,
-                                            myUploadTest[index]
-                                                .introLine,
-                                            myUploadTest[index]
-                                                .recruitmentNum,
-                                            myUploadTest[index]
-                                                .participantNum,
-                                            myUploadTest[index]
-                                                .createdDate,
-                                            myUploadTest[index].state,
-                                            context);
-                                      }),
-                                ),
+                                        controller: _refreshController1,
+                                        enablePullDown: true,
+                                        onRefresh: requestMyUploadTest,
+                                        child: ListView.builder(
+                                            itemCount: myUploadTest.length,
+                                            itemBuilder: (context, index) {
+                                              return joinMsgBox(
+                                                  true,
+                                                  myUploadTest[index].id,
+                                                  myUploadTest[index]
+                                                      .thumbnailUrl,
+                                                  myUploadTest[index].title,
+                                                  myUploadTest[index].introLine,
+                                                  myUploadTest[index]
+                                                      .recruitmentNum,
+                                                  myUploadTest[index]
+                                                      .participantNum,
+                                                  myUploadTest[index]
+                                                      .createdDate,
+                                                  myUploadTest[index].state,
+                                                  context);
+                                            }),
+                                      ),
                                 myPartiTest.isEmpty
                                     ? const Center(
-                                  child: Text("참여한 테스트가 없어요"),
-                                )
+                                        child: Text("참여한 테스트가 없어요"),
+                                      )
                                     : SmartRefresher(
-                                  controller: _refreshController2,
-                                  enablePullDown: true,
-                                  onRefresh: requestMyParticipantTest,
-                                  child: ListView.builder(
-                                      itemCount: myPartiTest.length,
-                                      itemBuilder: (context, index) {
-                                        return joinMsgBox(
-                                            false,
-                                            myPartiTest[index].id,
-                                            myPartiTest[index]
-                                                .thumbnailUrl,
-                                            myPartiTest[index].title,
-                                            myPartiTest[index]
-                                                .introLine,
-                                            myPartiTest[index]
-                                                .recruitmentNum,
-                                            myPartiTest[index]
-                                                .participantNum,
-                                            myPartiTest[index]
-                                                .createdDate,
-                                            myPartiTest[index].state,
-                                            context);
-                                      }),
-                                ),
+                                        controller: _refreshController2,
+                                        enablePullDown: true,
+                                        onRefresh: requestMyParticipantTest,
+                                        child: ListView.builder(
+                                            itemCount: myPartiTest.length,
+                                            itemBuilder: (context, index) {
+                                              return joinMsgBox(
+                                                  false,
+                                                  myPartiTest[index].id,
+                                                  myPartiTest[index]
+                                                      .thumbnailUrl,
+                                                  myPartiTest[index].title,
+                                                  myPartiTest[index].introLine,
+                                                  myPartiTest[index]
+                                                      .recruitmentNum,
+                                                  myPartiTest[index]
+                                                      .participantNum,
+                                                  myPartiTest[index]
+                                                      .createdDate,
+                                                  myPartiTest[index].state,
+                                                  context);
+                                            }),
+                                      ),
                               ],
                             ),
                           ),
@@ -379,8 +372,8 @@ class _MyPageContentState extends State<MyPageContent> {
   }
 }
 
-
-Widget joinMsgBox(bool isUp,
+Widget joinMsgBox(
+    bool isUp,
     int id,
     String thumbnailUrl,
     String title,
@@ -396,8 +389,8 @@ Widget joinMsgBox(bool isUp,
   Future<ListDetailInfo> requestRecruitingDetail(id) async {
     try {
       String url = "${Common.url}boards/${id}";
-      String? bearerToken = await FirebaseAuth.instance.currentUser!
-          .getIdToken();
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
 
       var data = await http.get(
         Uri.parse(url),
@@ -411,7 +404,6 @@ Widget joinMsgBox(bool isUp,
         if (data.body.isNotEmpty) {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
-
           listDetailInfo = ListDetailInfo.fromJson(jsonResults);
 
           return listDetailInfo;
@@ -424,24 +416,24 @@ Widget joinMsgBox(bool isUp,
       print('Error: $e');
     }
 
-    return ListDetailInfo(content: 'content',
-        appTestLink: 'appTestLink',
-        webTestLink: 'webTestLink',
-        participantNum: 0,
-        imageUrls: ['imageUrls'],
-        nickName: 'nickName',
-        views: 0,
-        likes: 0,
-        likedBoard : false
+    return ListDetailInfo(
+      content: 'content',
+      appTestLink: 'appTestLink',
+      webTestLink: 'webTestLink',
+      participantNum: 0,
+      imageUrls: ['imageUrls'],
+      nickName: 'nickName',
+      views: 0,
+      likes: 0,
+      likedBoard: false,
     );
   }
-
 
   Future<void> requestSeeMozipOne(id) async {
     try {
       String url = "${Common.url}participation/$id/participants";
       String? bearerToken =
-      await FirebaseAuth.instance.currentUser!.getIdToken();
+          await FirebaseAuth.instance.currentUser!.getIdToken();
 
       var data = await http.get(
         Uri.parse(url),
@@ -470,46 +462,130 @@ Widget joinMsgBox(bool isUp,
     }
   }
 
-  void showBottomModalSheet(context, partiMemberList) {
+  Future<void> requestTestLinkBroadcast(boardId, context) async {
+    try {
+      String url = "${Common.url}boards/${boardId.toString()}/start";
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      var data = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+      );
+      Map<String, dynamic> jsonBody = jsonDecode(utf8.decode(data.bodyBytes));
+      String message = jsonBody['message'];
+
+      if (data.statusCode == 200) {
+        print('~~~~~~~~~test link complete ${utf8.decode(data.bodyBytes)}');
+        Common().showToastN(context, message, 1);
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+        Common().showToastN(context, message, 1);
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  void showBottomModalSheet(
+      BuildContext context, List<PartiMember> partiMemberList, int boardId) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true, // Set to true for full width
       builder: (BuildContext context) {
-        return SingleChildScrollView(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery
-                .of(context)
-                .viewInsets
-                .bottom,
-          ),
-          child: Container(
-            padding: EdgeInsets.all(16.0),
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: partiMemberList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ListTile(
-                      leading: Text(partiMemberList[index].userId.toString()),
-                      title: Text(partiMemberList[index].email),
-
-                    );
-                  },
+        return (partiMemberList.isEmpty)
+            ? SizedBox(
+                height: 150,
+                child: Center(
+                  child: Text(
+                    "참여한 테스터가 없습니다",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: CustomColor.grey5),
+                  ),
                 ),
-              ],
-            ),
-          ),
-        );
+              )
+            : SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: Container(
+                  padding: EdgeInsets.all(16.0),
+                  width: MediaQuery.of(context).size.width,
+                  child: (state == '모집중')
+                      ? Stack(children: [
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: partiMemberList.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return ListTile(
+                                    leading: Text(partiMemberList[index]
+                                        .userId
+                                        .toString()),
+                                    title: Text(partiMemberList[index].email),
+                                  );
+                                },
+                              ),
+                              ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                      CustomColor.white),
+                                  minimumSize:
+                                      MaterialStateProperty.all(Size(310, 56)),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      side:
+                                          BorderSide(color: CustomColor.grey4),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  requestTestLinkBroadcast(boardId, context);
+                                },
+                                child: Text(
+                                  "테스트 링크 전송",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: CustomColor.primary1),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                              bottom: 43,
+                              right: 0,
+                              child: BalloonWidget(
+                                message: '한번만 전송할 수 있어요',
+                              ))
+                        ])
+                      : Column(mainAxisSize: MainAxisSize.min, children: [
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: partiMemberList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return ListTile(
+                                leading: Text(
+                                    partiMemberList[index].userId.toString()),
+                                title: Text(partiMemberList[index].email),
+                              );
+                            },
+                          ),
+                        ]),
+                ),
+              );
       },
     );
   }
-
 
   return Padding(
     padding: const EdgeInsets.all(12.0),
@@ -553,32 +629,31 @@ Widget joinMsgBox(bool isUp,
                   isUp ? Spacer() : Container(),
                   isUp
                       ? InkWell(
-                    onTap: () async {
-                      await requestSeeMozipOne(id);
-                      showBottomModalSheet(context, partiMemberList);
-                    },
-                    child: Container(
-                      height: 28,
-                      width: 67,
-                      padding: const EdgeInsets.only(left: 5),
-                      decoration: BoxDecoration(
-                          color: CustomColor.primary1,
-                          borderRadius: BorderRadius.circular(8.0)),
-                      child: Center(
-                        child: Row(
-                          children: [
-                            Icon(Icons.people),
-                            Text(
-                              " $recruNum/$pariNum",
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold),
+                          onTap: () async {
+                            await requestSeeMozipOne(id);
+                            showBottomModalSheet(context, partiMemberList, id);
+                          },
+                          child: Container(
+                            height: 28,
+                            width: 72,
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            decoration: BoxDecoration(
+                                color: CustomColor.primary1,
+                                borderRadius: BorderRadius.circular(8.0)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.people),
+                                Text(
+                                  " $recruNum/$pariNum",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
+                          ),
+                        )
                       : Container()
                 ],
               ),
@@ -586,95 +661,182 @@ Widget joinMsgBox(bool isUp,
                 padding: const EdgeInsets.only(top: 12.0),
                 child: Row(
                   children: [
-                    (state == '모집중')?Expanded(
-                      child: TextButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                          MaterialStateProperty.all(CustomColor.primary1),
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
+                    (state == '모집중')
+                        ? Expanded(
+                            child: TextButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                    CustomColor.primary1),
+                                shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                ),
+                              ),
+                              onPressed: () async {
+                                await requestRecruitingDetail(id)
+                                    .then((listDetailInfo) {
+                                  Get.to(() => ListDetail(
+                                      intValue: id,
+                                      title: title,
+                                      nickname: listDetailInfo.nickName,
+                                      createdDate: createdDate,
+                                      thumbnailUrl: thumbnailUrl,
+                                      likes: listDetailInfo.likes,
+                                      views: listDetailInfo.views,
+                                      urls: listDetailInfo.imageUrls,
+                                      introLine: introLine,
+                                      likedBoard: listDetailInfo.likedBoard));
+                                });
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.list_alt_outlined,
+                                      color: CustomColor.grey5),
+                                  const SizedBox(width: 8.0),
+                                  Text(
+                                    '글 보러가기',
+                                    style: TextStyle(
+                                        color: CustomColor.grey5,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ),
-                        onPressed: () async {
-                          await requestRecruitingDetail(id).then((listDetailInfo){
-                            Get.to(() =>
-                                ListDetail(
-                                    intValue: id,
-                                    title: title,
-                                    nickname: listDetailInfo.nickName,
-                                    createdDate: createdDate,
-                                    thumbnailUrl: thumbnailUrl,
-                                    likes: listDetailInfo.likes,
-                                    views: listDetailInfo.views,
-                                    urls: listDetailInfo.imageUrls,
-                                    introLine: introLine,
-                                    likedBoard: listDetailInfo.likedBoard));
-                          });
-
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.list_alt_outlined,
-                                color: CustomColor.grey5),
-                            const SizedBox(width: 8.0),
-                            Text(
-                              '글 보러가기',
-                              style: TextStyle(
-                                  color: CustomColor.grey5,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ):Expanded(
-                      child: TextButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                          MaterialStateProperty.all(CustomColor.primary2),
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                        ),
-                        onPressed: () async {
-                          await requestRecruitingDetail(id).then((listDetailInfo){
-                            Get.to(() =>
-                                ListDetail(
-                                    intValue: id,
-                                    title: title,
-                                    nickname: listDetailInfo.nickName,
-                                    createdDate: createdDate,
-                                    thumbnailUrl: thumbnailUrl,
-                                    likes: listDetailInfo.likes,
-                                    views: listDetailInfo.views,
-                                    urls: listDetailInfo.imageUrls,
-                                    introLine: introLine,
-                                    likedBoard: listDetailInfo.likedBoard));
-                          });
-
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.science_outlined,
-                                color: CustomColor.primary1),
-                            const SizedBox(width: 8.0),
-                            Text(
-                              '테스트 중',
-                              style: TextStyle(
-                                  color: CustomColor.primary1,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                          )
+                        : (state == '모집완료')
+                            ? Expanded(
+                                child: TextButton(
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        CustomColor.primary2),
+                                    shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    await requestRecruitingDetail(id)
+                                        .then((listDetailInfo) {
+                                      Get.to(() => ListDetail(
+                                          intValue: id,
+                                          title: title,
+                                          nickname: listDetailInfo.nickName,
+                                          createdDate: createdDate,
+                                          thumbnailUrl: thumbnailUrl,
+                                          likes: listDetailInfo.likes,
+                                          views: listDetailInfo.views,
+                                          urls: listDetailInfo.imageUrls,
+                                          introLine: introLine,
+                                          likedBoard:
+                                              listDetailInfo.likedBoard));
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.playlist_add_check,
+                                          color: CustomColor.primary3),
+                                      const SizedBox(width: 8.0),
+                                      Text(
+                                        '글 보러가기',
+                                        style: TextStyle(
+                                            color: CustomColor.primary3,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : (state == '테스트중')
+                                ? Expanded(
+                                    child: TextButton(
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                                CustomColor.primary2),
+                                        shape: MaterialStateProperty.all(
+                                          RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        await requestRecruitingDetail(id)
+                                            .then((listDetailInfo) {
+                                          Get.to(() => ListDetail(
+                                              intValue: id,
+                                              title: title,
+                                              nickname: listDetailInfo.nickName,
+                                              createdDate: createdDate,
+                                              thumbnailUrl: thumbnailUrl,
+                                              likes: listDetailInfo.likes,
+                                              views: listDetailInfo.views,
+                                              urls: listDetailInfo.imageUrls,
+                                              introLine: introLine,
+                                              likedBoard:
+                                                  listDetailInfo.likedBoard));
+                                        });
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.science_outlined,
+                                              color: CustomColor.primary1),
+                                          const SizedBox(width: 8.0),
+                                          Text(
+                                            '테스트 중',
+                                            style: TextStyle(
+                                                color: CustomColor.primary1,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : Expanded(
+                                    child: TextButton(
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                                CustomColor.primary1),
+                                        shape: MaterialStateProperty.all(
+                                          RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Common().showToastN(
+                                            context, '완료된 테스트입니다', 4);
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.list_alt_outlined,
+                                              color: CustomColor.grey5),
+                                          const SizedBox(width: 8.0),
+                                          Text(
+                                            '테스트 완료',
+                                            style: TextStyle(
+                                                color: CustomColor.grey5,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                   ],
                 ),
               )
@@ -698,4 +860,47 @@ Widget appIcon(String thumbnailUrl) {
       ),
     ),
   );
+}
+
+class BalloonWidget extends StatelessWidget {
+  final String message;
+
+  BalloonWidget({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 30,
+      padding: EdgeInsets.symmetric(horizontal: 3),
+      decoration: BoxDecoration(
+        color: CustomColor.primary1, // 말풍선 배경색
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            size: 20,
+            Icons.warning,
+            color: CustomColor.primary3, // 경고 아이콘 색상
+          ),
+          Text(
+            message,
+            style: TextStyle(
+              fontSize: 12,
+              color: CustomColor.grey5, // 메시지 텍스트 색상
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
