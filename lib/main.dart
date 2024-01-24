@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:and20roid/utility/common.dart';
 import 'package:and20roid/view/alarm/notification_controller.dart';
 import 'package:and20roid/view/alarm/notification_page.dart';
+import 'package:and20roid/view/list/list_controller.dart';
+import 'package:and20roid/view/list/list_page.dart';
 import 'package:and20roid/view/ranking/ranking_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
@@ -12,16 +14,17 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'bottom_navigator.dart';
 import 'direct_page.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding =  WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await FirebaseMessaging.instance.getToken();
-  await initialization(null);
 
   runApp(const MyApp());
 }
@@ -34,6 +37,7 @@ class MyApp extends StatelessWidget {
     init();
     firebaseMessageSetting();
     firebaseMessageProc(context);
+    FlutterNativeSplash.remove();
 
     return GetMaterialApp(
       color: CustomColor.grey5,
@@ -45,7 +49,7 @@ class MyApp extends StatelessWidget {
 bool kIsWeb = false;
 
 void init() async {
-  // await deleteToken();
+  Get.put(ListController());
 
   if (await Permission.notification.isDenied) {
     await Permission.notification.request();
@@ -58,6 +62,8 @@ void init() async {
   );
   String? token = await FirebaseMessaging.instance.getToken();
   print("fcm token $token");
+
+
 }
 
 void firebaseMessageSetting() async {
@@ -172,31 +178,4 @@ void firebaseMessageProc(context) {
 ///백그라운드 알림 수신
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-}
-
-Future<void> deleteToken() async {
-  final url = Uri.parse('${Common.url}users/tokens');
-  String? bearerToken = await FirebaseAuth.instance.currentUser!.getIdToken();
-  try {
-    final response = await http.delete(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $bearerToken', // 토큰을 헤더에 포함
-      },
-    );
-
-    if (response.statusCode == 200) {
-      print('Token deletion successful');
-    } else {
-      print('Token deletion failed. Status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
-    }
-  } catch (e) {
-    print('Error during token deletion: $e');
-  }
-}
-
-Future initialization(BuildContext? context) async {
-  await Future.delayed(const Duration(seconds: 2));
 }

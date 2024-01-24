@@ -1,11 +1,11 @@
 import 'package:and20roid/view/mypage/change_nickname.dart';
-import 'package:and20roid/view/mypage/delete_account.dart';
 import 'package:and20roid/view/mypage/personal_info_processing_policy.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:http/http.dart' as http;
+import '../../main.dart';
 import '../../utility/common.dart';
-import 'logout.dart';
 
 class ChangeInfo extends StatefulWidget {
   const ChangeInfo({super.key});
@@ -39,6 +39,227 @@ class _ChangeInfoState extends State<ChangeInfo> {
   }
 
   Widget _body() {
+
+    Future<void> signOut() async {
+      try {
+        await FirebaseAuth.instance.signOut();
+        print('User signed out successfully');
+      } catch (e) {
+        print('Error during sign out: $e');
+      }
+    }
+
+    Future<void> deleteAccount() async {
+      try {
+        await FirebaseAuth.instance.currentUser!.delete();
+        print('Account deleted successfully');
+      } catch (e) {
+        print('Error during account deletion: $e');
+      }
+    }
+
+
+    Future<void> deleteToken() async {
+      final url = Uri.parse('${Common.url}users/tokens');
+      String? bearerToken = await FirebaseAuth.instance.currentUser!.getIdToken();
+      try {
+        final response = await http.delete(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $bearerToken', // 토큰을 헤더에 포함
+          },
+        );
+
+        if (response.statusCode == 200) {
+          print('Token deletion successful');
+        } else {
+          print('Token deletion failed. Status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
+        }
+      } catch (e) {
+        print('Error during token deletion: $e');
+      }
+    }
+
+    Future<bool> logout(context) async {
+      bool? confirmExit = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Theme(
+            data: ThemeData(dialogBackgroundColor: Colors.white),
+            child: Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4.0),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: context.width,
+                    color: CustomColor.white,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
+                      child: Text(
+                        '로그아웃 하시겠습니까?',
+                        style: TextStyle(fontSize: 20,color: CustomColor.grey5, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(CustomColor.grey2),
+                            shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(0.0),
+                              ),
+                            ),
+                            minimumSize: MaterialStateProperty.all(Size(double.infinity, 50)), //
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop(false); // Cancel exit
+                          },
+                          child: Text(
+                            '취소',
+                            style: TextStyle(
+                              color: CustomColor.grey4,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: TextButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(CustomColor.primary1),
+                            minimumSize: MaterialStateProperty.all(Size(double.infinity, 50)), //
+                            shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(0.0),
+                              ),
+                            ),// 꽉 차게 하기 위한 설정
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop(true); // Confirm exit
+                          },
+                          child: Text(
+                            '로그아웃',
+                            style: TextStyle(
+                              color: CustomColor.grey5,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+
+                ],
+              ),
+            ),
+          );
+        },
+      );
+
+      return confirmExit ??
+          false; // Return false by default if confirmExit is null
+    }
+
+    Future<bool> delete(context) async {
+      bool? confirmExit = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Theme(
+            data: ThemeData(dialogBackgroundColor: Colors.white),
+            child: Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4.0),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: context.width,
+                    color: CustomColor.white,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
+                      child: Text(
+                        '계정 탈퇴 하시겠습니까?',
+                        style: TextStyle(fontSize: 20,color: CustomColor.grey5, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(CustomColor.grey2),
+                            shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(0.0),
+                              ),
+                            ),
+                            minimumSize: MaterialStateProperty.all(Size(double.infinity, 50)), //
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop(false); // Cancel exit
+                          },
+                          child: Text(
+                            '취소',
+                            style: TextStyle(
+                              color: CustomColor.grey4,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: TextButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(CustomColor.primary1),
+                            minimumSize: MaterialStateProperty.all(Size(double.infinity, 50)), //
+                            shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(0.0),
+                              ),
+                            ),// 꽉 차게 하기 위한 설정
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop(true); // Confirm exit
+                          },
+                          child: Text(
+                            '삭제하기',
+                            style: TextStyle(
+                              color: CustomColor.grey5,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+
+                ],
+              ),
+            ),
+          );
+        },
+      );
+
+      return confirmExit ??
+          false; // Return false by default if confirmExit is null
+    }
+
     return Column(
       children: [
         ListTile(
@@ -49,15 +270,34 @@ class _ChangeInfoState extends State<ChangeInfo> {
           title: Text("닉네임 변경"),
         ),
         ListTile(
-          onTap: (){
-            Get.to(()=>Logout(),transition: Transition.rightToLeft);
+          onTap: () async {
+            bool confirmDeletion = await logout(context);
+            if (confirmDeletion) {
+              print('Account deleted');
+              //firebase logout
+              signOut();
+              runApp(MyApp());
+            } else {
+              print('Deletion canceled');
+            }
           },
           leading: Icon(Icons.logout_outlined),
           title: Text("로그 아웃"),
         ),
         ListTile(
-          onTap: (){
-            Get.to(()=>DeleteAccount(),transition: Transition.rightToLeft);
+          onTap: () async{
+            bool confirmDeletion = await delete(context);
+            if (confirmDeletion) {
+              print('Account deleted');
+              //firebase 계정 삭제
+              deleteAccount();
+              //fcm 토큰 삭제
+              deleteToken();
+              runApp(MyApp());
+
+            } else {
+              print('Deletion canceled');
+            }
           },
           leading: Icon(Icons.no_accounts_outlined),
           title: Text("회원 탈퇴"),

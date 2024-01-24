@@ -9,123 +9,65 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../model/list_model.dart';
 import '../../utility/common.dart';
+import 'list_controller.dart';
 import 'list_detail.dart';
 
-class ListContent extends StatefulWidget {
-  @override
-  State<ListContent> createState() => _ListContentState();
-}
-
-class _ListContentState extends State<ListContent> {
-  final List<GatherList> gatherListItems = [];
-  final RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-  int lastBoardId = 0;
-
-  init() async {
-    await requestRecruitingList();
-  }
-
-  Future<void> requestRecruitingList() async {
-    try {
-      String url = "${Common.url}boards";
-      String? bearerToken =
-          await FirebaseAuth.instance.currentUser!.getIdToken();
-      Map<String, dynamic> queryParameters = {
-        'lastBoardId': lastBoardId.toString(),
-      };
-      var data = await http.get(
-        Uri.parse(url).replace(queryParameters: queryParameters),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $bearerToken',
-        },
-      );
-
-      if (data.statusCode == 200) {
-        if (data.body.isNotEmpty) {
-          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
-
-          var jsonData = jsonResults['readBoardResponses'];
-          for (var jsonResult in jsonData) {
-            GatherList gatherList = GatherList.fromJson(jsonResult);
-            gatherListItems.add(gatherList);
-          }
-
-          if(gatherListItems.length >= 10){
-            lastBoardId += 10;
-          }
-          print('$lastBoardId 번 째 게시글을 가져옴');
-
-          setState(() {});
-
-        }
-      } else {
-        print("Status code: ${data.statusCode}");
-        print("Response body: ${data.body}");
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-    _refreshController.refreshCompleted();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    init();
-  }
+class ListContent extends StatelessWidget {
+  final listCtrl = Get.find<ListController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CustomColor.grey1,
       appBar: _appBar(),
-      body: SmartRefresher(
-        enablePullDown: true,
-        controller: _refreshController,
-        onRefresh: requestRecruitingList,
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: gatherListItems.length,
-          itemBuilder: (context, index) {
-            return InkWell(
-              onTap: () {
-                print(gatherListItems[index].id);
-                Get.to(
-                    () => ListDetail(
-                          intValue: gatherListItems[index].id,
-                          title: gatherListItems[index].title,
-                          nickname: gatherListItems[index].nickname,
-                          createdDate: gatherListItems[index].createdDate,
-                          thumbnailUrl: gatherListItems[index].thumbnailUrl,
-                          likes: gatherListItems[index].likes,
-                          views: gatherListItems[index].views,
-                          urls: gatherListItems[index].imageUrls,
-                          introLine: gatherListItems[index].introLine,
-                          likedBoard: gatherListItems[index].likedBoard,
-                        ),
-                    transition: Transition.leftToRight);
+      body: GetBuilder<ListController>(
+        builder: (listCtrl) {
+          return SmartRefresher(
+            enablePullDown: true,
+            controller: listCtrl.refreshController,
+            onRefresh: listCtrl.requestRecruitingList,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: listCtrl.gatherListItems.length,
+              itemBuilder: (context, index) {
+                return InkWell(
+                  onTap: () {
+                    Get.to(
+                          () => ListDetail(
+                        intValue: listCtrl.gatherListItems[index].id,
+                        title: listCtrl.gatherListItems[index].title,
+                        nickname: listCtrl.gatherListItems[index].nickname,
+                        createdDate: listCtrl.gatherListItems[index].createdDate,
+                        thumbnailUrl: listCtrl.gatherListItems[index].thumbnailUrl,
+                        likes: listCtrl.gatherListItems[index].likes,
+                        views: listCtrl.gatherListItems[index].views,
+                        urls: listCtrl.gatherListItems[index].imageUrls,
+                        introLine: listCtrl.gatherListItems[index].introLine,
+                        likedBoard: listCtrl.gatherListItems[index].likedBoard,
+                      ),
+                      transition: Transition.leftToRight,
+                    );
+                  },
+                  child: renderCard(
+                    listCtrl.gatherListItems[index].participantNum.toString(),
+                    listCtrl.gatherListItems[index].title,
+                    listCtrl.gatherListItems[index].introLine,
+                    listCtrl.gatherListItems[index].imageUrls,
+                    listCtrl.gatherListItems[index].thumbnailUrl,
+                    listCtrl.gatherListItems[index].nickname,
+                    listCtrl.gatherListItems[index].likes,
+                    listCtrl.gatherListItems[index].views,
+                    MediaQuery.of(context).size.width,
+                    listCtrl.gatherListItems[index].likedBoard,
+                  ),
+                );
               },
-              child: renderCard(
-                gatherListItems[index].participantNum.toString(),
-                gatherListItems[index].title,
-                gatherListItems[index].introLine,
-                gatherListItems[index].imageUrls,
-                gatherListItems[index].thumbnailUrl,
-                gatherListItems[index].nickname,
-                gatherListItems[index].likes,
-                gatherListItems[index].views,
-                MediaQuery.of(context).size.width,
-                gatherListItems[index].likedBoard,
-              ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
-
   AppBar _appBar() {
     return AppBar(
         foregroundColor: CustomColor.grey1,
