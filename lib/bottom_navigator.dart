@@ -1,5 +1,7 @@
 import 'package:and20roid/utility/common.dart';
+import 'package:and20roid/view/list/list_controller.dart';
 import 'package:and20roid/view/list/list_page.dart';
+import 'package:and20roid/view/mypage/my_page_controller.dart';
 import 'package:and20roid/view/ranking/rank_page.dart';
 import 'package:and20roid/view/alarm/notification_page.dart';
 import 'package:and20roid/view/ranking/ranking_controller.dart';
@@ -21,6 +23,9 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
   int _currentIndex = 0;
 
   final notiCtrl = Get.find<NotiController>();
+  final rankCtrl = Get.find<RankingController>();
+  final listCtrl = Get.find<ListController>();
+  final myCtrl = Get.find<MyPageControllrer>();
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +85,15 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
               ),
             ],
             onTap: (index) {
-              if (index == 3) {
+              if (index == 0) {
+                listCtrl.update();
+                print('listCtrl update ');
+              } else if (index == 3) {
                 notiCtrl.alarmCount = 0.obs;
+              } else if (index == 1) {
+                rankCtrl.requestTotalRanking();
+                print('ranking update ');
+                // rankCtrl.update();
               }
               setState(() {
                 _currentIndex = index;
@@ -158,24 +170,28 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
                     padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
                     child: Text(
                       '앱을 종료하시겠습니까?',
-                      style: TextStyle(fontSize: 20,color: CustomColor.grey5, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: CustomColor.grey5,
+                          fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
                   ),
                 ),
-
                 Row(
                   children: [
                     Expanded(
                       child: TextButton(
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(CustomColor.grey2),
+                          backgroundColor:
+                              MaterialStateProperty.all(CustomColor.grey2),
                           shape: MaterialStateProperty.all(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(0.0),
                             ),
                           ),
-                          minimumSize: MaterialStateProperty.all(Size(double.infinity, 50)), //
+                          minimumSize: MaterialStateProperty.all(
+                              Size(double.infinity, 50)), //
                         ),
                         onPressed: () {
                           Navigator.of(context).pop(false); // Cancel exit
@@ -192,13 +208,15 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
                     Expanded(
                       child: TextButton(
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(CustomColor.primary1),
-                          minimumSize: MaterialStateProperty.all(Size(double.infinity, 50)), //
+                          backgroundColor:
+                              MaterialStateProperty.all(CustomColor.primary1),
+                          minimumSize: MaterialStateProperty.all(
+                              Size(double.infinity, 50)), //
                           shape: MaterialStateProperty.all(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(0.0),
                             ),
-                          ),// 꽉 차게 하기 위한 설정
+                          ), // 꽉 차게 하기 위한 설정
                         ),
                         onPressed: () {
                           Navigator.of(context).pop(true); // Confirm exit
@@ -214,7 +232,6 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
                     ),
                   ],
                 )
-
               ],
             ),
           ),

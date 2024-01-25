@@ -8,6 +8,7 @@ import 'package:and20roid/view/mypage/my_page.dart';
 import 'package:and20roid/view/mypage/my_page_controller.dart';
 import 'package:and20roid/view/ranking/ranking_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -17,16 +18,21 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-
+// import 'package:admob_flutter/admob_flutter.dart';
 import 'bottom_navigator.dart';
 import 'direct_page.dart';
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding =  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await FirebaseMessaging.instance.getToken();
+  // Admob.initialize();
 
   runApp(const MyApp());
 }
@@ -44,6 +50,8 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       color: CustomColor.grey5,
       home: const DirectingPage(),
+      theme: ThemeData(fontFamily: 'NotoSansKR'),
+      themeMode: ThemeMode.system,
     );
   }
 }
@@ -178,7 +186,6 @@ void firebaseMessageProc(context) {
   });
 
   Future.delayed(const Duration(seconds: 1));
-  print('대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ');
 }
 
 ///백그라운드 알림 수신

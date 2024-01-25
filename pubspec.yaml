@@ -55,6 +55,8 @@ dependencies:
   url_launcher: ^6.2.4
   flutter_native_splash: ^2.3.9
 
+#  admob_flutter: ^3.0.0
+  google_fonts: ^6.1.0
 #  google_mobile_ads: ^4.0.0
 
 dev_dependencies:
@@ -96,14 +98,10 @@ flutter:
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+#s
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
-  #   - family: Trajan Pro
+  #   - family: Trajan Pros
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf

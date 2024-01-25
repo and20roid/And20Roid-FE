@@ -11,6 +11,7 @@ import '../../model/list_model.dart';
 import '../../utility/common.dart';
 import 'list_controller.dart';
 import 'list_detail.dart';
+// import 'package:admob_flutter/admob_flutter.dart';
 
 class ListContent extends StatelessWidget {
   final listCtrl = Get.find<ListController>();
@@ -30,44 +31,102 @@ class ListContent extends StatelessWidget {
               shrinkWrap: true,
               itemCount: listCtrl.gatherListItems.length,
               itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    Get.to(
-                          () => ListDetail(
-                        intValue: listCtrl.gatherListItems[index].id,
-                        title: listCtrl.gatherListItems[index].title,
-                        nickname: listCtrl.gatherListItems[index].nickname,
-                        createdDate: listCtrl.gatherListItems[index].createdDate,
-                        thumbnailUrl: listCtrl.gatherListItems[index].thumbnailUrl,
-                        likes: listCtrl.gatherListItems[index].likes,
-                        views: listCtrl.gatherListItems[index].views,
-                        urls: listCtrl.gatherListItems[index].imageUrls,
-                        introLine: listCtrl.gatherListItems[index].introLine,
-                        likedBoard: listCtrl.gatherListItems[index].likedBoard,
-                      ),
-                      transition: Transition.leftToRight,
-                    );
-                  },
-                  child: renderCard(
-                    listCtrl.gatherListItems[index].participantNum.toString(),
-                    listCtrl.gatherListItems[index].title,
-                    listCtrl.gatherListItems[index].introLine,
-                    listCtrl.gatherListItems[index].imageUrls,
-                    listCtrl.gatherListItems[index].thumbnailUrl,
-                    listCtrl.gatherListItems[index].nickname,
-                    listCtrl.gatherListItems[index].likes,
-                    listCtrl.gatherListItems[index].views,
-                    MediaQuery.of(context).size.width,
-                    listCtrl.gatherListItems[index].likedBoard,
-                  ),
-                );
-              },
+                // if (index > 0 && (index + 1) % 5 == 0) {
+                //   return Column(
+                //     children: [
+                //       AdmobBanner(
+                //         adUnitId: AdmobBanner.testAdUnitId,
+                //         adSize: AdmobBannerSize.BANNER,
+                //       ),
+                //       InkWell(
+                //         onTap: () {
+                //           Get.to(
+                //             () => ListDetail(
+                //               intValue: listCtrl.gatherListItems[index].id,
+                //               title: listCtrl.gatherListItems[index].title,
+                //               nickname:
+                //                   listCtrl.gatherListItems[index].nickname,
+                //               createdDate:
+                //                   listCtrl.gatherListItems[index].createdDate,
+                //               thumbnailUrl:
+                //                   listCtrl.gatherListItems[index].thumbnailUrl,
+                //               likes: listCtrl.gatherListItems[index].likes,
+                //               views: listCtrl.gatherListItems[index].views,
+                //               urls: listCtrl.gatherListItems[index].imageUrls,
+                //               introLine:
+                //                   listCtrl.gatherListItems[index].introLine,
+                //               likedBoard:
+                //                   listCtrl.gatherListItems[index].likedBoard,
+                //             ),
+                //             transition: Transition.leftToRight,
+                //           );
+                //         },
+                //         child: renderCard(
+                //           listCtrl.gatherListItems[index].participantNum
+                //               .toString(),
+                //           listCtrl.gatherListItems[index].title,
+                //           listCtrl.gatherListItems[index].introLine,
+                //           listCtrl.gatherListItems[index].imageUrls,
+                //           listCtrl.gatherListItems[index].thumbnailUrl,
+                //           listCtrl.gatherListItems[index].nickname,
+                //           listCtrl.gatherListItems[index].likes,
+                //           listCtrl.gatherListItems[index].views,
+                //           MediaQuery.of(context).size.width,
+                //           listCtrl.gatherListItems[index].likedBoard,
+                //         ),
+                //       )
+                //     ],
+                //   );
+                // } else {
+                  return InkWell(
+                    onTap: () {
+                      Get.to(
+                            () =>
+                            ListDetail(
+                              intValue: listCtrl.gatherListItems[index].id,
+                              title: listCtrl.gatherListItems[index].title,
+                              nickname: listCtrl.gatherListItems[index]
+                                  .nickname,
+                              createdDate:
+                              listCtrl.gatherListItems[index].createdDate,
+                              thumbnailUrl:
+                              listCtrl.gatherListItems[index].thumbnailUrl,
+                              likes: listCtrl.gatherListItems[index].likes,
+                              views: listCtrl.gatherListItems[index].views,
+                              urls: listCtrl.gatherListItems[index].imageUrls,
+                              introLine: listCtrl.gatherListItems[index]
+                                  .introLine,
+                              likedBoard: listCtrl.gatherListItems[index]
+                                  .likedBoard,
+                            ),
+                        transition: Transition.leftToRight,
+                      );
+                    },
+                    child: renderCard(
+                      listCtrl.gatherListItems[index].participantNum.toString(),
+                      listCtrl.gatherListItems[index].title,
+                      listCtrl.gatherListItems[index].introLine,
+                      listCtrl.gatherListItems[index].imageUrls,
+                      listCtrl.gatherListItems[index].thumbnailUrl,
+                      listCtrl.gatherListItems[index].nickname,
+                      listCtrl.gatherListItems[index].likes,
+                      listCtrl.gatherListItems[index].views,
+                      MediaQuery
+                          .of(context)
+                          .size
+                          .width,
+                      listCtrl.gatherListItems[index].likedBoard,
+                    ),
+                  );
+                }
+              // },
             ),
           );
         },
       ),
     );
   }
+
   AppBar _appBar() {
     return AppBar(
         foregroundColor: CustomColor.grey1,

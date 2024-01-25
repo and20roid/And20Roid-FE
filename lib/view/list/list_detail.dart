@@ -338,6 +338,7 @@ class _ListDetailState extends State<ListDetail> {
                         ),
                       ),
                       LinearProgressIndicator(
+                        borderRadius: BorderRadius.circular(4),
                         value: participantNum / 20,
                         backgroundColor: Colors.black12, // 배경색
                         valueColor: AlwaysStoppedAnimation<Color>(

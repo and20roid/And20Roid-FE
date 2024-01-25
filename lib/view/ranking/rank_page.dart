@@ -108,14 +108,12 @@ class RankingContent extends StatelessWidget {
                   child: ListView.builder(
                     itemBuilder: (context, index) {
                       // 4등부터의 데이터를 가져옴
-                      Map<String, dynamic> playerData =
-                          rankCtrl.rankList[index + 3] as Map<String, dynamic>;
-                      String playerName = playerData['nickname'];
-                      int ranking = playerData['rank'];
-                      int testCount = playerData['completedTestCount'];
-                      bool related = playerData['relatedUser'];
-                      int helpEach = playerData['interactionCountAsTester'] +
-                          playerData['interactionCountAsUploader'];
+                      Rank playerData = rankCtrl.rankList[index + 3];
+                      String playerName = playerData.nickname;
+                      int ranking = playerData.rank;
+                      int testCount = playerData.completedTestCount;
+                      bool related = playerData.relatedUser;
+                      int helpEach = playerData.interactionCountAsTester + playerData.interactionCountAsUploader;
 
                       // Rank playerData = dummyList[index + 3];
                       // String playerName = playerData.nickname;
@@ -127,7 +125,7 @@ class RankingContent extends StatelessWidget {
 
                       return InkWell(
                         onTap: () {
-                          movePage(playerName, playerData['userId'],
+                          movePage(playerName, playerData.userId,
                               ranking.toString(), helpEach, related);
                         },
                         // onTap: () {

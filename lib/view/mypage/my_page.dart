@@ -20,178 +20,190 @@ class MyPageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: GetBuilder<MyPageControllrer>(
-          builder: (myCtrl){
-            return Scaffold(
-                appBar: AppBar(
-                  toolbarHeight: 80,
-                  backgroundColor: CustomColor.grey1,
-                  title: RichText(
-                    text: TextSpan(
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: '${myCtrl.name}',
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: CustomColor
-                                .primary1, // You can customize the color if needed
-                          ),
-                        ),
-                        TextSpan(
-                          text: ' 님의 페이지',
-                          style: TextStyle(fontSize: 15, color: Colors.black),
-                        ),
-                      ],
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  actions: [
-                    IconButton(
-                        onPressed: () {
-                          Get.to(() => const ChangeInfo(),
-                              transition: Transition.rightToLeftWithFade);
-                        },
-                        icon: Icon(
-                          Icons.settings,
-                          size: 30,
-                        ))
-                  ],
-                ),
-                backgroundColor: CustomColor.grey1,
-                body: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                              child: testInfo(" 랭킹", myCtrl.rank.toString(),
-                                  Icons.emoji_events_outlined, '등')),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                              child: testInfo(
-                                  " 게시물",
-                                  myCtrl.uploadBoardCount.toString(),
-                                  Icons.upload_file_outlined,'개')),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                              child: testInfo(" 완료",
-                                  myCtrl.completedTestCount.toString(), Icons.done,'회')),
-                        ],
+    return SafeArea(child: GetBuilder<MyPageControllrer>(
+      builder: (myCtrl) {
+        return Scaffold(
+            appBar: AppBar(
+              toolbarHeight: 80,
+              backgroundColor: CustomColor.grey1,
+              title: RichText(
+                text: TextSpan(
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: '${myCtrl.name}',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: CustomColor
+                            .primary1, // You can customize the color if needed
                       ),
                     ),
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(30.0),
-                            topRight: Radius.circular(30.0),
-                          ),
-                          color: CustomColor.white,
-                        ),
-                        child: DefaultTabController(
-                          length: 2,
-                          child: Column(
-                            children: [
-                              TabBar(
-                                indicatorColor: CustomColor.primary1,
-                                tabs: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Text(
-                                      '업로드한 테스트',
-                                      style: TextStyle(
-                                          color: CustomColor.grey4, fontSize: 18),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Text(
-                                      '참여한 테스트',
-                                      style: TextStyle(
-                                          color: CustomColor.grey4, fontSize: 18),
-                                    ),
-                                  ),
-                                ],
+                    TextSpan(
+                      text: ' 님의 페이지',
+                      style: TextStyle(fontSize: 15, color: Colors.black),
+                    ),
+                  ],
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              actions: [
+                IconButton(
+                    onPressed: () {
+                      Get.to(() => const ChangeInfo(),
+                          transition: Transition.rightToLeftWithFade);
+                    },
+                    icon: Icon(
+                      Icons.settings,
+                      size: 30,
+                    ))
+              ],
+            ),
+            backgroundColor: CustomColor.grey1,
+            body: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                          child: testInfo(" 랭킹", myCtrl.rank.toString(),
+                              Icons.emoji_events_outlined, '등')),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                          child: testInfo(
+                              " 게시물",
+                              myCtrl.uploadBoardCount.toString(),
+                              Icons.upload_file_outlined,
+                              '개')),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                          child: testInfo(
+                              " 완료",
+                              myCtrl.completedTestCount.toString(),
+                              Icons.done,
+                              '회')),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(30.0),
+                        topRight: Radius.circular(30.0),
+                      ),
+                      color: CustomColor.white,
+                    ),
+                    child: DefaultTabController(
+                      length: 2,
+                      child: Column(
+                        children: [
+                          TabBar(
+                            indicatorColor: CustomColor.primary1,
+                            tabs: [
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(
+                                  '업로드한 테스트',
+                                  style: TextStyle(
+                                      color: CustomColor.grey4, fontSize: 18),
+                                ),
                               ),
-                              Expanded(
-                                child: TabBarView(
-                                  children: [
-                                    myCtrl.myUploadTest.isEmpty
-                                        ? const Center(
-                                      child: Text("업로드한 테스트가 없어요"),
-                                    )
-                                        : SmartRefresher(
-                                      controller: myCtrl.refreshController1,
-                                      enablePullDown: true,
-                                      onRefresh: myCtrl.requestMyUploadTest,
-                                      child: ListView.builder(
-                                          itemCount: myCtrl.myUploadTest.length,
-                                          itemBuilder: (context, index) {
-                                            return joinMsgBox(
-                                                true,
-                                                myCtrl.myUploadTest[index].id,
-                                                myCtrl.myUploadTest[index]
-                                                    .thumbnailUrl,
-                                                myCtrl.myUploadTest[index].title,
-                                                myCtrl.myUploadTest[index].introLine,
-                                                myCtrl.myUploadTest[index]
-                                                    .recruitmentNum,
-                                                myCtrl.myUploadTest[index]
-                                                    .participantNum,
-                                                myCtrl.myUploadTest[index]
-                                                    .createdDate,
-                                                myCtrl.myUploadTest[index].state,
-                                                context);
-                                          }),
-                                    ),
-                                    myCtrl.myPartiTest.isEmpty
-                                        ? const Center(
-                                      child: Text("참여한 테스트가 없어요"),
-                                    )
-                                        : SmartRefresher(
-                                      controller: myCtrl.refreshController2,
-                                      enablePullDown: true,
-                                      onRefresh: myCtrl.requestMyParticipantTest,
-                                      child: ListView.builder(
-                                          itemCount: myCtrl.myPartiTest.length,
-                                          itemBuilder: (context, index) {
-                                            return joinMsgBox(
-                                                false,
-                                                myCtrl.myPartiTest[index].id,
-                                                myCtrl.myPartiTest[index]
-                                                    .thumbnailUrl,
-                                                myCtrl.myPartiTest[index].title,
-                                                myCtrl.myPartiTest[index].introLine,
-                                                myCtrl.myPartiTest[index]
-                                                    .recruitmentNum,
-                                                myCtrl.myPartiTest[index]
-                                                    .participantNum,
-                                                myCtrl.myPartiTest[index]
-                                                    .createdDate,
-                                                myCtrl.myPartiTest[index].state,
-                                                context);
-                                          }),
-                                    ),
-                                  ],
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(
+                                  '참여한 테스트',
+                                  style: TextStyle(
+                                      color: CustomColor.grey4, fontSize: 18),
                                 ),
                               ),
                             ],
                           ),
-                        ),
+                          Expanded(
+                            child: TabBarView(
+                              children: [
+                                myCtrl.myUploadTest.isEmpty
+                                    ? const Center(
+                                        child: Text("업로드한 테스트가 없어요"),
+                                      )
+                                    : SmartRefresher(
+                                        controller: myCtrl.refreshController1,
+                                        enablePullDown: true,
+                                        onRefresh: myCtrl.requestMyUploadTest,
+                                        child: ListView.builder(
+                                            itemCount:
+                                                myCtrl.myUploadTest.length,
+                                            itemBuilder: (context, index) {
+                                              return joinMsgBox(
+                                                  true,
+                                                  myCtrl.myUploadTest[index].id,
+                                                  myCtrl.myUploadTest[index]
+                                                      .thumbnailUrl,
+                                                  myCtrl.myUploadTest[index]
+                                                      .title,
+                                                  myCtrl.myUploadTest[index]
+                                                      .introLine,
+                                                  myCtrl.myUploadTest[index]
+                                                      .recruitmentNum,
+                                                  myCtrl.myUploadTest[index]
+                                                      .participantNum,
+                                                  myCtrl.myUploadTest[index]
+                                                      .createdDate,
+                                                  myCtrl.myUploadTest[index]
+                                                      .state,
+                                                  context);
+                                            }),
+                                      ),
+                                myCtrl.myPartiTest.isEmpty
+                                    ? const Center(
+                                        child: Text("참여한 테스트가 없어요"),
+                                      )
+                                    : SmartRefresher(
+                                        controller: myCtrl.refreshController2,
+                                        enablePullDown: true,
+                                        onRefresh:
+                                            myCtrl.requestMyParticipantTest,
+                                        child: ListView.builder(
+                                            itemCount:
+                                                myCtrl.myPartiTest.length,
+                                            itemBuilder: (context, index) {
+                                              return joinMsgBox(
+                                                  false,
+                                                  myCtrl.myPartiTest[index].id,
+                                                  myCtrl.myPartiTest[index]
+                                                      .thumbnailUrl,
+                                                  myCtrl
+                                                      .myPartiTest[index].title,
+                                                  myCtrl.myPartiTest[index]
+                                                      .introLine,
+                                                  myCtrl.myPartiTest[index]
+                                                      .recruitmentNum,
+                                                  myCtrl.myPartiTest[index]
+                                                      .participantNum,
+                                                  myCtrl.myPartiTest[index]
+                                                      .createdDate,
+                                                  myCtrl
+                                                      .myPartiTest[index].state,
+                                                  context);
+                                            }),
+                                      ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    )
-                  ],
-                ));
-          },
-        ));
+                    ),
+                  ),
+                )
+              ],
+            ));
+      },
+    ));
   }
 
   Widget testInfo(String title, String num, IconData icon, String danwi) {
@@ -216,7 +228,7 @@ class MyPageContent extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child:Text(
+              child: Text(
                 "$num$danwi",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
               ),
@@ -331,6 +343,7 @@ Widget joinMsgBox(
       );
       Map<String, dynamic> jsonBody = jsonDecode(utf8.decode(data.bodyBytes));
       String message = jsonBody['message'];
+      print('message ~~~~~~~~ $message');
 
       if (data.statusCode == 200) {
         print('~~~~~~~~~test link complete ${utf8.decode(data.bodyBytes)}');
@@ -381,10 +394,18 @@ Widget joinMsgBox(
                                 itemCount: partiMemberList.length,
                                 itemBuilder: (BuildContext context, int index) {
                                   return ListTile(
-                                    leading: Text(partiMemberList[index]
-                                        .userId
-                                        .toString()),
-                                    title: Text(partiMemberList[index].email),
+                                    leading: Text(
+                                      (index+1).toString(),
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    title: Text(partiMemberList[index].email,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                      ),),
                                   );
                                 },
                               ),
@@ -429,8 +450,17 @@ Widget joinMsgBox(
                             itemBuilder: (BuildContext context, int index) {
                               return ListTile(
                                 leading: Text(
-                                    partiMemberList[index].userId.toString()),
-                                title: Text(partiMemberList[index].email),
+                                  (index+1).toString(),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                title: Text(partiMemberList[index].email,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  ),),
                               );
                             },
                           ),

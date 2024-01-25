@@ -1,3 +1,4 @@
+import 'package:and20roid/direct_page.dart';
 import 'package:and20roid/view/mypage/change_nickname.dart';
 import 'package:and20roid/view/mypage/personal_info_processing_policy.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../main.dart';
 import '../../utility/common.dart';
+import 'my_page_controller.dart';
 
 class ChangeInfo extends StatefulWidget {
   const ChangeInfo({super.key});
@@ -27,6 +29,8 @@ class _ChangeInfoState extends State<ChangeInfo> {
   }
 
   AppBar _appBar() {
+    final myCtrl = Get.find<MyPageControllrer>();
+
     return AppBar(
       toolbarHeight: 60,
       backgroundColor: CustomColor.grey1,
@@ -35,11 +39,17 @@ class _ChangeInfoState extends State<ChangeInfo> {
         style: TextStyle(
             color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
       ),
+      leading: IconButton(
+        onPressed: () {
+          myCtrl.getUserName();
+          Get.back();
+        },
+        icon: Icon(Icons.arrow_back_outlined),
+      ),
     );
   }
 
   Widget _body() {
-
     Future<void> signOut() async {
       try {
         await FirebaseAuth.instance.signOut();
@@ -58,10 +68,10 @@ class _ChangeInfoState extends State<ChangeInfo> {
       }
     }
 
-
     Future<void> deleteToken() async {
       final url = Uri.parse('${Common.url}users/tokens');
-      String? bearerToken = await FirebaseAuth.instance.currentUser!.getIdToken();
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
       try {
         final response = await http.delete(
           url,
@@ -100,27 +110,32 @@ class _ChangeInfoState extends State<ChangeInfo> {
                     width: context.width,
                     color: CustomColor.white,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
+                      padding:
+                          const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
                       child: Text(
                         '로그아웃 하시겠습니까?',
-                        style: TextStyle(fontSize: 20,color: CustomColor.grey5, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: CustomColor.grey5,
+                            fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                     ),
                   ),
-
                   Row(
                     children: [
                       Expanded(
                         child: TextButton(
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(CustomColor.grey2),
+                            backgroundColor:
+                                MaterialStateProperty.all(CustomColor.grey2),
                             shape: MaterialStateProperty.all(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(0.0),
                               ),
                             ),
-                            minimumSize: MaterialStateProperty.all(Size(double.infinity, 50)), //
+                            minimumSize: MaterialStateProperty.all(
+                                Size(double.infinity, 50)), //
                           ),
                           onPressed: () {
                             Navigator.of(context).pop(false); // Cancel exit
@@ -137,13 +152,15 @@ class _ChangeInfoState extends State<ChangeInfo> {
                       Expanded(
                         child: TextButton(
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(CustomColor.primary1),
-                            minimumSize: MaterialStateProperty.all(Size(double.infinity, 50)), //
+                            backgroundColor:
+                                MaterialStateProperty.all(CustomColor.primary1),
+                            minimumSize: MaterialStateProperty.all(
+                                Size(double.infinity, 50)), //
                             shape: MaterialStateProperty.all(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(0.0),
                               ),
-                            ),// 꽉 차게 하기 위한 설정
+                            ), // 꽉 차게 하기 위한 설정
                           ),
                           onPressed: () {
                             Navigator.of(context).pop(true); // Confirm exit
@@ -159,7 +176,6 @@ class _ChangeInfoState extends State<ChangeInfo> {
                       ),
                     ],
                   )
-
                 ],
               ),
             ),
@@ -189,27 +205,32 @@ class _ChangeInfoState extends State<ChangeInfo> {
                     width: context.width,
                     color: CustomColor.white,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
+                      padding:
+                          const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
                       child: Text(
                         '계정 탈퇴 하시겠습니까?',
-                        style: TextStyle(fontSize: 20,color: CustomColor.grey5, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: CustomColor.grey5,
+                            fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                     ),
                   ),
-
                   Row(
                     children: [
                       Expanded(
                         child: TextButton(
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(CustomColor.grey2),
+                            backgroundColor:
+                                MaterialStateProperty.all(CustomColor.grey2),
                             shape: MaterialStateProperty.all(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(0.0),
                               ),
                             ),
-                            minimumSize: MaterialStateProperty.all(Size(double.infinity, 50)), //
+                            minimumSize: MaterialStateProperty.all(
+                                Size(double.infinity, 50)), //
                           ),
                           onPressed: () {
                             Navigator.of(context).pop(false); // Cancel exit
@@ -226,13 +247,15 @@ class _ChangeInfoState extends State<ChangeInfo> {
                       Expanded(
                         child: TextButton(
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(CustomColor.primary1),
-                            minimumSize: MaterialStateProperty.all(Size(double.infinity, 50)), //
+                            backgroundColor:
+                                MaterialStateProperty.all(CustomColor.primary1),
+                            minimumSize: MaterialStateProperty.all(
+                                Size(double.infinity, 50)), //
                             shape: MaterialStateProperty.all(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(0.0),
                               ),
-                            ),// 꽉 차게 하기 위한 설정
+                            ), // 꽉 차게 하기 위한 설정
                           ),
                           onPressed: () {
                             Navigator.of(context).pop(true); // Confirm exit
@@ -248,7 +271,6 @@ class _ChangeInfoState extends State<ChangeInfo> {
                       ),
                     ],
                   )
-
                 ],
               ),
             ),
@@ -263,8 +285,8 @@ class _ChangeInfoState extends State<ChangeInfo> {
     return Column(
       children: [
         ListTile(
-          onTap: (){
-            Get.to(()=>ChangeNickname(),transition: Transition.rightToLeft);
+          onTap: () {
+            Get.to(() => ChangeNickname(), transition: Transition.rightToLeft);
           },
           leading: Icon(Icons.edit_outlined),
           title: Text("닉네임 변경"),
@@ -276,7 +298,9 @@ class _ChangeInfoState extends State<ChangeInfo> {
               print('Account deleted');
               //firebase logout
               signOut();
-              runApp(MyApp());
+              Common().showToastN(context, '잠시 후 앱이 재시작됩니다', 1);
+              await Future.delayed(Duration(seconds: 5));
+              Get.offAll(() => DirectingPage());
             } else {
               print('Deletion canceled');
             }
@@ -285,7 +309,7 @@ class _ChangeInfoState extends State<ChangeInfo> {
           title: Text("로그 아웃"),
         ),
         ListTile(
-          onTap: () async{
+          onTap: () async {
             bool confirmDeletion = await delete(context);
             if (confirmDeletion) {
               print('Account deleted');
@@ -294,7 +318,6 @@ class _ChangeInfoState extends State<ChangeInfo> {
               //fcm 토큰 삭제
               deleteToken();
               runApp(MyApp());
-
             } else {
               print('Deletion canceled');
             }
@@ -303,8 +326,9 @@ class _ChangeInfoState extends State<ChangeInfo> {
           title: Text("회원 탈퇴"),
         ),
         ListTile(
-          onTap: (){
-            Get.to(()=>PersonalInfoProccessingPolicy(),transition: Transition.rightToLeft);
+          onTap: () {
+            Get.to(() => PersonalInfoProccessingPolicy(),
+                transition: Transition.rightToLeft);
           },
           leading: Icon(Icons.person_2_outlined),
           title: Text("개인정보 처리방침"),

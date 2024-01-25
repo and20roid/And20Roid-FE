@@ -25,6 +25,7 @@ class RankingController extends GetxController{
 
       if (data.statusCode == 200) {
         if (data.body.isNotEmpty) {
+          rankList.clear();
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
           var jsonData = jsonResults['rankInfos'];
           for (var jsonResult in jsonData) {

@@ -92,12 +92,12 @@ class _LoginPageState extends State<LoginPage> {
           height: 140,
           width: 140,
           decoration: BoxDecoration(
-            color: CustomColor.white,
+            color: CustomColor.grey1,
             borderRadius: BorderRadius.circular(24),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
-            child: Image.asset('assets/images/logo.png'),
+            child: Image.asset('assets/images/logoNoback.png'),
           ),
         ),
         slogan(),
