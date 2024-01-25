@@ -86,8 +86,7 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
             ],
             onTap: (index) {
               if (index == 0) {
-                listCtrl.update();
-                print('listCtrl update ');
+                listCtrl.gotoTop();
               } else if (index == 3) {
                 notiCtrl.alarmCount = 0.obs;
               } else if (index == 1) {

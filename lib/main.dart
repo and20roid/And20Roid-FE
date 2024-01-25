@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:and20roid/utility/common.dart';
 import 'package:and20roid/view/alarm/notification_controller.dart';
 import 'package:and20roid/view/alarm/notification_page.dart';
+import 'package:and20roid/view/list/adState.dart';
 import 'package:and20roid/view/list/list_controller.dart';
 import 'package:and20roid/view/list/list_page.dart';
 import 'package:and20roid/view/mypage/my_page.dart';
@@ -18,9 +19,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-// import 'package:admob_flutter/admob_flutter.dart';
+import 'package:provider/provider.dart';
 import 'bottom_navigator.dart';
 import 'direct_page.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding =  WidgetsFlutterBinding.ensureInitialized();
@@ -32,9 +34,17 @@ Future<void> main() async {
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await FirebaseMessaging.instance.getToken();
-  // Admob.initialize();
+  final initFuture = MobileAds.instance.initialize();
+  final adState = AdState(initFuture);
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<AdState>(create: (_) => adState),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -50,8 +60,6 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       color: CustomColor.grey5,
       home: const DirectingPage(),
-      theme: ThemeData(fontFamily: 'NotoSansKR'),
-      themeMode: ThemeMode.system,
     );
   }
 }

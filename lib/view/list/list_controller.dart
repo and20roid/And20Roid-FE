@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -12,6 +14,26 @@ class ListController extends GetxController {
   final List<GatherList> gatherListItems = [];
   final RefreshController refreshController =
       RefreshController(initialRefresh: false);
+
+  Map<String, String> UNIT_ID = kReleaseMode
+      ? {
+          'ios': '[YOUR iOS AD UNIT ID]',
+          'android': 'ca-app-pub-8601392848585629/1080629832',
+        }
+      : {
+          'ios': 'ca-app-pub-3940256099942544/2934735716',
+          'android': 'ca-app-pub-3940256099942544/6300978111',
+        };
+
+  ScrollController scrollController = ScrollController();
+
+  void gotoTop() {
+    scrollController.animateTo(
+      0.0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
 
   Future<void> requestRecruitingList() async {
     try {

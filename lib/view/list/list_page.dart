@@ -1,20 +1,49 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../model/list_model.dart';
 import '../../utility/common.dart';
+import 'adState.dart';
 import 'list_controller.dart';
 import 'list_detail.dart';
-// import 'package:admob_flutter/admob_flutter.dart';
 
-class ListContent extends StatelessWidget {
+class ListContent extends StatefulWidget {
+  @override
+  State<ListContent> createState() => _ListContentState();
+}
+
+class _ListContentState extends State<ListContent> {
   final listCtrl = Get.find<ListController>();
+
+  BannerAd? banner;
+  bool _bannerIsLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final adState = Provider.of<AdState>(context, listen: false);
+    adState.initialisation.then((status) {
+      setState(() {
+        banner = BannerAd(
+          adUnitId: adState.bannerAdUnitId,
+          size: AdSize.banner,
+          request: const AdRequest(),
+          listener: adState.adListener,
+        )..load();
+
+        _bannerIsLoaded = true;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,77 +57,105 @@ class ListContent extends StatelessWidget {
             controller: listCtrl.refreshController,
             onRefresh: listCtrl.requestRecruitingList,
             child: ListView.builder(
+              controller: listCtrl.scrollController,
               shrinkWrap: true,
               itemCount: listCtrl.gatherListItems.length,
               itemBuilder: (context, index) {
-                // if (index > 0 && (index + 1) % 5 == 0) {
-                //   return Column(
-                //     children: [
-                //       AdmobBanner(
-                //         adUnitId: AdmobBanner.testAdUnitId,
-                //         adSize: AdmobBannerSize.BANNER,
-                //       ),
-                //       InkWell(
-                //         onTap: () {
-                //           Get.to(
-                //             () => ListDetail(
-                //               intValue: listCtrl.gatherListItems[index].id,
-                //               title: listCtrl.gatherListItems[index].title,
-                //               nickname:
-                //                   listCtrl.gatherListItems[index].nickname,
-                //               createdDate:
-                //                   listCtrl.gatherListItems[index].createdDate,
-                //               thumbnailUrl:
-                //                   listCtrl.gatherListItems[index].thumbnailUrl,
-                //               likes: listCtrl.gatherListItems[index].likes,
-                //               views: listCtrl.gatherListItems[index].views,
-                //               urls: listCtrl.gatherListItems[index].imageUrls,
-                //               introLine:
-                //                   listCtrl.gatherListItems[index].introLine,
-                //               likedBoard:
-                //                   listCtrl.gatherListItems[index].likedBoard,
-                //             ),
-                //             transition: Transition.leftToRight,
-                //           );
-                //         },
-                //         child: renderCard(
-                //           listCtrl.gatherListItems[index].participantNum
-                //               .toString(),
-                //           listCtrl.gatherListItems[index].title,
-                //           listCtrl.gatherListItems[index].introLine,
-                //           listCtrl.gatherListItems[index].imageUrls,
-                //           listCtrl.gatherListItems[index].thumbnailUrl,
-                //           listCtrl.gatherListItems[index].nickname,
-                //           listCtrl.gatherListItems[index].likes,
-                //           listCtrl.gatherListItems[index].views,
-                //           MediaQuery.of(context).size.width,
-                //           listCtrl.gatherListItems[index].likedBoard,
-                //         ),
-                //       )
-                //     ],
-                //   );
-                // } else {
-                  return InkWell(
-                    onTap: () {
-                      Get.to(
-                            () =>
-                            ListDetail(
+                if (index > 0 && (index + 1) % 5 == 0) {
+                  return Column(
+                    children: [
+                      // if (_bannerIsLoaded)
+                      //   Container(
+                      //       decoration: BoxDecoration(
+                      //         borderRadius: BorderRadius.circular(12.0),
+                      //         border: Border.all(color: Colors.black, width: 1.0),
+                      //       ),
+                      //       child: SizedBox(
+                      //           height: 50, child: AdWidget(ad: banner!))),
+                      _bannerIsLoaded
+                          ? Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12.0),
+                                border:
+                                    Border.all(color: Colors.black, width: 1.0),
+                              ),
+                              child: FutureBuilder(
+                                // Use FutureBuilder to get the ad size
+                                future: banner!.load(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.done) {
+                                    double adHeight =
+                                        banner!.size.height.toDouble();
+                                    return SizedBox(
+                                      height: adHeight,
+                                      child: AdWidget(ad: banner!),
+                                    );
+                                  } else {
+                                    // Return a placeholder or loading indicator if needed
+                                    return CircularProgressIndicator();
+                                  }
+                                },
+                              ))
+                          : Container(),
+                      InkWell(
+                        onTap: () {
+                          Get.to(
+                            () => ListDetail(
                               intValue: listCtrl.gatherListItems[index].id,
                               title: listCtrl.gatherListItems[index].title,
-                              nickname: listCtrl.gatherListItems[index]
-                                  .nickname,
+                              nickname:
+                                  listCtrl.gatherListItems[index].nickname,
                               createdDate:
-                              listCtrl.gatherListItems[index].createdDate,
+                                  listCtrl.gatherListItems[index].createdDate,
                               thumbnailUrl:
-                              listCtrl.gatherListItems[index].thumbnailUrl,
+                                  listCtrl.gatherListItems[index].thumbnailUrl,
                               likes: listCtrl.gatherListItems[index].likes,
                               views: listCtrl.gatherListItems[index].views,
                               urls: listCtrl.gatherListItems[index].imageUrls,
-                              introLine: listCtrl.gatherListItems[index]
-                                  .introLine,
-                              likedBoard: listCtrl.gatherListItems[index]
-                                  .likedBoard,
+                              introLine:
+                                  listCtrl.gatherListItems[index].introLine,
+                              likedBoard:
+                                  listCtrl.gatherListItems[index].likedBoard,
                             ),
+                            transition: Transition.leftToRight,
+                          );
+                        },
+                        child: renderCard(
+                          listCtrl.gatherListItems[index].participantNum
+                              .toString(),
+                          listCtrl.gatherListItems[index].title,
+                          listCtrl.gatherListItems[index].introLine,
+                          listCtrl.gatherListItems[index].imageUrls,
+                          listCtrl.gatherListItems[index].thumbnailUrl,
+                          listCtrl.gatherListItems[index].nickname,
+                          listCtrl.gatherListItems[index].likes,
+                          listCtrl.gatherListItems[index].views,
+                          MediaQuery.of(context).size.width,
+                          listCtrl.gatherListItems[index].likedBoard,
+                        ),
+                      )
+                    ],
+                  );
+                } else {
+                  return InkWell(
+                    onTap: () {
+                      Get.to(
+                        () => ListDetail(
+                          intValue: listCtrl.gatherListItems[index].id,
+                          title: listCtrl.gatherListItems[index].title,
+                          nickname: listCtrl.gatherListItems[index].nickname,
+                          createdDate:
+                              listCtrl.gatherListItems[index].createdDate,
+                          thumbnailUrl:
+                              listCtrl.gatherListItems[index].thumbnailUrl,
+                          likes: listCtrl.gatherListItems[index].likes,
+                          views: listCtrl.gatherListItems[index].views,
+                          urls: listCtrl.gatherListItems[index].imageUrls,
+                          introLine: listCtrl.gatherListItems[index].introLine,
+                          likedBoard:
+                              listCtrl.gatherListItems[index].likedBoard,
+                        ),
                         transition: Transition.leftToRight,
                       );
                     },
@@ -111,15 +168,12 @@ class ListContent extends StatelessWidget {
                       listCtrl.gatherListItems[index].nickname,
                       listCtrl.gatherListItems[index].likes,
                       listCtrl.gatherListItems[index].views,
-                      MediaQuery
-                          .of(context)
-                          .size
-                          .width,
+                      MediaQuery.of(context).size.width,
                       listCtrl.gatherListItems[index].likedBoard,
                     ),
                   );
                 }
-              // },
+              },
             ),
           );
         },
