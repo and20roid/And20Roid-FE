@@ -357,25 +357,31 @@ Column _body3(UploadThirdController controller, context) {
             int totalSize = await total.calculateTotalSize(total.appPhotoImage);
             if (appIconImageValue != null) {
               if (totalSize < 15 * 1024 * 1024 && totalSize > 0) {
-                // appIconImageValue 사용 가능
-                total.uploadImages(
-                  first.titleController.text,
-                  first.oneLineController.text,
-                  first.recruitNumController.text,
-                  total.appPhotoImage,
-                  appIconImageValue,
-                  third.appLinkController.text,
-                  third.webLinkController.text,
-                  third.contentController.text,
-                );
-                Common().showToastN(context, '업로드 중 입니다', 4);
-                first.titleController.dispose();
-                first.oneLineController.dispose();
-                first.recruitNumController.dispose();
-                third.appLinkController.dispose();
-                third.webLinkController.dispose();
-                third.contentController.dispose();
-                Get.offAll(() => const BottomNavigatorPage());
+                if(controller.appLinkController.text.isEmpty || controller.webLinkController.text.isEmpty || controller.contentController.text.isEmpty)
+                  {
+                    Common().showToastN(context, '내용을 모두 입력해주세요', 1);
+                  }
+                else{
+                  // appIconImageValue 사용 가능
+                  total.uploadImages(
+                    first.titleController.text,
+                    first.oneLineController.text,
+                    first.recruitNumController.text,
+                    total.appPhotoImage,
+                    appIconImageValue,
+                    third.appLinkController.text,
+                    third.webLinkController.text,
+                    third.contentController.text,
+                  );
+                  Common().showToastN(context, '업로드 성공', 4);
+                  first.titleController.dispose();
+                  first.oneLineController.dispose();
+                  first.recruitNumController.dispose();
+                  third.appLinkController.dispose();
+                  third.webLinkController.dispose();
+                  third.contentController.dispose();
+                  Get.offAll(() => const BottomNavigatorPage());
+                }
               } else {
                 Common().showToastN(context, '사진 크기를 확인해 주세요', 1);
                 Get.back();

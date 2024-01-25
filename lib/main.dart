@@ -4,6 +4,8 @@ import 'package:and20roid/view/alarm/notification_controller.dart';
 import 'package:and20roid/view/alarm/notification_page.dart';
 import 'package:and20roid/view/list/list_controller.dart';
 import 'package:and20roid/view/list/list_page.dart';
+import 'package:and20roid/view/mypage/my_page.dart';
+import 'package:and20roid/view/mypage/my_page_controller.dart';
 import 'package:and20roid/view/ranking/ranking_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
@@ -114,7 +116,8 @@ void firebaseMessageSetting() async {
 
 void firebaseMessageProc(context) {
   final notificationController = Get.put(NotiController());
-  final rankCtrl = Get.put(RankingController());
+  Get.put(RankingController());
+  Get.put(MyPageControllrer());
 
   ///알림 수신[앱 실행중]
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -173,6 +176,9 @@ void firebaseMessageProc(context) {
       });
     }
   });
+
+  Future.delayed(const Duration(seconds: 1));
+  print('대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ대기 1초 ㅋ');
 }
 
 ///백그라운드 알림 수신

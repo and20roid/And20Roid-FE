@@ -13,334 +13,188 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../model/list_detail.dart';
 import '../../model/mypage_tests.dart';
 import '../../utility/common.dart';
+import 'my_page_controller.dart';
 
-class MyPageContent extends StatefulWidget {
-  @override
-  State<MyPageContent> createState() => _MyPageContentState();
-}
-
-class _MyPageContentState extends State<MyPageContent> {
-  final SaveSharedPreferences sharedPreferences = SaveSharedPreferences();
-  final RefreshController _refreshController1 =
-      RefreshController(initialRefresh: false);
-  final RefreshController _refreshController2 =
-      RefreshController(initialRefresh: false);
-
-  String? name;
-  String? profileUrl;
-  int lastBoardId = 0;
-  int partilastBoardId = 0;
-  int completedTestCount = 0;
-  int uploadBoardCount = 0;
-
-  List<MyUploadTest> myUploadTest = [];
-  List<MyUploadTest> myPartiTest = [];
-
-  Future<void> getUserName() async {
-    name = await sharedPreferences.getUserNick();
-    profileUrl = await sharedPreferences.getUserProfile();
-    await requestMyUploadTest();
-    await requestMyParticipantTest();
-    await requestMyInfo();
-    setState(() {});
-  }
-
-  Future<void> requestMyInfo() async {
-    try {
-      String url = "${Common.url}users";
-      String? bearerToken =
-          await FirebaseAuth.instance.currentUser!.getIdToken();
-
-      var data = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $bearerToken',
-        },
-      );
-
-      if (data.statusCode == 200) {
-        if (data.body.isNotEmpty) {
-          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
-          completedTestCount = jsonResults['completedTestCount'];
-          uploadBoardCount = jsonResults['uploadBoardCount'];
-        }
-      } else {
-        print("Status code: ${data.statusCode}");
-        print("Response body: ${data.body}");
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
-  Future<void> requestMyUploadTest() async {
-    try {
-      String url = "${Common.url}myPages/boards/upload";
-      String? bearerToken =
-          await FirebaseAuth.instance.currentUser!.getIdToken();
-
-      Map<String, dynamic> queryParameters = {
-        'lastBoardId': lastBoardId.toString(),
-      };
-      var data = await http.get(
-        Uri.parse(url).replace(queryParameters: queryParameters),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $bearerToken',
-        },
-      );
-
-      if (data.statusCode == 200) {
-        if (data.body.isNotEmpty) {
-          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
-
-          var jsonData = jsonResults['readBoardResponses'];
-          myUploadTest.clear();
-          for (var jsonResult in jsonData) {
-            print(jsonResult);
-            MyUploadTest gather = MyUploadTest.fromJson(jsonResult);
-            print(
-                '----------------------------업로드한 테스트 ------------------------');
-
-            myUploadTest.add(gather);
-          }
-        }
-        if (myUploadTest.length > 9) {
-          lastBoardId += 10;
-        }
-      } else {
-        print("Status code: ${data.statusCode}");
-        print("Response body: ${data.body}");
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-    _refreshController1.refreshCompleted();
-    setState(() {});
-  }
-
-  Future<void> requestMyParticipantTest() async {
-    try {
-      String url = "${Common.url}myPages/boards/participation";
-      String? bearerToken =
-          await FirebaseAuth.instance.currentUser!.getIdToken();
-
-      Map<String, dynamic> queryParameters = {
-        'lastBoardId': partilastBoardId.toString(),
-      };
-      var data = await http.get(
-        Uri.parse(url).replace(queryParameters: queryParameters),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $bearerToken',
-        },
-      );
-
-      if (data.statusCode == 200) {
-        if (data.body.isNotEmpty) {
-          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
-
-          var jsonData = jsonResults['readBoardResponses'];
-          myPartiTest.clear();
-          for (var jsonResult in jsonData) {
-            MyUploadTest gather = MyUploadTest.fromJson(jsonResult);
-            myPartiTest.add(gather);
-          }
-          if (myPartiTest.length > 9) {
-            partilastBoardId += 10;
-          }
-        }
-      } else {
-        print("Status code: ${data.statusCode}");
-        print("Response body: ${data.body}");
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-    _refreshController2.refreshCompleted();
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    getUserName();
-    super.initState();
-  }
+class MyPageContent extends StatelessWidget {
+  final myCtrl = Get.find<MyPageControllrer>();
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-            appBar: AppBar(
-              toolbarHeight: 80,
-              backgroundColor: CustomColor.grey1,
-              title: RichText(
-                text: TextSpan(
-                  children: <TextSpan>[
-                    TextSpan(
-                      text: '$name',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: CustomColor
-                            .primary1, // You can customize the color if needed
-                      ),
+        child: GetBuilder<MyPageControllrer>(
+          builder: (myCtrl){
+            return Scaffold(
+                appBar: AppBar(
+                  toolbarHeight: 80,
+                  backgroundColor: CustomColor.grey1,
+                  title: RichText(
+                    text: TextSpan(
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: '${myCtrl.name}',
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: CustomColor
+                                .primary1, // You can customize the color if needed
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' 님의 페이지',
+                          style: TextStyle(fontSize: 15, color: Colors.black),
+                        ),
+                      ],
                     ),
-                    TextSpan(
-                      text: ' 님의 페이지',
-                      style: TextStyle(fontSize: 15, color: Colors.black),
-                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  actions: [
+                    IconButton(
+                        onPressed: () {
+                          Get.to(() => const ChangeInfo(),
+                              transition: Transition.rightToLeftWithFade);
+                        },
+                        icon: Icon(
+                          Icons.settings,
+                          size: 30,
+                        ))
                   ],
                 ),
-                overflow: TextOverflow.ellipsis,
-              ),
-              actions: [
-                IconButton(
-                    onPressed: () {
-                      Get.to(() => const ChangeInfo(),
-                          transition: Transition.rightToLeftWithFade);
-                    },
-                    icon: Icon(
-                      Icons.settings,
-                      size: 30,
-                    ))
-              ],
-            ),
-            backgroundColor: CustomColor.grey1,
-            body: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      // Expanded(
-                      //     child: testInfo(" 랭킹", '100등',
-                      //         'assets/icons/trophyIcon.png')),
-                      // const SizedBox(
-                      //   width: 10,
-                      // ),
-                      Expanded(
-                          child: testInfo(
-                              " 업로드한 테스트",
-                              uploadBoardCount.toString(),
-                              Icons.upload_file_outlined)),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                          child: testInfo(" 완료한 테스트",
-                              completedTestCount.toString(), Icons.done)),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(30.0),
-                        topRight: Radius.circular(30.0),
-                      ),
-                      color: CustomColor.white,
-                    ),
-                    child: DefaultTabController(
-                      length: 2,
-                      child: Column(
+                backgroundColor: CustomColor.grey1,
+                body: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          TabBar(
-                            indicatorColor: CustomColor.primary1,
-                            tabs: [
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Text(
-                                  '업로드한 테스트',
-                                  style: TextStyle(
-                                      color: CustomColor.grey4, fontSize: 18),
-                                ),
+                          Expanded(
+                              child: testInfo(" 랭킹", myCtrl.rank.toString(),
+                                  Icons.emoji_events_outlined, '등')),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                              child: testInfo(
+                                  " 게시물",
+                                  myCtrl.uploadBoardCount.toString(),
+                                  Icons.upload_file_outlined,'개')),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                              child: testInfo(" 완료",
+                                  myCtrl.completedTestCount.toString(), Icons.done,'회')),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(30.0),
+                            topRight: Radius.circular(30.0),
+                          ),
+                          color: CustomColor.white,
+                        ),
+                        child: DefaultTabController(
+                          length: 2,
+                          child: Column(
+                            children: [
+                              TabBar(
+                                indicatorColor: CustomColor.primary1,
+                                tabs: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Text(
+                                      '업로드한 테스트',
+                                      style: TextStyle(
+                                          color: CustomColor.grey4, fontSize: 18),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Text(
+                                      '참여한 테스트',
+                                      style: TextStyle(
+                                          color: CustomColor.grey4, fontSize: 18),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Text(
-                                  '참여한 테스트',
-                                  style: TextStyle(
-                                      color: CustomColor.grey4, fontSize: 18),
+                              Expanded(
+                                child: TabBarView(
+                                  children: [
+                                    myCtrl.myUploadTest.isEmpty
+                                        ? const Center(
+                                      child: Text("업로드한 테스트가 없어요"),
+                                    )
+                                        : SmartRefresher(
+                                      controller: myCtrl.refreshController1,
+                                      enablePullDown: true,
+                                      onRefresh: myCtrl.requestMyUploadTest,
+                                      child: ListView.builder(
+                                          itemCount: myCtrl.myUploadTest.length,
+                                          itemBuilder: (context, index) {
+                                            return joinMsgBox(
+                                                true,
+                                                myCtrl.myUploadTest[index].id,
+                                                myCtrl.myUploadTest[index]
+                                                    .thumbnailUrl,
+                                                myCtrl.myUploadTest[index].title,
+                                                myCtrl.myUploadTest[index].introLine,
+                                                myCtrl.myUploadTest[index]
+                                                    .recruitmentNum,
+                                                myCtrl.myUploadTest[index]
+                                                    .participantNum,
+                                                myCtrl.myUploadTest[index]
+                                                    .createdDate,
+                                                myCtrl.myUploadTest[index].state,
+                                                context);
+                                          }),
+                                    ),
+                                    myCtrl.myPartiTest.isEmpty
+                                        ? const Center(
+                                      child: Text("참여한 테스트가 없어요"),
+                                    )
+                                        : SmartRefresher(
+                                      controller: myCtrl.refreshController2,
+                                      enablePullDown: true,
+                                      onRefresh: myCtrl.requestMyParticipantTest,
+                                      child: ListView.builder(
+                                          itemCount: myCtrl.myPartiTest.length,
+                                          itemBuilder: (context, index) {
+                                            return joinMsgBox(
+                                                false,
+                                                myCtrl.myPartiTest[index].id,
+                                                myCtrl.myPartiTest[index]
+                                                    .thumbnailUrl,
+                                                myCtrl.myPartiTest[index].title,
+                                                myCtrl.myPartiTest[index].introLine,
+                                                myCtrl.myPartiTest[index]
+                                                    .recruitmentNum,
+                                                myCtrl.myPartiTest[index]
+                                                    .participantNum,
+                                                myCtrl.myPartiTest[index]
+                                                    .createdDate,
+                                                myCtrl.myPartiTest[index].state,
+                                                context);
+                                          }),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                          Expanded(
-                            child: TabBarView(
-                              children: [
-                                myUploadTest.isEmpty
-                                    ? const Center(
-                                        child: Text("업로드한 테스트가 없어요"),
-                                      )
-                                    : SmartRefresher(
-                                        controller: _refreshController1,
-                                        enablePullDown: true,
-                                        onRefresh: requestMyUploadTest,
-                                        child: ListView.builder(
-                                            itemCount: myUploadTest.length,
-                                            itemBuilder: (context, index) {
-                                              return joinMsgBox(
-                                                  true,
-                                                  myUploadTest[index].id,
-                                                  myUploadTest[index]
-                                                      .thumbnailUrl,
-                                                  myUploadTest[index].title,
-                                                  myUploadTest[index].introLine,
-                                                  myUploadTest[index]
-                                                      .recruitmentNum,
-                                                  myUploadTest[index]
-                                                      .participantNum,
-                                                  myUploadTest[index]
-                                                      .createdDate,
-                                                  myUploadTest[index].state,
-                                                  context);
-                                            }),
-                                      ),
-                                myPartiTest.isEmpty
-                                    ? const Center(
-                                        child: Text("참여한 테스트가 없어요"),
-                                      )
-                                    : SmartRefresher(
-                                        controller: _refreshController2,
-                                        enablePullDown: true,
-                                        onRefresh: requestMyParticipantTest,
-                                        child: ListView.builder(
-                                            itemCount: myPartiTest.length,
-                                            itemBuilder: (context, index) {
-                                              return joinMsgBox(
-                                                  false,
-                                                  myPartiTest[index].id,
-                                                  myPartiTest[index]
-                                                      .thumbnailUrl,
-                                                  myPartiTest[index].title,
-                                                  myPartiTest[index].introLine,
-                                                  myPartiTest[index]
-                                                      .recruitmentNum,
-                                                  myPartiTest[index]
-                                                      .participantNum,
-                                                  myPartiTest[index]
-                                                      .createdDate,
-                                                  myPartiTest[index].state,
-                                                  context);
-                                            }),
-                                      ),
-                              ],
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                )
-              ],
-            )));
+                    )
+                  ],
+                ));
+          },
+        ));
   }
 
-  Widget testInfo(String title, String num, IconData icon) {
+  Widget testInfo(String title, String num, IconData icon, String danwi) {
     return Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0), color: Colors.white),
@@ -362,8 +216,8 @@ class _MyPageContentState extends State<MyPageContent> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Text(
-                "$num회",
+              child:Text(
+                "$num$danwi",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
               ),
             ),
