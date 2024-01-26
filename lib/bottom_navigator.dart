@@ -20,6 +20,11 @@ class BottomNavigatorPage extends StatefulWidget {
 }
 
 class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
+  @override
+  void initState() {
+    setState(() {});
+    super.initState();
+  }
   int _currentIndex = 0;
 
   final notiCtrl = Get.find<NotiController>();
@@ -87,12 +92,17 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
             onTap: (index) {
               if (index == 0) {
                 listCtrl.gotoTop();
-              } else if (index == 3) {
-                notiCtrl.alarmCount = 0.obs;
-              } else if (index == 1) {
+                listCtrl.update();
+              }else if (index == 1) {
                 rankCtrl.requestTotalRanking();
                 print('ranking update ');
-                // rankCtrl.update();
+                rankCtrl.update();
+              } else if (index == 3) {
+                notiCtrl.alarmCount = 0.obs;
+              }else if (index == 4) {
+                myCtrl.getUserName();
+                print('ranking update ');
+                myCtrl.update();
               }
               setState(() {
                 _currentIndex = index;

@@ -93,22 +93,21 @@ class MyPageControllrer extends GetxController {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
           var jsonData = jsonResults['readBoardResponses'];
+          List<int> existingIds =
+          myUploadTest.map((item) => item.id).toList();
           print(
               '----------------------------업로드한 테스트 ------------------------');
           print(jsonData);
           for (var jsonResult in jsonData) {
             MyUploadTest gather = MyUploadTest.fromJson(jsonResult);
 
-            List<int> existingIds =
-                myUploadTest.map((item) => item.id).toList();
             // 새로운 GatherList의 id가 중복되지 않으면 추가
             if (!existingIds.contains(gather.id)) {
               myUploadTest.add(gather);
             }
           }
-          if (lastBoardId < myUploadTest.length) {
-            lastBoardId = myUploadTest.length;
-          }
+          lastBoardId = existingIds.reduce((value, element) => value < element ? value : element);
+
         }
       } else {
         print("Status code: ${data.statusCode}");
@@ -142,18 +141,18 @@ class MyPageControllrer extends GetxController {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
           var jsonData = jsonResults['readBoardResponses'];
+          List<int> existingIds = myPartiTest.map((item) => item.id).toList();
+
           for (var jsonResult in jsonData) {
             MyUploadTest gather = MyUploadTest.fromJsonD(jsonResult);
 
-            List<int> existingIds = myPartiTest.map((item) => item.id).toList();
             if (!existingIds.contains(gather.id)) {
               myPartiTest.add(gather);
             }
           }
-          if (lastBoardId < myPartiTest.length) {
-            lastBoardId = myPartiTest.length;
-          }
-        }
+          partilastBoardId = existingIds.reduce((value, element) => value < element ? value : element);
+
+       }
       } else {
         print("Status code: ${data.statusCode}");
         print("Response body: ${data.body}");

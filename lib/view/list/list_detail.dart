@@ -472,19 +472,20 @@ class _ListDetailState extends State<ListDetail> {
             padding: const EdgeInsets.fromLTRB(0, 12.0, 12.0, 0),
             child: SizedBox(
               width: screenWidth / 3.5, // 화면 너비의 3분의 1 크기로 설정
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: CustomColor.grey5, width: 1.5),
-                      borderRadius: BorderRadius.circular(12.0)
-                  ),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.0),
+                  border: Border.all(color: CustomColor.grey5, width: 1.5),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12.0),
                   child: CachedNetworkImage(
                     imageUrl: urls[index],
                     fit: BoxFit.fill,
                   ),
                 ),
               ),
+
             ),
           );
         },

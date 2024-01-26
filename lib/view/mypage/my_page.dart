@@ -364,11 +364,7 @@ Widget joinMsgBox(
 
   void copyToClipboard(List<PartiMember> partiMemberList) {
     String textToCopy = partiMemberList.map((party) => party.email).join(',');
-
     Clipboard.setData(ClipboardData(text: textToCopy));
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('이메일이 복사되었습니다'),
-    ));
   }
 
   void showBottomModalSheet(
@@ -377,120 +373,125 @@ Widget joinMsgBox(
       context: context,
       isScrollControlled: true, // Set to true for full width
       builder: (BuildContext context) {
-        return (partiMemberList.isEmpty)
-            ? Column(
-              children: [
-                ElevatedButton(onPressed: (){
-                  copyToClipboard(partiMemberList);
-                }, child: Text('이메일 복사하기')),
-                SizedBox(
-                    height: 150,
-                    child: Center(
-                      child: Text(
-                        "참여한 테스터가 없습니다",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: CustomColor.grey5),
-                      ),
-                    ),
-                  ),
-              ],
-            )
-            : SingleChildScrollView(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom,
-                ),
-                child: Container(
-                  padding: EdgeInsets.all(16.0),
-                  width: MediaQuery.of(context).size.width,
-                  child: (state == '모집중')
-                      ? Stack(children: [
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: partiMemberList.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return ListTile(
-                                    leading: Text(
-                                      (index + 1).toString(),
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                    title: Text(
-                                      partiMemberList[index].email,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
-                                      CustomColor.white),
-                                  minimumSize:
-                                      MaterialStateProperty.all(Size(310, 56)),
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                      side:
-                                          BorderSide(color: CustomColor.grey4),
-                                      borderRadius: BorderRadius.circular(12.0),
-                                    ),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  requestTestLinkBroadcast(boardId, context);
-                                },
-                                child: Text(
-                                  "테스트 링크 전송",
-                                  style: TextStyle(
+        return SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            width: MediaQuery.of(context).size.width,
+            child: (state == '모집중')
+                ? (partiMemberList.isEmpty)
+                    ? SizedBox(
+                        height: 150,
+                        child: Center(
+                          child: Text(
+                            "참여한 테스터가 없습니다",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: CustomColor.grey5),
+                          ),
+                        ),
+                      )
+                    : Stack(children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: partiMemberList.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return ListTile(
+                                  leading: Text(
+                                    (index + 1).toString(),
+                                    style: TextStyle(
                                       fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: CustomColor.primary1),
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  title: Text(
+                                    partiMemberList[index].email,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            ElevatedButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                    CustomColor.white),
+                                minimumSize:
+                                    MaterialStateProperty.all(Size(310, 56)),
+                                shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    side: BorderSide(color: CustomColor.grey4),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
-                          Positioned(
-                              bottom: 43,
-                              right: 0,
-                              child: BalloonWidget(
-                                message: '한번만 전송할 수 있어요',
-                              ))
-                        ])
-                      : Column(mainAxisSize: MainAxisSize.min, children: [
-                          ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: partiMemberList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return ListTile(
-                                leading: Text(
-                                  (index + 1).toString(),
-                                  style: TextStyle(
+                              onPressed: () {
+                                requestTestLinkBroadcast(boardId, context);
+                              },
+                              child: Text(
+                                "테스트 링크 전송",
+                                style: TextStyle(
                                     fontSize: 20,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                title: Text(
-                                  partiMemberList[index].email,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              );
-                            },
+                                    fontWeight: FontWeight.bold,
+                                    color: CustomColor.primary1),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Positioned(
+                            bottom: 43,
+                            right: 0,
+                            child: BalloonWidget(
+                              message: '한번만 전송할 수 있어요',
+                            )),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: ElevatedButton(
+                              onPressed: () {
+                                copyToClipboard(partiMemberList);
+                              },
+                              child: Icon(
+                                Icons.copy,
+                                color: CustomColor.primary1,
+                                size: 20,
+                              )),
+                        ),
+                      ])
+                : Column(mainAxisSize: MainAxisSize.min, children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: partiMemberList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          leading: Text(
+                            (index + 1).toString(),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                        ]),
-                ),
-              );
+                          title: Text(
+                            partiMemberList[index].email,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ]),
+          ),
+        );
       },
     );
   }

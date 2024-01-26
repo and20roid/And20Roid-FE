@@ -14,7 +14,7 @@ class ListController extends GetxController {
   List<GatherList> gatherListItems = [];
 
   final RefreshController refreshController =
-      RefreshController(initialRefresh: false);
+      RefreshController(initialRefresh: true);
 
   Map<String, String> UNIT_ID = kReleaseMode
       ? {
@@ -35,7 +35,6 @@ class ListController extends GetxController {
       curve: Curves.easeInOut,
     );
   }
-
   Future<void> requestRecruitingList() async {
     try {
       String url = "${Common.url}boards";
@@ -58,22 +57,23 @@ class ListController extends GetxController {
 
           var jsonData = jsonResults['readBoardResponses'];
           print(jsonData);
+
+          List<int> existingIds = gatherListItems.map((item) => item.id).toList();
+          print(existingIds);
           for (var jsonResult in jsonData) {
             GatherList gatherList = GatherList.fromJson(jsonResult);
 
-           List<int> existingIds = gatherListItems.map((item) => item.id).toList();
-            // 새로운 GatherList의 id가 중복되지 않으면 추가
             if (!existingIds.contains(gatherList.id)) {
               gatherListItems.add(gatherList);
             }
           }
 
-          if(lastBoardId < gatherListItems.length){
-            lastBoardId = gatherListItems.length ;
-          }
+          //max
+          // lastBoardId = existingIds.reduce((value, element) => value > element ? value : element);
+          //min
+          lastBoardId = existingIds.reduce((value, element) => value < element ? value : element);
 
-
-          print('$lastBoardId 번 째 게시글을 가져옴 ${gatherListItems.length}');
+          print('$lastBoardId 번 째 게시글을 가져옴');
 
           update();
         }

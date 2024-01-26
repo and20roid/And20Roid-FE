@@ -37,17 +37,21 @@ class NotiController extends GetxController {
           var jsonData = jsonResults['fcmMessageResponses'];
           print(
               '------------------fcmMessageResponses Start--------------------, ${jsonData.length}');
+
+          List<int> existingIds = notiData.map((item) => item.id).toList();
+
           for(var notificationData in jsonData){
             NotificationList notification = NotificationList.fromJson(notificationData);
-            List<int> existingIds = notiData.map((item) => item.id).toList();
+
             if (!existingIds.contains(notification.id)) {
               notiData.add(notification);
             }
           }
-
-          if(lastMessageId < notiData.length){
-            lastMessageId = notiData.length ;
-          }
+          //
+          // if(lastMessageId < notiData.length){
+          //   lastMessageId = notiData.length ;
+          // }
+          lastMessageId = existingIds.reduce((value, element) => value < element ? value : element);
 
           print(
               '------------------fcmMessageResponses End--------------------');

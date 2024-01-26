@@ -4,8 +4,10 @@ import 'package:and20roid/view/mypage/personal_info_processing_policy.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../main.dart';
 import '../../utility/common.dart';
 import 'my_page_controller.dart';
@@ -51,6 +53,22 @@ class _ChangeInfoState extends State<ChangeInfo> {
   }
 
   Widget _body() {
+
+    Future<void> clearSharedPreferences() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+    }
+
+    Future<void> clearAppCache() async {
+      DefaultCacheManager().emptyCache();
+    }
+
+    void onLogout() async {
+      await clearAppCache();
+      await clearSharedPreferences();
+    }
+
+
     Future<void> signOut() async {
       try {
         await FirebaseAuth.instance.signOut();
@@ -334,6 +352,7 @@ class _ChangeInfoState extends State<ChangeInfo> {
               print('Account deleted');
               //firebase logout
               signOut();
+              onLogout();
               Common().showToastN(context, '잠시 후 앱이 재시작됩니다', 1);
               await Future.delayed(Duration(seconds: 5));
               Get.offAll(() => DirectingPage());
@@ -353,6 +372,7 @@ class _ChangeInfoState extends State<ChangeInfo> {
               deleteAccount();
               deleteDb();
               deleteToken();
+              onLogout();
               Common().showToastN(context, '잠시 후 앱이 종료됩니다', 1);
               await Future.delayed(Duration(seconds: 5));
               SystemNavigator.pop();
