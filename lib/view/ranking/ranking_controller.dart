@@ -28,6 +28,7 @@ class RankingController extends GetxController{
           rankList.clear();
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
           var jsonData = jsonResults['rankInfos'];
+          print('------------------------rnaking data ${jsonData}');
           for (var jsonResult in jsonData) {
             print("ranking : $jsonResult");
             Rank ranking = Rank.fromJson(jsonResult);

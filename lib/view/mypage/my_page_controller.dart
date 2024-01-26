@@ -8,12 +8,12 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../model/mypage_tests.dart';
 import '../../utility/common.dart';
 
-class MyPageControllrer extends GetxController{
+class MyPageControllrer extends GetxController {
   final SaveSharedPreferences sharedPreferences = SaveSharedPreferences();
   final RefreshController refreshController1 =
-  RefreshController(initialRefresh: false);
+      RefreshController(initialRefresh: false);
   final RefreshController refreshController2 =
-  RefreshController(initialRefresh: false);
+      RefreshController(initialRefresh: false);
 
   String? name;
   String? profileUrl;
@@ -23,11 +23,13 @@ class MyPageControllrer extends GetxController{
   int uploadBoardCount = 0;
   int rank = 0;
 
+  String? emailName;
+
   List<MyUploadTest> myUploadTest = [];
   List<MyUploadTest> myPartiTest = [];
 
   Future<void> getUserName() async {
-    name = await sharedPreferences.getUserNick();
+    emailName = await sharedPreferences.getUserNick();
     profileUrl = await sharedPreferences.getUserProfile();
     await requestMyUploadTest();
     await requestMyParticipantTest();
@@ -39,7 +41,7 @@ class MyPageControllrer extends GetxController{
     try {
       String url = "${Common.url}users";
       String? bearerToken =
-      await FirebaseAuth.instance.currentUser!.getIdToken();
+          await FirebaseAuth.instance.currentUser!.getIdToken();
 
       var data = await http.get(
         Uri.parse(url),
@@ -57,6 +59,8 @@ class MyPageControllrer extends GetxController{
           completedTestCount = jsonResults['completedTestCount'];
           uploadBoardCount = jsonResults['uploadBoardCount'];
           rank = jsonResults['rank'];
+
+          print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~name $name');
         }
       } else {
         print("Status code: ${data.statusCode}");
@@ -71,7 +75,7 @@ class MyPageControllrer extends GetxController{
     try {
       String url = "${Common.url}myPages/boards/upload";
       String? bearerToken =
-      await FirebaseAuth.instance.currentUser!.getIdToken();
+          await FirebaseAuth.instance.currentUser!.getIdToken();
 
       Map<String, dynamic> queryParameters = {
         'lastBoardId': lastBoardId.toString(),
@@ -89,18 +93,22 @@ class MyPageControllrer extends GetxController{
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
           var jsonData = jsonResults['readBoardResponses'];
-          myUploadTest.clear();
+          print(
+              '----------------------------업로드한 테스트 ------------------------');
+          print(jsonData);
           for (var jsonResult in jsonData) {
-            print(jsonResult);
             MyUploadTest gather = MyUploadTest.fromJson(jsonResult);
-            print(
-                '----------------------------업로드한 테스트 ------------------------');
 
-            myUploadTest.add(gather);
+            List<int> existingIds =
+                myUploadTest.map((item) => item.id).toList();
+            // 새로운 GatherList의 id가 중복되지 않으면 추가
+            if (!existingIds.contains(gather.id)) {
+              myUploadTest.add(gather);
+            }
           }
-        }
-        if (myUploadTest.length > 9) {
-          lastBoardId += 10;
+          if (lastBoardId < myUploadTest.length) {
+            lastBoardId = myUploadTest.length;
+          }
         }
       } else {
         print("Status code: ${data.statusCode}");
@@ -116,7 +124,7 @@ class MyPageControllrer extends GetxController{
     try {
       String url = "${Common.url}myPages/boards/participation";
       String? bearerToken =
-      await FirebaseAuth.instance.currentUser!.getIdToken();
+          await FirebaseAuth.instance.currentUser!.getIdToken();
 
       Map<String, dynamic> queryParameters = {
         'lastBoardId': partilastBoardId.toString(),
@@ -134,13 +142,16 @@ class MyPageControllrer extends GetxController{
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
           var jsonData = jsonResults['readBoardResponses'];
-          myPartiTest.clear();
           for (var jsonResult in jsonData) {
-            MyUploadTest gather = MyUploadTest.fromJson(jsonResult);
-            myPartiTest.add(gather);
+            MyUploadTest gather = MyUploadTest.fromJsonD(jsonResult);
+
+            List<int> existingIds = myPartiTest.map((item) => item.id).toList();
+            if (!existingIds.contains(gather.id)) {
+              myPartiTest.add(gather);
+            }
           }
-          if (myPartiTest.length > 9) {
-            partilastBoardId += 10;
+          if (lastBoardId < myPartiTest.length) {
+            lastBoardId = myPartiTest.length;
           }
         }
       } else {
@@ -158,5 +169,4 @@ class MyPageControllrer extends GetxController{
     getUserName();
     super.onInit();
   }
-
 }

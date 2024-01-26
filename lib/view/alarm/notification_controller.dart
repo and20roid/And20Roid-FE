@@ -12,6 +12,7 @@ class NotiController extends GetxController {
   List<NotificationList> notiData = [];
   final RefreshController refreshController =
       RefreshController(initialRefresh: false);
+  int lastMessageId = 0;
 
   Future<void> requestUserTestNum() async {
     try {
@@ -19,9 +20,11 @@ class NotiController extends GetxController {
 
       String? bearerToken =
           await FirebaseAuth.instance.currentUser!.getIdToken();
-
+      Map<String, dynamic> queryParameters = {
+        'lastMessageId': lastMessageId.toString(),
+      };
       var data = await http.get(
-        Uri.parse(url),
+        Uri.parse(url).replace(queryParameters: queryParameters),
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $bearerToken',
@@ -34,10 +37,18 @@ class NotiController extends GetxController {
           var jsonData = jsonResults['fcmMessageResponses'];
           print(
               '------------------fcmMessageResponses Start--------------------, ${jsonData.length}');
-          for (int i = 0; i < jsonData.length; i++) {
-            print(jsonData[i]);
-            notiData.add(NotificationList.fromJson(jsonData[i]));
+          for(var notificationData in jsonData){
+            NotificationList notification = NotificationList.fromJson(notificationData);
+            List<int> existingIds = notiData.map((item) => item.id).toList();
+            if (!existingIds.contains(notification.id)) {
+              notiData.add(notification);
+            }
           }
+
+          if(lastMessageId < notiData.length){
+            lastMessageId = notiData.length ;
+          }
+
           print(
               '------------------fcmMessageResponses End--------------------');
         }

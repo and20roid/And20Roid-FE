@@ -11,26 +11,23 @@ import '../../utility/common.dart';
 import '../mypage/another_mypage.dart';
 
 class RankingContent extends StatelessWidget {
-  
   final rankCtrl = Get.find<RankingController>();
-  
+
   void movePage(
       String userName, int userId, String ranking, int helpEach, bool related) {
-    Get.to(() => RequestTest(
-        userName: userName,
-        userId: userId,
-        ranking: ranking,
-        helpEach: helpEach,
-        related: related),transition: Transition.fadeIn);
+    Get.to(
+        () => RequestTest(
+            userName: userName,
+            userId: userId,
+            ranking: ranking,
+            helpEach: helpEach,
+            related: related),
+        transition: Transition.fadeIn);
   }
 
   @override
   Widget build(BuildContext context) {
-    return (rankCtrl.rankList.isEmpty)
-        ? Center(
-            child: CircularProgressIndicator(),
-          )
-        : Scaffold(
+    return  Scaffold(
             appBar: _appBar(),
             backgroundColor: CustomColor.grey1,
             body: Column(
@@ -40,24 +37,39 @@ class RankingContent extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      trophy(
+                      (rankCtrl.rankList.isEmpty)
+                          ? trophy(
+                          '1',
+                          '',
+                          0
+                              .toString(),
+                          "assets/images/Vector.png",
+                          0,
+                          0,
+                          false)
+                          : trophy(
                           '1',
                           rankCtrl.rankList.first.nickname,
-                          rankCtrl.rankList.first.completedTestCount.toString(),
+                          rankCtrl.rankList.first.completedTestCount
+                              .toString(),
                           "assets/images/Vector.png",
                           rankCtrl.rankList.first.userId,
-                          (rankCtrl.rankList.first.interactionCountAsUploader +
-                              rankCtrl.rankList.first.interactionCountAsTester),
+                          (rankCtrl.rankList.first
+                              .interactionCountAsUploader +
+                              rankCtrl
+                                  .rankList.first.interactionCountAsTester),
                           rankCtrl.rankList.first.relatedUser),
                       (rankCtrl.rankList.length > 1)
                           ? trophy(
                               '2',
                               rankCtrl.rankList[1].nickname,
-                              rankCtrl.rankList[1].completedTestCount.toString(),
+                              rankCtrl.rankList[1].completedTestCount
+                                  .toString(),
                               "assets/images/Vector-1.png",
                               rankCtrl.rankList[1].userId,
                               (rankCtrl.rankList[1].interactionCountAsUploader +
-                                  rankCtrl.rankList[1].interactionCountAsTester),
+                                  rankCtrl
+                                      .rankList[1].interactionCountAsTester),
                               rankCtrl.rankList[1].relatedUser,
                             )
                           : const SizedBox(
@@ -68,26 +80,19 @@ class RankingContent extends StatelessWidget {
                           ? trophy(
                               '3',
                               rankCtrl.rankList[2].nickname,
-                              rankCtrl.rankList[2].completedTestCount.toString(),
+                              rankCtrl.rankList[2].completedTestCount
+                                  .toString(),
                               "assets/images/Vector-2.png",
                               rankCtrl.rankList[2].userId,
                               (rankCtrl.rankList[2].interactionCountAsUploader +
-                                  rankCtrl.rankList[2].interactionCountAsTester),
+                                  rankCtrl
+                                      .rankList[2].interactionCountAsTester),
                               rankCtrl.rankList[2].relatedUser,
                             )
                           : const SizedBox(
                               height: 220,
                               width: 120,
                             )
-                      // trophy(
-                      //           '3',
-                      //           'nicknamsssssse',
-                      //           'toString()',
-                      //           "assets/images/Vector-2.png",
-                      //           3,
-                      //           3,
-                      //           true,
-                      //         ),
                     ],
                   ),
                 ),
@@ -113,7 +118,8 @@ class RankingContent extends StatelessWidget {
                       int ranking = playerData.rank;
                       int testCount = playerData.completedTestCount;
                       bool related = playerData.relatedUser;
-                      int helpEach = playerData.interactionCountAsTester + playerData.interactionCountAsUploader;
+                      int helpEach = playerData.interactionCountAsTester +
+                          playerData.interactionCountAsUploader;
 
                       // Rank playerData = dummyList[index + 3];
                       // String playerName = playerData.nickname;
@@ -169,7 +175,9 @@ class RankingContent extends StatelessWidget {
                       );
                     },
                     // itemCount: dummyList.length > 3 ? dummyList.length - 3 : 0,
-                    itemCount: rankCtrl.rankList.length > 3 ? rankCtrl.rankList.length - 3 : 0,
+                    itemCount: rankCtrl.rankList.length > 3
+                        ? rankCtrl.rankList.length - 3
+                        : 0,
                   ),
                 ),
               ],
@@ -192,7 +200,7 @@ class RankingContent extends StatelessWidget {
           color: relatedUser ? CustomColor.primary4 : CustomColor.white),
       child: InkWell(
         onTap: () {
-          movePage(name, userId, ranking, helpEach, relatedUser);
+          (ranking == '1')?(): movePage(name, userId, ranking, helpEach, relatedUser);
         },
         child: Padding(
           padding: const EdgeInsets.all(12.0),

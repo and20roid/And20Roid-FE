@@ -158,15 +158,19 @@ void firebaseMessageProc(context) {
       String msgAction = message.data["clickAction"].toString();
       if (msgAction == 'request') {
         notificationController.alarmCount.value++;
+        notificationController.requestUserTestNum();
         print('requestTest');
       } else if (msgAction == 'join') {
         notificationController.alarmCount.value++;
+        notificationController.requestUserTestNum();
         print('joinTest');
       } else if (msgAction == 'start') {
         notificationController.alarmCount.value++;
+        notificationController.requestUserTestNum();
         print('startTest');
       } else if (msgAction == 'endUploader') {
         notificationController.alarmCount.value++;
+        notificationController.requestUserTestNum();
         print('endTest');
       }
     }

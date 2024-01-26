@@ -6,6 +6,7 @@ import 'package:and20roid/view/mypage/my_page_change.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -30,7 +31,8 @@ class MyPageContent extends StatelessWidget {
                 text: TextSpan(
                   children: <TextSpan>[
                     TextSpan(
-                      text: '${myCtrl.name}',
+                      text:
+                          '${((myCtrl.name == null || myCtrl.name == '') ? myCtrl.emailName : myCtrl.name)}',
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -173,23 +175,24 @@ class MyPageContent extends StatelessWidget {
                                                 myCtrl.myPartiTest.length,
                                             itemBuilder: (context, index) {
                                               return joinMsgBox(
-                                                  false,
-                                                  myCtrl.myPartiTest[index].id,
-                                                  myCtrl.myPartiTest[index]
-                                                      .thumbnailUrl,
-                                                  myCtrl
-                                                      .myPartiTest[index].title,
-                                                  myCtrl.myPartiTest[index]
-                                                      .introLine,
-                                                  myCtrl.myPartiTest[index]
-                                                      .recruitmentNum,
-                                                  myCtrl.myPartiTest[index]
-                                                      .participantNum,
-                                                  myCtrl.myPartiTest[index]
-                                                      .createdDate,
-                                                  myCtrl
-                                                      .myPartiTest[index].state,
-                                                  context);
+                                                false,
+                                                myCtrl.myPartiTest[index].id,
+                                                myCtrl.myPartiTest[index]
+                                                    .thumbnailUrl,
+                                                myCtrl.myPartiTest[index].title,
+                                                myCtrl.myPartiTest[index]
+                                                    .introLine,
+                                                myCtrl.myPartiTest[index]
+                                                    .recruitmentNum,
+                                                myCtrl.myPartiTest[index]
+                                                    .participantNum,
+                                                myCtrl.myPartiTest[index]
+                                                    .createdDate,
+                                                myCtrl.myPartiTest[index].state,
+                                                context,
+                                                deleted: myCtrl
+                                                    .myPartiTest[index].deleted,
+                                              );
                                             }),
                                       ),
                               ],
@@ -248,7 +251,8 @@ Widget joinMsgBox(
     int recruNum,
     String createdDate,
     String state,
-    BuildContext context) {
+    BuildContext context,
+    {bool? deleted}) {
   ListDetailInfo listDetailInfo;
   List<PartiMember> partiMemberList = [];
 
@@ -358,6 +362,15 @@ Widget joinMsgBox(
     }
   }
 
+  void copyToClipboard(List<PartiMember> partiMemberList) {
+    String textToCopy = partiMemberList.map((party) => party.email).join(',');
+
+    Clipboard.setData(ClipboardData(text: textToCopy));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('이메일이 복사되었습니다'),
+    ));
+  }
+
   void showBottomModalSheet(
       BuildContext context, List<PartiMember> partiMemberList, int boardId) {
     showModalBottomSheet(
@@ -365,18 +378,25 @@ Widget joinMsgBox(
       isScrollControlled: true, // Set to true for full width
       builder: (BuildContext context) {
         return (partiMemberList.isEmpty)
-            ? SizedBox(
-                height: 150,
-                child: Center(
-                  child: Text(
-                    "참여한 테스터가 없습니다",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: CustomColor.grey5),
+            ? Column(
+              children: [
+                ElevatedButton(onPressed: (){
+                  copyToClipboard(partiMemberList);
+                }, child: Text('이메일 복사하기')),
+                SizedBox(
+                    height: 150,
+                    child: Center(
+                      child: Text(
+                        "참여한 테스터가 없습니다",
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: CustomColor.grey5),
+                      ),
+                    ),
                   ),
-                ),
-              )
+              ],
+            )
             : SingleChildScrollView(
                 padding: EdgeInsets.only(
                   bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -395,17 +415,19 @@ Widget joinMsgBox(
                                 itemBuilder: (BuildContext context, int index) {
                                   return ListTile(
                                     leading: Text(
-                                      (index+1).toString(),
+                                      (index + 1).toString(),
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w400,
                                       ),
                                     ),
-                                    title: Text(partiMemberList[index].email,
+                                    title: Text(
+                                      partiMemberList[index].email,
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w400,
-                                      ),),
+                                      ),
+                                    ),
                                   );
                                 },
                               ),
@@ -450,17 +472,19 @@ Widget joinMsgBox(
                             itemBuilder: (BuildContext context, int index) {
                               return ListTile(
                                 leading: Text(
-                                  (index+1).toString(),
+                                  (index + 1).toString(),
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
-                                title: Text(partiMemberList[index].email,
+                                title: Text(
+                                  partiMemberList[index].email,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
-                                  ),),
+                                  ),
+                                ),
                               );
                             },
                           ),
@@ -488,29 +512,31 @@ Widget joinMsgBox(
                   appIcon(thumbnailUrl),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                              color: CustomColor.grey5,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          introLine,
-                          style: TextStyle(
-                              color: CustomColor.grey5,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400),
-                          overflow: TextOverflow.ellipsis,
-                        )
-                      ],
+                    child: SizedBox(
+                      width: 180,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: TextStyle(
+                                color: CustomColor.grey5,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            introLine,
+                            style: TextStyle(
+                                color: CustomColor.grey5,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400),
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                  isUp ? Spacer() : Container(),
                   isUp
                       ? InkWell(
                           onTap: () async {
@@ -558,20 +584,24 @@ Widget joinMsgBox(
                                 ),
                               ),
                               onPressed: () async {
-                                await requestRecruitingDetail(id)
-                                    .then((listDetailInfo) {
-                                  Get.to(() => ListDetail(
-                                      intValue: id,
-                                      title: title,
-                                      nickname: listDetailInfo.nickName,
-                                      createdDate: createdDate,
-                                      thumbnailUrl: thumbnailUrl,
-                                      likes: listDetailInfo.likes,
-                                      views: listDetailInfo.views,
-                                      urls: listDetailInfo.imageUrls,
-                                      introLine: introLine,
-                                      likedBoard: listDetailInfo.likedBoard));
-                                });
+                                if (deleted == true) {
+                                  Common().showToastN(context, '삭제된 게시물입니다', 1);
+                                } else {
+                                  await requestRecruitingDetail(id)
+                                      .then((listDetailInfo) {
+                                    Get.to(() => ListDetail(
+                                        intValue: id,
+                                        title: title,
+                                        nickname: listDetailInfo.nickName,
+                                        createdDate: createdDate,
+                                        thumbnailUrl: thumbnailUrl,
+                                        likes: listDetailInfo.likes,
+                                        views: listDetailInfo.views,
+                                        urls: listDetailInfo.imageUrls,
+                                        introLine: introLine,
+                                        likedBoard: listDetailInfo.likedBoard));
+                                  });
+                                }
                               },
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -604,21 +634,26 @@ Widget joinMsgBox(
                                     ),
                                   ),
                                   onPressed: () async {
-                                    await requestRecruitingDetail(id)
-                                        .then((listDetailInfo) {
-                                      Get.to(() => ListDetail(
-                                          intValue: id,
-                                          title: title,
-                                          nickname: listDetailInfo.nickName,
-                                          createdDate: createdDate,
-                                          thumbnailUrl: thumbnailUrl,
-                                          likes: listDetailInfo.likes,
-                                          views: listDetailInfo.views,
-                                          urls: listDetailInfo.imageUrls,
-                                          introLine: introLine,
-                                          likedBoard:
-                                              listDetailInfo.likedBoard));
-                                    });
+                                    if (deleted == true) {
+                                      Common()
+                                          .showToastN(context, '삭제된 게시물입니다', 1);
+                                    } else {
+                                      await requestRecruitingDetail(id)
+                                          .then((listDetailInfo) {
+                                        Get.to(() => ListDetail(
+                                            intValue: id,
+                                            title: title,
+                                            nickname: listDetailInfo.nickName,
+                                            createdDate: createdDate,
+                                            thumbnailUrl: thumbnailUrl,
+                                            likes: listDetailInfo.likes,
+                                            views: listDetailInfo.views,
+                                            urls: listDetailInfo.imageUrls,
+                                            introLine: introLine,
+                                            likedBoard:
+                                                listDetailInfo.likedBoard));
+                                      });
+                                    }
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -652,21 +687,27 @@ Widget joinMsgBox(
                                         ),
                                       ),
                                       onPressed: () async {
-                                        await requestRecruitingDetail(id)
-                                            .then((listDetailInfo) {
-                                          Get.to(() => ListDetail(
-                                              intValue: id,
-                                              title: title,
-                                              nickname: listDetailInfo.nickName,
-                                              createdDate: createdDate,
-                                              thumbnailUrl: thumbnailUrl,
-                                              likes: listDetailInfo.likes,
-                                              views: listDetailInfo.views,
-                                              urls: listDetailInfo.imageUrls,
-                                              introLine: introLine,
-                                              likedBoard:
-                                                  listDetailInfo.likedBoard));
-                                        });
+                                        if (deleted == true) {
+                                          Common().showToastN(
+                                              context, '삭제된 게시물입니다', 1);
+                                        } else {
+                                          await requestRecruitingDetail(id)
+                                              .then((listDetailInfo) {
+                                            Get.to(() => ListDetail(
+                                                intValue: id,
+                                                title: title,
+                                                nickname:
+                                                    listDetailInfo.nickName,
+                                                createdDate: createdDate,
+                                                thumbnailUrl: thumbnailUrl,
+                                                likes: listDetailInfo.likes,
+                                                views: listDetailInfo.views,
+                                                urls: listDetailInfo.imageUrls,
+                                                introLine: introLine,
+                                                likedBoard:
+                                                    listDetailInfo.likedBoard));
+                                          });
+                                        }
                                       },
                                       child: Row(
                                         mainAxisAlignment:
@@ -700,8 +741,13 @@ Widget joinMsgBox(
                                         ),
                                       ),
                                       onPressed: () {
-                                        Common().showToastN(
-                                            context, '완료된 테스트입니다', 4);
+                                        if (deleted == true) {
+                                          Common().showToastN(
+                                              context, '삭제된 게시물입니다', 1);
+                                        } else {
+                                          Common().showToastN(
+                                              context, '완료된 테스트입니다', 4);
+                                        }
                                       },
                                       child: Row(
                                         mainAxisAlignment:

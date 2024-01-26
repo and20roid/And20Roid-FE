@@ -64,14 +64,6 @@ class _ListContentState extends State<ListContent> {
                 if (index > 0 && (index + 1) % 5 == 0) {
                   return Column(
                     children: [
-                      // if (_bannerIsLoaded)
-                      //   Container(
-                      //       decoration: BoxDecoration(
-                      //         borderRadius: BorderRadius.circular(12.0),
-                      //         border: Border.all(color: Colors.black, width: 1.0),
-                      //       ),
-                      //       child: SizedBox(
-                      //           height: 50, child: AdWidget(ad: banner!))),
                       _bannerIsLoaded
                           ? Container(
                               decoration: BoxDecoration(

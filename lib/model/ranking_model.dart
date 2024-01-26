@@ -20,7 +20,7 @@ class Rank {
   factory Rank.fromJson(Map<String, dynamic> json) {
     return Rank(
         userId: json["userId"],
-        rank: json["rank"],
+        rank: json["rank"] ?? 0,
         nickname: json["nickname"],
         completedTestCount: json["completedTestCount"],
         interactionCountAsTester: json['interactionCountAsTester'],

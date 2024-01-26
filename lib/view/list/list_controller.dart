@@ -11,7 +11,8 @@ import '../../utility/common.dart';
 
 class ListController extends GetxController {
   int lastBoardId = 0;
-  final List<GatherList> gatherListItems = [];
+  List<GatherList> gatherListItems = [];
+
   final RefreshController refreshController =
       RefreshController(initialRefresh: false);
 
@@ -56,15 +57,24 @@ class ListController extends GetxController {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
           var jsonData = jsonResults['readBoardResponses'];
+          print(jsonData);
           for (var jsonResult in jsonData) {
             GatherList gatherList = GatherList.fromJson(jsonResult);
-            gatherListItems.add(gatherList);
+
+           List<int> existingIds = gatherListItems.map((item) => item.id).toList();
+            // 새로운 GatherList의 id가 중복되지 않으면 추가
+            if (!existingIds.contains(gatherList.id)) {
+              gatherListItems.add(gatherList);
+            }
           }
 
-          if (gatherListItems.length >= 10) {
-            lastBoardId += 10;
+          if(lastBoardId < gatherListItems.length){
+            lastBoardId = gatherListItems.length ;
           }
-          print('$lastBoardId 번 째 게시글을 가져옴');
+
+
+          print('$lastBoardId 번 째 게시글을 가져옴 ${gatherListItems.length}');
+
           update();
         }
       } else {

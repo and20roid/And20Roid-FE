@@ -3,6 +3,7 @@ import 'package:and20roid/view/mypage/change_nickname.dart';
 import 'package:and20roid/view/mypage/personal_info_processing_policy.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../../main.dart';
@@ -61,10 +62,45 @@ class _ChangeInfoState extends State<ChangeInfo> {
 
     Future<void> deleteAccount() async {
       try {
-        await FirebaseAuth.instance.currentUser!.delete();
-        print('Account deleted successfully');
+        User? user = FirebaseAuth.instance.currentUser;
+
+        if (user != null) {
+          // 사용자가 로그인되어 있으면 인증 세션 갱신
+          await user.getIdToken(true);
+
+          // 이후에 계정 삭제 수행
+          await user.delete();
+
+          print('Account deleted successfully');
+        } else {
+          print('No user is currently signed in');
+        }
       } catch (e) {
         print('Error during account deletion: $e');
+      }
+    }
+
+    Future<void> deleteDb() async {
+      final url = Uri.parse('${Common.url}users');
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
+      try {
+        final response = await http.delete(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $bearerToken', // 토큰을 헤더에 포함
+          },
+        );
+
+        if (response.statusCode == 200) {
+          print('Token deletion successful');
+        } else {
+          print('Token deletion failed. Status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
+        }
+      } catch (e) {
+        print('Error during token deletion: $e');
       }
     }
 
@@ -315,9 +351,11 @@ class _ChangeInfoState extends State<ChangeInfo> {
               print('Account deleted');
               //firebase 계정 삭제
               deleteAccount();
-              //fcm 토큰 삭제
+              deleteDb();
               deleteToken();
-              runApp(MyApp());
+              Common().showToastN(context, '잠시 후 앱이 종료됩니다', 1);
+              await Future.delayed(Duration(seconds: 5));
+              SystemNavigator.pop();
             } else {
               print('Deletion canceled');
             }
