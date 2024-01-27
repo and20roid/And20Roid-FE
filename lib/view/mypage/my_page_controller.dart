@@ -73,6 +73,47 @@ class MyPageControllrer extends GetxController {
 
   Future<void> requestMyUploadTest() async {
     try {
+      lastBoardId = 0;
+      String url = "${Common.url}myPages/boards/upload";
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      Map<String, dynamic> queryParameters = {
+        'lastBoardId': lastBoardId.toString(),
+      };
+      var data = await http.get(
+        Uri.parse(url).replace(queryParameters: queryParameters),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+      );
+
+      if (data.statusCode == 200) {
+        if (data.body.isNotEmpty) {
+          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
+          var jsonData = jsonResults['readBoardResponses'];
+          print(jsonData);
+
+          for (var jsonResult in jsonData) {
+            MyUploadTest gather = MyUploadTest.fromJson(jsonResult);
+
+            myUploadTest.add(gather);
+          }
+          update();
+        }
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+    refreshController1.refreshCompleted();
+  }
+
+  Future<void> requestDownMyUploadTest() async {
+    try {
       String url = "${Common.url}myPages/boards/upload";
       String? bearerToken =
           await FirebaseAuth.instance.currentUser!.getIdToken();
@@ -93,8 +134,7 @@ class MyPageControllrer extends GetxController {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
           var jsonData = jsonResults['readBoardResponses'];
-          List<int> existingIds =
-          myUploadTest.map((item) => item.id).toList();
+          List<int> existingIds = myUploadTest.map((item) => item.id).toList();
           print(
               '----------------------------업로드한 테스트 ------------------------');
           print(jsonData);
@@ -106,8 +146,8 @@ class MyPageControllrer extends GetxController {
               myUploadTest.add(gather);
             }
           }
-          lastBoardId = existingIds.reduce((value, element) => value < element ? value : element);
-
+          lastBoardId = existingIds
+              .reduce((value, element) => value < element ? value : element);
         }
       } else {
         print("Status code: ${data.statusCode}");
@@ -116,10 +156,49 @@ class MyPageControllrer extends GetxController {
     } catch (e) {
       print('Error: $e');
     }
-    refreshController1.refreshCompleted();
+    refreshController1.loadComplete();
   }
 
   Future<void> requestMyParticipantTest() async {
+    try {
+      partilastBoardId = 0;
+      String url = "${Common.url}myPages/boards/participation";
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      Map<String, dynamic> queryParameters = {
+        'lastBoardId': partilastBoardId.toString(),
+      };
+      var data = await http.get(
+        Uri.parse(url).replace(queryParameters: queryParameters),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $bearerToken',
+        },
+      );
+
+      if (data.statusCode == 200) {
+        if (data.body.isNotEmpty) {
+          var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
+
+          var jsonData = jsonResults['readBoardResponses'];
+          for (var jsonResult in jsonData) {
+            MyUploadTest gather = MyUploadTest.fromJsonD(jsonResult);
+
+            myPartiTest.add(gather);
+          }
+        }
+      } else {
+        print("Status code: ${data.statusCode}");
+        print("Response body: ${data.body}");
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+    refreshController2.refreshCompleted();
+  }
+
+  Future<void> requestDownMyParticipantTest() async {
     try {
       String url = "${Common.url}myPages/boards/participation";
       String? bearerToken =
@@ -150,9 +229,10 @@ class MyPageControllrer extends GetxController {
               myPartiTest.add(gather);
             }
           }
-          partilastBoardId = existingIds.reduce((value, element) => value < element ? value : element);
-
-       }
+          partilastBoardId = existingIds
+              .reduce((value, element) => value < element ? value : element);
+        }
+        update();
       } else {
         print("Status code: ${data.statusCode}");
         print("Response body: ${data.body}");
@@ -160,7 +240,7 @@ class MyPageControllrer extends GetxController {
     } catch (e) {
       print('Error: $e');
     }
-    refreshController2.refreshCompleted();
+    refreshController2.loadComplete();
   }
 
   @override

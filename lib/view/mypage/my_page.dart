@@ -5,6 +5,7 @@ import 'package:and20roid/view/list/list_detail.dart';
 import 'package:and20roid/view/mypage/my_page_change.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -131,12 +132,42 @@ class MyPageContent extends StatelessWidget {
                               children: [
                                 myCtrl.myUploadTest.isEmpty
                                     ? const Center(
-                                        child: Text("업로드한 테스트가 없어요"),
+                                        child: Text(
+                                          "업로드한 테스트가 없어요 🥲",
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500),
+                                        ),
                                       )
                                     : SmartRefresher(
                                         controller: myCtrl.refreshController1,
                                         enablePullDown: true,
+                                        enablePullUp: true,
                                         onRefresh: myCtrl.requestMyUploadTest,
+                                        onLoading:
+                                            myCtrl.requestDownMyUploadTest,
+                                        footer: CustomFooter(
+                                          builder: (BuildContext context,
+                                              LoadStatus? mode) {
+                                            Widget body;
+                                            if (mode == LoadStatus.idle) {
+                                              body = Container();
+                                            } else if (mode ==
+                                                LoadStatus.loading) {
+                                              body =
+                                                  CupertinoActivityIndicator();
+                                            } else if (mode ==
+                                                LoadStatus.failed) {
+                                              body = Text("다시 로드해주세요");
+                                            } else {
+                                              body = Container();
+                                            }
+                                            return Container(
+                                              height: 30.0,
+                                              child: Center(child: body),
+                                            );
+                                          },
+                                        ),
                                         child: ListView.builder(
                                             itemCount:
                                                 myCtrl.myUploadTest.length,
@@ -163,13 +194,43 @@ class MyPageContent extends StatelessWidget {
                                       ),
                                 myCtrl.myPartiTest.isEmpty
                                     ? const Center(
-                                        child: Text("참여한 테스트가 없어요"),
+                                        child: Text(
+                                          "참여한 테스트가 없어요 🥲",
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500),
+                                        ),
                                       )
                                     : SmartRefresher(
                                         controller: myCtrl.refreshController2,
                                         enablePullDown: true,
+                                        enablePullUp: true,
+                                        onLoading:
+                                            myCtrl.requestDownMyParticipantTest,
                                         onRefresh:
                                             myCtrl.requestMyParticipantTest,
+                                        footer: CustomFooter(
+                                          builder: (BuildContext context,
+                                              LoadStatus? mode) {
+                                            Widget body;
+                                            if (mode == LoadStatus.idle) {
+                                              body = Container();
+                                            } else if (mode ==
+                                                LoadStatus.loading) {
+                                              body =
+                                                  CupertinoActivityIndicator();
+                                            } else if (mode ==
+                                                LoadStatus.failed) {
+                                              body = Text("다시 로드해주세요");
+                                            } else {
+                                              body = Container();
+                                            }
+                                            return Container(
+                                              height: 20.0,
+                                              child: Center(child: body),
+                                            );
+                                          },
+                                        ),
                                         child: ListView.builder(
                                             itemCount:
                                                 myCtrl.myPartiTest.length,

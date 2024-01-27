@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,51 +20,91 @@ class NotificationContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: CustomColor.grey1,
       appBar: _appBar(),
-      body: Container(
-        color: CustomColor.grey1,
-        child: SmartRefresher(
-          enablePullDown: true,
-          controller: noti.refreshController,
-          onRefresh: noti.requestUserTestNum,
-          child: ListView.builder(
-            itemCount: noti.notiData.length,
-            itemBuilder: (context, index) {
-              NotificationList data = noti.notiData[index];
-              switch (data.type) {
-                case 'request':
-                  return requestMsgBox(data.content, data.thumbnailUrl!,
-                      data.boardTitle!, data.introLine!, data.boardId!);
-                case 'join':
-                  return joinMsgBox(data.content, data.thumbnailUrl!,
-                      data.boardTitle!, data.introLine!, data.boardId!);
-                case 'start':
-                  return startMsgBox(
-                      data.content,
-                      data.thumbnailUrl!,
-                      data.boardTitle!,
-                      data.introLine!,
-                      data.appTestLink!,
-                      data.webTestLink!,
-                  context);
-                case 'endUploader':
-                  return endUploaderBox(data.content, data.thumbnailUrl!,
-                      data.boardTitle!, data.introLine!, data.boardId!,context);
-                case 'endTester':
-                  return endTesterBox(data.content, data.thumbnailUrl!,
-                      data.boardTitle!, data.introLine!, context);
-                default:
-                  return Container(); // 예외 처리
-              }
-            },
-          ),
-        ),
-      ),
+      body: (noti.notiData.isEmpty)
+          ? Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  color: CustomColor.white,
+                  child: Center(
+                      child: Text(
+                    "알림이 없어요 🥲",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ))),
+            )
+          : Container(
+              color: CustomColor.grey1,
+              child: SmartRefresher(
+                enablePullDown: true,
+                enablePullUp: true,
+                controller: noti.refreshController,
+                onRefresh: noti.requestUserTestNum,
+                onLoading: noti.requestDownUserTestNum,
+                footer: CustomFooter(
+                  builder: (BuildContext context, LoadStatus? mode) {
+                    Widget body;
+                    if (mode == LoadStatus.idle) {
+                      body = Container();
+                    } else if (mode == LoadStatus.loading) {
+                      body = CupertinoActivityIndicator();
+                    } else if (mode == LoadStatus.failed) {
+                      body = Text("다시 로드해주세요");
+                    } else {
+                      body =Container();
+                    }
+                    return Container(
+                      height: 55.0,
+                      child: Center(child: body),
+                    );
+                  },
+                ),
+                child: ListView.builder(
+                  itemCount: noti.notiData.length,
+                  itemBuilder: (context, index) {
+                    NotificationList data = noti.notiData[index];
+                    switch (data.type) {
+                      case 'request':
+                        return requestMsgBox(data.content, data.thumbnailUrl!,
+                            data.boardTitle!, data.introLine!, data.boardId!);
+                      case 'join':
+                        return joinMsgBox(data.content, data.thumbnailUrl!,
+                            data.boardTitle!, data.introLine!, data.boardId!);
+                      case 'start':
+                        return startMsgBox(
+                            data.content,
+                            data.thumbnailUrl!,
+                            data.boardTitle!,
+                            data.introLine!,
+                            data.appTestLink!,
+                            data.webTestLink!,
+                            context);
+                      case 'endUploader':
+                        return endUploaderBox(
+                            data.content,
+                            data.thumbnailUrl!,
+                            data.boardTitle!,
+                            data.introLine!,
+                            data.boardId!,
+                            context);
+                      case 'endTester':
+                        return endTesterBox(data.content, data.thumbnailUrl!,
+                            data.boardTitle!, data.introLine!, context);
+                      default:
+                        return Container(); // 예외 처리
+                    }
+                  },
+                ),
+              ),
+            ),
     );
   }
 
   AppBar _appBar() {
     return AppBar(
+      elevation: 1,
       toolbarHeight: 80,
       backgroundColor: CustomColor.grey1,
       title: const Text(
@@ -146,32 +187,38 @@ Widget requestMsgBox(String name, String thumbnailUrl, String title,
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-              Row(
-                children: [
-                  appIcon(thumbnailUrl),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                              color: CustomColor.grey5,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          introLine,
-                          style: TextStyle(
-                              color: CustomColor.grey5,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400),
-                        )
-                      ],
-                    ),
-                  )
-                ],
+              SizedBox(
+                width: 270,
+                child: Row(
+                  children: [
+                    appIcon(thumbnailUrl),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            overflow: TextOverflow.fade,
+                            title,
+                            style: TextStyle(
+                                color: CustomColor.grey5,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            overflow: TextOverflow.fade,
+
+                            introLine,
+                            style: TextStyle(
+                                color: CustomColor.grey5,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
@@ -235,15 +282,15 @@ Widget requestMsgBox(String name, String thumbnailUrl, String title,
   );
 }
 
-Widget joinMsgBox(
-    String name, String thumbnailUrl, String title, String introLine, int boardId) {
+Widget joinMsgBox(String name, String thumbnailUrl, String title,
+    String introLine, int boardId) {
   ListDetailInfo listDetailInfo;
 
   Future<ListDetailInfo> requestRecruitingDetail(id) async {
     try {
       String url = "${Common.url}boards/${id}";
       String? bearerToken =
-      await FirebaseAuth.instance.currentUser!.getIdToken();
+          await FirebaseAuth.instance.currentUser!.getIdToken();
 
       var data = await http.get(
         Uri.parse(url),
@@ -280,6 +327,7 @@ Widget joinMsgBox(
         likes: 0,
         likedBoard: false);
   }
+
   return Padding(
     padding: const EdgeInsets.all(12.0),
     child: Column(children: [
@@ -310,24 +358,29 @@ Widget joinMsgBox(
                   appIcon(thumbnailUrl),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                              color: CustomColor.grey5,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          introLine,
-                          style: TextStyle(
-                              color: CustomColor.grey5,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400),
-                        )
-                      ],
+                    child: SizedBox(
+                      width: 270,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            overflow: TextOverflow.fade,
+                            title,
+                            style: TextStyle(
+                                color: CustomColor.grey5,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            overflow: TextOverflow.fade,
+                            introLine,
+                            style: TextStyle(
+                                color: CustomColor.grey5,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400),
+                          )
+                        ],
+                      ),
                     ),
                   )
                 ],
@@ -430,32 +483,35 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-              Row(
-                children: [
-                  appIcon(thumbnailUrl),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                              color: CustomColor.grey5,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          introLine,
-                          style: TextStyle(
-                              color: CustomColor.grey5,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400),
-                        )
-                      ],
-                    ),
-                  )
-                ],
+              SizedBox(
+                width: 270,
+                child: Row(
+                  children: [
+                    appIcon(thumbnailUrl),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: TextStyle(
+                                color: CustomColor.grey5,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            introLine,
+                            style: TextStyle(
+                                color: CustomColor.grey5,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
               const SizedBox(
                 height: 10,
@@ -474,10 +530,10 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
                           ),
                         ),
                       ),
-                      onPressed: ()  async{
+                      onPressed: () async {
                         Uri uri = Uri.parse(appLink);
                         bool isOpen = await openLink(uri);
-                        if(!isOpen){
+                        if (!isOpen) {
                           Common().showToastN(context, '$appLink를 열 수 없습니다', 1);
                         }
                       },
@@ -522,7 +578,7 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
                       onPressed: () async {
                         Uri uri = Uri.parse(webLink);
                         bool isOpen = await openLink(uri);
-                        if(!isOpen){
+                        if (!isOpen) {
                           Common().showToastN(context, '$webLink를 열 수 없습니다', 1);
                         }
                       },
@@ -557,13 +613,14 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
     ]),
   );
 }
-Widget endUploaderBox(String name, String thumbnailUrl, String title,
-    String introLine,int boardId, BuildContext context) {
 
+Widget endUploaderBox(String name, String thumbnailUrl, String title,
+    String introLine, int boardId, BuildContext context) {
   void requestTestEndBroadCast(int boardId) async {
     try {
       String url = '${Common.url}boards/${boardId.toString()}/end';
-      String? bearerToken = await FirebaseAuth.instance.currentUser!.getIdToken();
+      String? bearerToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
 
       var data = await http.post(
         Uri.parse(url),
@@ -582,7 +639,6 @@ Widget endUploaderBox(String name, String thumbnailUrl, String title,
       print('Error: $e');
     }
   }
-
 
   return Padding(
     padding: const EdgeInsets.all(12.0),
@@ -614,24 +670,28 @@ Widget endUploaderBox(String name, String thumbnailUrl, String title,
                   appIcon(thumbnailUrl),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                              color: CustomColor.grey5,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          introLine,
-                          style: TextStyle(
-                              color: CustomColor.grey5,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400),
-                        )
-                      ],
+                    child: SizedBox(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: TextStyle(
+                                overflow: TextOverflow.fade,
+                                color: CustomColor.grey5,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            introLine,
+                            style: TextStyle(
+                                overflow: TextOverflow.fade,
+                                color: CustomColor.grey5,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400),
+                          )
+                        ],
+                      ),
                     ),
                   )
                 ],
@@ -644,7 +704,7 @@ Widget endUploaderBox(String name, String thumbnailUrl, String title,
                       child: TextButton(
                         style: ButtonStyle(
                           backgroundColor:
-                          MaterialStateProperty.all(CustomColor.primary2),
+                              MaterialStateProperty.all(CustomColor.primary2),
                           shape: MaterialStateProperty.all(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),

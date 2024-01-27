@@ -229,6 +229,7 @@ class UploadThird extends StatelessWidget {
 
 AppBar _appbar(title, isback) {
   return AppBar(
+    elevation: 1,
     toolbarHeight: 80,
     backgroundColor: CustomColor.grey1,
     title: Text(
@@ -258,8 +259,14 @@ Column _body(UploadFirstController controller, BuildContext context) {
                     controller.recruitNumController.text.isEmpty) {
                   Common().showToastN(context, "모든 정보를 입력해 주세요", 1);
                 } else {
-                  Get.to(() => UploadSecond(),
-                      transition: Transition.rightToLeftWithFade);
+                  if (controller.oneLineController.text.length > 20) {
+                    Common().showToastN(context, "20자 이내로 작성해주세요", 1);
+                  } else if (controller.recruitNumController.text.length > 2) {
+                    Common().showToastN(context, "모집 인원은 100명 이내로 설정해주세요", 1);
+                  } else {
+                    Get.to(() => UploadSecond(),
+                        transition: Transition.rightToLeftWithFade);
+                  }
                 }
               },
               child: Text(
@@ -345,42 +352,43 @@ Column _body3(UploadThirdController controller, context) {
       CustomInputField("앱 링크", controller.appLinkController, "스토어 url을 입력해주세요"),
       CustomInputField("웹 링크", controller.webLinkController, "웹 url을 입력해주세요"),
       CustomInputField(
-          "서비스 소개", controller.contentController, "서비스를 자유롭게 소개해주세요"),
+          "서비스 소개", controller.contentController, "서비스를 자유롭게 소개해주세요 (300자)"),
       Spacer(),
       Padding(
         padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 36.0),
         child: ElevatedButton(
-          onPressed:
-          // (total.uploadFormKey1.currentState!.validate() && total.uploadFormKey2.currentState!.validate()) ?
-              () async {
+          onPressed: () async {
             File? appIconImageValue = total.appIconImage.value;
             int totalSize = await total.calculateTotalSize(total.appPhotoImage);
             if (appIconImageValue != null) {
               if (totalSize < 15 * 1024 * 1024 && totalSize > 0) {
-                if(controller.appLinkController.text.isEmpty || controller.webLinkController.text.isEmpty || controller.contentController.text.isEmpty)
-                  {
-                    Common().showToastN(context, '내용을 모두 입력해주세요', 1);
+                if (controller.appLinkController.text.isEmpty ||
+                    controller.webLinkController.text.isEmpty ||
+                    controller.contentController.text.isEmpty) {
+                  Common().showToastN(context, '내용을 모두 입력해주세요', 1);
+                } else {
+                  if (controller.contentController.text.length > 300) {
+                    Common().showToastN(context, '내용을 300자 이내로 작성해주세요', 1);
+                  } else {
+                    total.uploadImages(
+                      first.titleController.text,
+                      first.oneLineController.text,
+                      first.recruitNumController.text,
+                      total.appPhotoImage,
+                      appIconImageValue,
+                      third.appLinkController.text,
+                      third.webLinkController.text,
+                      third.contentController.text,
+                    );
+                    Common().showToastN(context, '업로드 성공', 4);
+                    first.titleController.dispose();
+                    first.oneLineController.dispose();
+                    first.recruitNumController.dispose();
+                    third.appLinkController.dispose();
+                    third.webLinkController.dispose();
+                    third.contentController.dispose();
+                    Get.offAll(() => const BottomNavigatorPage());
                   }
-                else{
-                  // appIconImageValue 사용 가능
-                  total.uploadImages(
-                    first.titleController.text,
-                    first.oneLineController.text,
-                    first.recruitNumController.text,
-                    total.appPhotoImage,
-                    appIconImageValue,
-                    third.appLinkController.text,
-                    third.webLinkController.text,
-                    third.contentController.text,
-                  );
-                  Common().showToastN(context, '업로드 성공', 4);
-                  first.titleController.dispose();
-                  first.oneLineController.dispose();
-                  first.recruitNumController.dispose();
-                  third.appLinkController.dispose();
-                  third.webLinkController.dispose();
-                  third.contentController.dispose();
-                  Get.offAll(() => const BottomNavigatorPage());
                 }
               } else {
                 Common().showToastN(context, '사진 크기를 확인해 주세요', 1);
@@ -461,7 +469,9 @@ Widget CustomInputField(title, TextEditingController testController, hintText) {
               )
             : (title == '앱 링크' || title == '웹 링크')
                 ? Form(
-                    key: (title == '앱 링크') ? total.uploadFormKey1 : total.uploadFormKey2,
+                    key: (title == '앱 링크')
+                        ? total.uploadFormKey1
+                        : total.uploadFormKey2,
                     autovalidateMode: AutovalidateMode.always,
                     child: TextFormField(
                       controller: testController,

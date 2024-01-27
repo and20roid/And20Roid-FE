@@ -27,90 +27,87 @@ class RankingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-            appBar: _appBar(),
-            backgroundColor: CustomColor.grey1,
-            body: Column(
+    return Scaffold(
+      appBar: _appBar(),
+      backgroundColor: CustomColor.grey1,
+      body: Column(
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height * 0.3,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.3,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      (rankCtrl.rankList.isEmpty)
-                          ? trophy(
-                          '1',
-                          '',
-                          0
-                              .toString(),
-                          "assets/images/Vector.png",
-                          0,
-                          0,
-                          false)
-                          : trophy(
-                          '1',
-                          rankCtrl.rankList.first.nickname,
-                          rankCtrl.rankList.first.completedTestCount
-                              .toString(),
-                          "assets/images/Vector.png",
-                          rankCtrl.rankList.first.userId,
-                          (rankCtrl.rankList.first
-                              .interactionCountAsUploader +
-                              rankCtrl
-                                  .rankList.first.interactionCountAsTester),
-                          rankCtrl.rankList.first.relatedUser),
-                      (rankCtrl.rankList.length > 1)
-                          ? trophy(
-                              '2',
-                              rankCtrl.rankList[1].nickname,
-                              rankCtrl.rankList[1].completedTestCount
-                                  .toString(),
-                              "assets/images/Vector-1.png",
-                              rankCtrl.rankList[1].userId,
-                              (rankCtrl.rankList[1].interactionCountAsUploader +
-                                  rankCtrl
-                                      .rankList[1].interactionCountAsTester),
-                              rankCtrl.rankList[1].relatedUser,
-                            )
-                          : const SizedBox(
-                              height: 220,
-                              width: 120,
-                            ),
-                      (rankCtrl.rankList.length > 2)
-                          ? trophy(
-                              '3',
-                              rankCtrl.rankList[2].nickname,
-                              rankCtrl.rankList[2].completedTestCount
-                                  .toString(),
-                              "assets/images/Vector-2.png",
-                              rankCtrl.rankList[2].userId,
-                              (rankCtrl.rankList[2].interactionCountAsUploader +
-                                  rankCtrl
-                                      .rankList[2].interactionCountAsTester),
-                              rankCtrl.rankList[2].relatedUser,
-                            )
-                          : const SizedBox(
-                              height: 220,
-                              width: 120,
-                            )
-                    ],
+                (rankCtrl.rankList.isEmpty)
+                    ? trophy('1', '', 0.toString(), "assets/images/Vector.png",
+                        0, 0, false)
+                    : trophy(
+                        '1',
+                        rankCtrl.rankList.first.nickname,
+                        rankCtrl.rankList.first.completedTestCount.toString(),
+                        "assets/images/Vector.png",
+                        rankCtrl.rankList.first.userId,
+                        (rankCtrl.rankList.first.interactionCountAsUploader +
+                            rankCtrl.rankList.first.interactionCountAsTester),
+                        rankCtrl.rankList.first.relatedUser),
+                (rankCtrl.rankList.length > 1)
+                    ? trophy(
+                        '2',
+                        rankCtrl.rankList[1].nickname,
+                        rankCtrl.rankList[1].completedTestCount.toString(),
+                        "assets/images/Vector-1.png",
+                        rankCtrl.rankList[1].userId,
+                        (rankCtrl.rankList[1].interactionCountAsUploader +
+                            rankCtrl.rankList[1].interactionCountAsTester),
+                        rankCtrl.rankList[1].relatedUser,
+                      )
+                    : const SizedBox(
+                        height: 220,
+                        width: 120,
+                      ),
+                (rankCtrl.rankList.length > 2)
+                    ? trophy(
+                        '3',
+                        rankCtrl.rankList[2].nickname,
+                        rankCtrl.rankList[2].completedTestCount.toString(),
+                        "assets/images/Vector-2.png",
+                        rankCtrl.rankList[2].userId,
+                        (rankCtrl.rankList[2].interactionCountAsUploader +
+                            rankCtrl.rankList[2].interactionCountAsTester),
+                        rankCtrl.rankList[2].relatedUser,
+                      )
+                    : const SizedBox(
+                        height: 220,
+                        width: 120,
+                      )
+              ],
+            ),
+          ),
+          Divider(
+            height: 0.1,
+            color: CustomColor.grey2,
+          ),
+          const ListTile(
+            title: Text(
+              '아이디',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            leading: Text(
+              '순위',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            trailing: Text('테스트 횟수',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ),
+          Expanded(
+            child: (rankCtrl.rankList.isEmpty)
+                ? const Center(
+                  child: Text(
+                    "테스트를 완료한 유저가 없어요 🥲",
+                    style: TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w500),
                   ),
-                ),
-                const ListTile(
-                  title: Text(
-                    '아이디',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  leading: Text(
-                    '순위',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  trailing: Text('테스트 횟수',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-                Expanded(
-                  child: ListView.builder(
+                )
+                : ListView.builder(
                     itemBuilder: (context, index) {
                       // 4등부터의 데이터를 가져옴
                       Rank playerData = rankCtrl.rankList[index + 3];
@@ -179,10 +176,10 @@ class RankingContent extends StatelessWidget {
                         ? rankCtrl.rankList.length - 3
                         : 0,
                   ),
-                ),
-              ],
-            ),
-          );
+          ),
+        ],
+      ),
+    );
   }
 
   Widget trophy(String ranking, String name, String count, String imagePath,
@@ -200,7 +197,7 @@ class RankingContent extends StatelessWidget {
           color: relatedUser ? CustomColor.primary4 : CustomColor.white),
       child: InkWell(
         onTap: () {
-          (ranking == '1')?(): movePage(name, userId, ranking, helpEach, relatedUser);
+          movePage(name, userId, ranking, helpEach, relatedUser);
         },
         child: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -240,6 +237,7 @@ class RankingContent extends StatelessWidget {
 
   AppBar _appBar() {
     return AppBar(
+      elevation: 1,
       toolbarHeight: 80,
       backgroundColor: CustomColor.grey1,
       title: const Text(

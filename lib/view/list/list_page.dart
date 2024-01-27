@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -26,7 +27,6 @@ class _ListContentState extends State<ListContent> {
 
   BannerAd? banner;
   bool _bannerIsLoaded = false;
-
 
   @override
   void initState() {
@@ -55,10 +55,30 @@ class _ListContentState extends State<ListContent> {
         builder: (listCtrl) {
           return SmartRefresher(
             enablePullDown: true,
+            enablePullUp: true,
             controller: listCtrl.refreshController,
             onRefresh: listCtrl.requestRecruitingList,
+            scrollController: listCtrl.scrollController,
+            onLoading: listCtrl.requestDownRecruitingList,
+            footer: CustomFooter(
+              builder: (BuildContext context, LoadStatus? mode) {
+                Widget body;
+                if (mode == LoadStatus.idle) {
+                  body = Container();
+                } else if (mode == LoadStatus.loading) {
+                  body = CupertinoActivityIndicator();
+                } else if (mode == LoadStatus.failed) {
+                  body = Text("다시 로드해주세요");
+                } else {
+                  body =Container();
+                }
+                return Container(
+                  height: 20.0,
+                  child: Center(child: body),
+                );
+              },
+            ),
             child: ListView.builder(
-              controller: listCtrl.scrollController,
               shrinkWrap: true,
               itemCount: listCtrl.gatherListItems.length,
               itemBuilder: (context, index) {
@@ -179,6 +199,7 @@ class _ListContentState extends State<ListContent> {
         foregroundColor: CustomColor.grey1,
         toolbarHeight: 80.0,
         backgroundColor: CustomColor.grey1,
+        elevation: 1,
         title: SizedBox(
             width: 60,
             height: 60,
@@ -197,6 +218,7 @@ class _ListContentState extends State<ListContent> {
       double screenWidth,
       bool liked) {
     return Card(
+      elevation: 1,
       color: CustomColor.white,
       child: Column(
         children: [
@@ -230,15 +252,23 @@ class _ListContentState extends State<ListContent> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                      SizedBox(
+                        width: 255,
+                        child: Text(
+                          title,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.clip,
+                        ),
                       ),
-                      Text(
-                        intro,
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w400),
+                      SizedBox(
+                        width: 255,
+                        child: Text(
+                          intro,
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w400),
+                          overflow: TextOverflow.fade,
+                        ),
                       ),
                     ],
                   ),
@@ -269,7 +299,7 @@ class _ListContentState extends State<ListContent> {
 
   Widget imageList(List<String> urls, double screenWidth) {
     return SizedBox(
-      height: screenWidth / 1.5,
+      height: screenWidth / 1.6,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: urls.length,
@@ -291,7 +321,6 @@ class _ListContentState extends State<ListContent> {
                   ),
                 ),
               ),
-
             ),
           );
         },

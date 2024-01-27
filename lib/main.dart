@@ -58,6 +58,7 @@ class MyApp extends StatelessWidget {
     FlutterNativeSplash.remove();
 
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       color: CustomColor.grey5,
       home: const DirectingPage(),
     );
@@ -156,23 +157,8 @@ void firebaseMessageProc(context) {
 
     if (!kIsWeb && message.data["clickAction"] != null) {
       String msgAction = message.data["clickAction"].toString();
-      if (msgAction == 'request') {
-        notificationController.alarmCount.value++;
-        notificationController.requestUserTestNum();
-        print('requestTest');
-      } else if (msgAction == 'join') {
-        notificationController.alarmCount.value++;
-        notificationController.requestUserTestNum();
-        print('joinTest');
-      } else if (msgAction == 'start') {
-        notificationController.alarmCount.value++;
-        notificationController.requestUserTestNum();
-        print('startTest');
-      } else if (msgAction == 'endUploader') {
-        notificationController.alarmCount.value++;
-        notificationController.requestUserTestNum();
-        print('endTest');
-      }
+      notificationController.alarmCount.value++;
+      notificationController.requestUserTestNum();
     }
   });
 

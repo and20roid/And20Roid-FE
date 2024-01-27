@@ -463,7 +463,7 @@ class _ListDetailState extends State<ListDetail> {
 
   Widget imageList(List<String> urls, double screenWidth) {
     return Container(
-      height: screenWidth / 1.5,
+      height: screenWidth / 1.6,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: urls.length,
