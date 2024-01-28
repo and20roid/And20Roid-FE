@@ -19,20 +19,22 @@ class ListDetail extends StatefulWidget {
   final List<String> urls;
   final String introLine;
   final bool likedBoard;
+  String? mine;
 
-  const ListDetail({
-    Key? key,
-    required this.intValue,
-    required this.title,
-    required this.nickname,
-    required this.createdDate,
-    required this.thumbnailUrl,
-    required this.likes,
-    required this.views,
-    required this.urls,
-    required this.introLine,
-    required this.likedBoard,
-  }) : super(key: key);
+  ListDetail(
+      {Key? key,
+      required this.intValue,
+      required this.title,
+      required this.nickname,
+      required this.createdDate,
+      required this.thumbnailUrl,
+      required this.likes,
+      required this.views,
+      required this.urls,
+      required this.introLine,
+      required this.likedBoard,
+      this.mine})
+      : super(key: key);
 
   @override
   State<ListDetail> createState() => _ListDetailState();
@@ -94,13 +96,14 @@ class _ListDetailState extends State<ListDetail> {
       );
 
       if (data.statusCode == 200) {
-        Common().showToastN(context,'이메일을 성공적으로 전송했습니다',1);
+        Common().showToastN(context, '이메일을 성공적으로 전송했습니다', 1);
       } else {
-        Map<String, dynamic> parsedResponse = jsonDecode(utf8.decode(data.bodyBytes));
+        Map<String, dynamic> parsedResponse =
+            jsonDecode(utf8.decode(data.bodyBytes));
         String message = parsedResponse['message'];
 
-        if(data.statusCode == 400 ){
-          Common().showToastN(context,message,1);
+        if (data.statusCode == 400) {
+          Common().showToastN(context, message, 1);
         }
         print("Response body: ${utf8.decode(data.bodyBytes)}");
       }
@@ -210,9 +213,9 @@ class _ListDetailState extends State<ListDetail> {
                         },
                         style: ButtonStyle(
                           backgroundColor:
-                          MaterialStateProperty.all(CustomColor.white),
+                              MaterialStateProperty.all(CustomColor.white),
                           minimumSize:
-                          MaterialStateProperty.all(const Size(135, 40)),
+                              MaterialStateProperty.all(const Size(135, 40)),
                           side: MaterialStateProperty.all(
                             BorderSide(color: CustomColor.grey3, width: 1.0),
                           ),
@@ -234,9 +237,8 @@ class _ListDetailState extends State<ListDetail> {
                       TextButton(
                         style: ButtonStyle(
                           backgroundColor:
-                          MaterialStateProperty.all(CustomColor.primary1),
-                          minimumSize:
-                          MaterialStateProperty.all(Size(135, 40)),
+                              MaterialStateProperty.all(CustomColor.primary1),
+                          minimumSize: MaterialStateProperty.all(Size(135, 40)),
                           shape: MaterialStateProperty.all(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
@@ -282,7 +284,6 @@ class _ListDetailState extends State<ListDetail> {
     emailController.dispose();
     super.dispose();
   }
-
 
   init() async {
     await requestRecruitingDetail();
@@ -340,9 +341,11 @@ class _ListDetailState extends State<ListDetail> {
                       LinearProgressIndicator(
                         borderRadius: BorderRadius.circular(4),
                         value: participantNum / 20,
-                        backgroundColor: Colors.black12, // 배경색
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            CustomColor.primary1), // 진행률 바 색상
+                        backgroundColor: Colors.black12,
+                        // 배경색
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(CustomColor.primary1),
+                        // 진행률 바 색상
                         minHeight: 10,
                       ),
                       const SizedBox(
@@ -380,37 +383,251 @@ class _ListDetailState extends State<ListDetail> {
             const SizedBox(
               height: 10,
             ),
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  _showEmailDialog(context);
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: CustomColor.primary1,
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(12.0), // 모서리 radius 설정
-                    ),
-                    minimumSize: const Size.fromHeight(60)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset("assets/icons/email.png"),
-                    // 아이콘 색상 설정
-                    const SizedBox(width: 8.0),
-                    // 아이콘과 텍스트 사이의 간격 조절
-                    const Text(
-                      "참여하기",
-                      style: TextStyle(color: Colors.black, fontSize: 20),
-                    ),
-                    // 글자색 설정
-                  ],
-                ),
-              ),
-            )
+            (widget.mine == '모집중')
+                ? Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: mozipjuBtn(widget.intValue, context),
+                  )
+                : (widget.mine == '테스트중')
+                    ? Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: endMozipBtn(context,'테스트 중'),
+                      )
+                    : (widget.mine == '참여중')
+                        ? Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: endMozipBtn(context,'참여 중'),
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: partyButton(context))
           ],
         ),
+      ),
+    );
+  }
+
+  ElevatedButton endMozipBtn(context, String state) {
+    return ElevatedButton(
+      onPressed: () {
+        Common().showToastN(context, '${state}입니다', 1);
+      },
+      style: ElevatedButton.styleFrom(
+          backgroundColor: CustomColor.primary2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0), // 모서리 radius 설정
+          ),
+          minimumSize: const Size.fromHeight(60)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.science_outlined,
+            color: CustomColor.primary1,
+          ),
+          const SizedBox(width: 8.0),
+          // 아이콘과 텍스트 사이의 간격 조절
+          Text(
+            state,
+            style: TextStyle(color: CustomColor.primary3, fontSize: 20),
+          ),
+          // 글자색 설정
+        ],
+      ),
+    );
+  }
+
+  ElevatedButton mozipjuBtn(boardId, context) {
+    Future<void> requestTestLinkBroadcast(boardId, context) async {
+      try {
+        String url = "${Common.url}boards/${boardId.toString()}/start";
+        String? bearerToken =
+            await FirebaseAuth.instance.currentUser!.getIdToken();
+
+        var data = await http.post(
+          Uri.parse(url),
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $bearerToken',
+          },
+        );
+        Map<String, dynamic> jsonBody = jsonDecode(utf8.decode(data.bodyBytes));
+        String message = jsonBody['message'];
+        print('message ~~~~~~~~ $message');
+
+        if (data.statusCode == 200) {
+          print('~~~~~~~~~test link complete ${utf8.decode(data.bodyBytes)}');
+          Common().showToastN(context, message, 1);
+        } else {
+          print("Status code: ${data.statusCode}");
+          print("Response body: ${data.body}");
+          Common().showToastN(context, message, 1);
+        }
+      } catch (e) {
+        print('Error: $e');
+      }
+    }
+
+    void mozipEnd(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Theme(
+            data: ThemeData(
+              dialogBackgroundColor: Colors.white,
+            ),
+            child: Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
+                    child: Text(
+                      "테스터 모집 마감",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 10.0),
+                    child: Text(
+                      "모집 마감 시 참여자들에게\n설치 링크가 전달됩니다",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // 취소 버튼
+                              emailController.clear();
+                            },
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(CustomColor.white),
+                              minimumSize: MaterialStateProperty.all(
+                                  const Size(135, 40)),
+                              side: MaterialStateProperty.all(
+                                BorderSide(
+                                    color: CustomColor.grey3, width: 1.0),
+                              ),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              '취소',
+                              style: TextStyle(
+                                color: CustomColor.grey3,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: TextButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                  CustomColor.primary1),
+                              minimumSize:
+                                  MaterialStateProperty.all(Size(135, 40)),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                            ),
+                            onPressed: () async {
+                              requestTestLinkBroadcast(boardId, context);
+                              Navigator.of(context).pop(); // 취소 버튼
+                              Common().showToastN(context, '모집이 마감됐습니다', 1);
+                            },
+                            child: Text(
+                              '마감하기',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    return ElevatedButton(
+      onPressed: () {
+        mozipEnd(context);
+      },
+      style: ElevatedButton.styleFrom(
+          backgroundColor: CustomColor.primary1,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0), // 모서리 radius 설정
+          ),
+          minimumSize: const Size.fromHeight(60)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.check_box_outlined,
+            color: CustomColor.grey5,
+          ),
+          const SizedBox(width: 8.0),
+          // 아이콘과 텍스트 사이의 간격 조절
+          const Text(
+            "모집 마감하기",
+            style: TextStyle(color: Colors.black, fontSize: 20),
+          ),
+          // 글자색 설정
+        ],
+      ),
+    );
+  }
+
+  ElevatedButton partyButton(context) {
+    return ElevatedButton(
+      onPressed: () {
+        _showEmailDialog(context);
+      },
+      style: ElevatedButton.styleFrom(
+          backgroundColor: CustomColor.primary1,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0), // 모서리 radius 설정
+          ),
+          minimumSize: const Size.fromHeight(60)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset("assets/icons/email.png"),
+          // 아이콘 색상 설정
+          const SizedBox(width: 8.0),
+          // 아이콘과 텍스트 사이의 간격 조절
+          const Text(
+            "참여하기",
+            style: TextStyle(color: Colors.black, fontSize: 20),
+          ),
+          // 글자색 설정
+        ],
       ),
     );
   }
@@ -444,7 +661,7 @@ class _ListDetailState extends State<ListDetail> {
                   ? Row(
                       children: [
                         Icon(Icons.favorite, color: Colors.red),
-                        Text(" ${(int.parse(heart)+1).toString()}"),
+                        Text(" ${(int.parse(heart) + 1).toString()}"),
                       ],
                     )
                   : Row(
@@ -485,7 +702,6 @@ class _ListDetailState extends State<ListDetail> {
                   ),
                 ),
               ),
-
             ),
           );
         },

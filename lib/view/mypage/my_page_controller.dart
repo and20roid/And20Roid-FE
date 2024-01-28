@@ -91,6 +91,7 @@ class MyPageControllrer extends GetxController {
 
       if (data.statusCode == 200) {
         if (data.body.isNotEmpty) {
+          myUploadTest.clear();
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
           var jsonData = jsonResults['readBoardResponses'];
           print(jsonData);
@@ -179,6 +180,7 @@ class MyPageControllrer extends GetxController {
 
       if (data.statusCode == 200) {
         if (data.body.isNotEmpty) {
+          myPartiTest.clear();
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
 
           var jsonData = jsonResults['readBoardResponses'];

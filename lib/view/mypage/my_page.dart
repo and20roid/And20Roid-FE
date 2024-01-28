@@ -393,35 +393,6 @@ Widget joinMsgBox(
     }
   }
 
-  Future<void> requestTestLinkBroadcast(boardId, context) async {
-    try {
-      String url = "${Common.url}boards/${boardId.toString()}/start";
-      String? bearerToken =
-          await FirebaseAuth.instance.currentUser!.getIdToken();
-
-      var data = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $bearerToken',
-        },
-      );
-      Map<String, dynamic> jsonBody = jsonDecode(utf8.decode(data.bodyBytes));
-      String message = jsonBody['message'];
-      print('message ~~~~~~~~ $message');
-
-      if (data.statusCode == 200) {
-        print('~~~~~~~~~test link complete ${utf8.decode(data.bodyBytes)}');
-        Common().showToastN(context, message, 1);
-      } else {
-        print("Status code: ${data.statusCode}");
-        print("Response body: ${data.body}");
-        Common().showToastN(context, message, 1);
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
 
   void copyToClipboard(List<PartiMember> partiMemberList) {
     String textToCopy = partiMemberList.map((party) => party.email).join(',');
@@ -455,78 +426,57 @@ Widget joinMsgBox(
                           ),
                         ),
                       )
-                    : Stack(children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: partiMemberList.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return ListTile(
-                                  leading: Text(
-                                    (index + 1).toString(),
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                  title: Text(
-                                    partiMemberList[index].email,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                    CustomColor.white),
-                                minimumSize:
-                                    MaterialStateProperty.all(Size(310, 56)),
-                                shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    side: BorderSide(color: CustomColor.grey4),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
+                    : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: partiMemberList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return ListTile(
+                              leading: Text(
+                                (index + 1).toString(),
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
-                              onPressed: () {
-                                requestTestLinkBroadcast(boardId, context);
-                              },
-                              child: Text(
-                                "테스트 링크 전송",
+                              title: Text(
+                                partiMemberList[index].email,
                                 style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: CustomColor.primary1),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                CustomColor.white),
+                            minimumSize:
+                                MaterialStateProperty.all(Size(310, 56)),
+                            shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                side: BorderSide(color: CustomColor.grey4),
+                                borderRadius: BorderRadius.circular(12.0),
                               ),
                             ),
-                          ],
+                          ),
+                          onPressed: () {
+                            copyToClipboard(partiMemberList);
+                          },
+                          child: Text(
+                            "이메일 복사하기",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: CustomColor.primary1),
+                          ),
                         ),
-                        Positioned(
-                            bottom: 43,
-                            right: 0,
-                            child: BalloonWidget(
-                              message: '한번만 전송할 수 있어요',
-                            )),
-                        Positioned(
-                          top: 0,
-                          right: 0,
-                          child: ElevatedButton(
-                              onPressed: () {
-                                copyToClipboard(partiMemberList);
-                              },
-                              child: Icon(
-                                Icons.copy,
-                                color: CustomColor.primary1,
-                                size: 20,
-                              )),
-                        ),
-                      ])
+                      ],
+                    )
                 : Column(mainAxisSize: MainAxisSize.min, children: [
                     ListView.builder(
                       shrinkWrap: true,
@@ -572,10 +522,9 @@ Widget joinMsgBox(
               Row(
                 children: [
                   appIcon(thumbnailUrl),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: SizedBox(
-                      width: 180,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -661,7 +610,8 @@ Widget joinMsgBox(
                                         views: listDetailInfo.views,
                                         urls: listDetailInfo.imageUrls,
                                         introLine: introLine,
-                                        likedBoard: listDetailInfo.likedBoard));
+                                        likedBoard: listDetailInfo.likedBoard,
+                                        mine: isUp?'모집중':'참여중'));
                                   });
                                 }
                               },
@@ -713,7 +663,8 @@ Widget joinMsgBox(
                                             urls: listDetailInfo.imageUrls,
                                             introLine: introLine,
                                             likedBoard:
-                                                listDetailInfo.likedBoard));
+                                                listDetailInfo.likedBoard,
+                                            mine: '모집완료'));
                                       });
                                     }
                                   },
@@ -756,18 +707,21 @@ Widget joinMsgBox(
                                           await requestRecruitingDetail(id)
                                               .then((listDetailInfo) {
                                             Get.to(() => ListDetail(
-                                                intValue: id,
-                                                title: title,
-                                                nickname:
-                                                    listDetailInfo.nickName,
-                                                createdDate: createdDate,
-                                                thumbnailUrl: thumbnailUrl,
-                                                likes: listDetailInfo.likes,
-                                                views: listDetailInfo.views,
-                                                urls: listDetailInfo.imageUrls,
-                                                introLine: introLine,
-                                                likedBoard:
-                                                    listDetailInfo.likedBoard));
+                                                  intValue: id,
+                                                  title: title,
+                                                  nickname:
+                                                      listDetailInfo.nickName,
+                                                  createdDate: createdDate,
+                                                  thumbnailUrl: thumbnailUrl,
+                                                  likes: listDetailInfo.likes,
+                                                  views: listDetailInfo.views,
+                                                  urls:
+                                                      listDetailInfo.imageUrls,
+                                                  introLine: introLine,
+                                                  likedBoard:
+                                                      listDetailInfo.likedBoard,
+                                                  mine: '테스트중',
+                                                ));
                                           });
                                         }
                                       },
@@ -794,7 +748,7 @@ Widget joinMsgBox(
                                       style: ButtonStyle(
                                         backgroundColor:
                                             MaterialStateProperty.all(
-                                                CustomColor.primary1),
+                                                CustomColor.primary2),
                                         shape: MaterialStateProperty.all(
                                           RoundedRectangleBorder(
                                             borderRadius:
@@ -815,13 +769,13 @@ Widget joinMsgBox(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Icon(Icons.list_alt_outlined,
-                                              color: CustomColor.grey5),
+                                          Icon(Icons.check_box_outlined,
+                                              color: CustomColor.primary1),
                                           const SizedBox(width: 8.0),
                                           Text(
                                             '테스트 완료',
                                             style: TextStyle(
-                                                color: CustomColor.grey5,
+                                                color: CustomColor.primary1,
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.w400),
                                           ),

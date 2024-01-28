@@ -1,4 +1,4 @@
-class   MyUploadTest {
+class MyUploadTest {
   final int id;
   final String title;
   final int participantNum;
@@ -36,15 +36,14 @@ class   MyUploadTest {
 
   factory MyUploadTest.fromJsonD(Map<String, dynamic> json) {
     return MyUploadTest(
-      id: json['id'],
-      title: json['title'],
-      participantNum: json['participantNum'],
-      recruitmentNum: json['recruitmentNum'],
-      state: json['state'],
-      thumbnailUrl: json['thumbnailUrl'],
-      createdDate: json['createdDate'],
-      introLine: json['introLine'],
-      deleted : json['deleted']
-    );
+        id: json['id'],
+        title: json['title'],
+        participantNum: json['participantNum'],
+        recruitmentNum: json['recruitmentNum'],
+        state: json['state'],
+        thumbnailUrl: json['thumbnailUrl'],
+        createdDate: json['createdDate'],
+        introLine: json['introLine'],
+        deleted: json['deleted']);
   }
 }

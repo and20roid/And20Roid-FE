@@ -29,7 +29,7 @@ class NotificationContent extends StatelessWidget {
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.8,
                   color: CustomColor.white,
-                  child: Center(
+                  child: const Center(
                       child: Text(
                     "알림이 없어요 🥲",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
@@ -53,7 +53,7 @@ class NotificationContent extends StatelessWidget {
                     } else if (mode == LoadStatus.failed) {
                       body = Text("다시 로드해주세요");
                     } else {
-                      body =Container();
+                      body = Container();
                     }
                     return Container(
                       height: 55.0,
@@ -122,7 +122,7 @@ Widget requestMsgBox(String name, String thumbnailUrl, String title,
 
   Future<ListDetailInfo> requestRecruitingDetail(id) async {
     try {
-      String url = "${Common.url}boards/${id}";
+      String url = "${Common.url}boards/$id";
       String? bearerToken =
           await FirebaseAuth.instance.currentUser!.getIdToken();
 
@@ -167,12 +167,18 @@ Widget requestMsgBox(String name, String thumbnailUrl, String title,
     child: Column(children: [
       Row(children: [
         const Icon(Icons.handshake_outlined),
-        Text(
-          ' $name',
-          style: TextStyle(
-              color: CustomColor.grey5,
-              fontSize: 16,
-              fontWeight: FontWeight.w400),
+        const SizedBox(
+          width: 10,
+        ),
+        Expanded(
+          child: Text(
+            overflow: TextOverflow.clip,
+            name,
+            style: TextStyle(
+                color: CustomColor.grey5,
+                fontSize: 16,
+                fontWeight: FontWeight.w400),
+          ),
         )
       ]),
       const SizedBox(
@@ -187,18 +193,17 @@ Widget requestMsgBox(String name, String thumbnailUrl, String title,
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-              SizedBox(
-                width: 270,
-                child: Row(
-                  children: [
-                    appIcon(thumbnailUrl),
-                    Padding(
+              Row(
+                children: [
+                  appIcon(thumbnailUrl),
+                  Expanded(
+                    child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            overflow: TextOverflow.fade,
+                            overflow: TextOverflow.clip,
                             title,
                             style: TextStyle(
                                 color: CustomColor.grey5,
@@ -206,8 +211,7 @@ Widget requestMsgBox(String name, String thumbnailUrl, String title,
                                 fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            overflow: TextOverflow.fade,
-
+                            overflow: TextOverflow.clip,
                             introLine,
                             style: TextStyle(
                                 color: CustomColor.grey5,
@@ -216,9 +220,9 @@ Widget requestMsgBox(String name, String thumbnailUrl, String title,
                           )
                         ],
                       ),
-                    )
-                  ],
-                ),
+                    ),
+                  )
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
@@ -288,7 +292,7 @@ Widget joinMsgBox(String name, String thumbnailUrl, String title,
 
   Future<ListDetailInfo> requestRecruitingDetail(id) async {
     try {
-      String url = "${Common.url}boards/${id}";
+      String url = "${Common.url}boards/$id";
       String? bearerToken =
           await FirebaseAuth.instance.currentUser!.getIdToken();
 
@@ -332,13 +336,19 @@ Widget joinMsgBox(String name, String thumbnailUrl, String title,
     padding: const EdgeInsets.all(12.0),
     child: Column(children: [
       Row(children: [
-        Icon(Icons.how_to_vote_outlined),
-        Text(
-          ' $name',
-          style: TextStyle(
-              color: CustomColor.grey5,
-              fontSize: 16,
-              fontWeight: FontWeight.w400),
+        const Icon(Icons.how_to_vote_outlined),
+        const SizedBox(
+          width: 10,
+        ),
+        Expanded(
+          child: Text(
+            overflow: TextOverflow.clip,
+            name,
+            style: TextStyle(
+                color: CustomColor.grey5,
+                fontSize: 16,
+                fontWeight: FontWeight.w400),
+          ),
         )
       ]),
       const SizedBox(
@@ -356,15 +366,14 @@ Widget joinMsgBox(String name, String thumbnailUrl, String title,
               Row(
                 children: [
                   appIcon(thumbnailUrl),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: SizedBox(
-                      width: 270,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            overflow: TextOverflow.fade,
+                            overflow: TextOverflow.clip,
                             title,
                             style: TextStyle(
                                 color: CustomColor.grey5,
@@ -372,7 +381,7 @@ Widget joinMsgBox(String name, String thumbnailUrl, String title,
                                 fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            overflow: TextOverflow.fade,
+                            overflow: TextOverflow.clip,
                             introLine,
                             style: TextStyle(
                                 color: CustomColor.grey5,
@@ -413,7 +422,9 @@ Widget joinMsgBox(String name, String thumbnailUrl, String title,
                                 views: listDetailInfo.views,
                                 urls: listDetailInfo.imageUrls,
                                 introLine: introLine,
-                                likedBoard: listDetailInfo.likedBoard));
+                                likedBoard: listDetailInfo.likedBoard,
+                              mine: '모집중',
+                            ));
                           });
                         },
                         child: Row(
@@ -453,20 +464,20 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
     child: Column(children: [
       Row(
         children: [
-          Icon(
+          const Icon(
             Icons.play_arrow_outlined,
           ),
           const SizedBox(width: 8), // 아이콘과 텍스트 간격 조절
           Expanded(
             child: Text(
-              '${name.contains('.') ? name.replaceAll('.', '.\n') : name}',
+              overflow: TextOverflow.clip,
+              name,
+              // '${name.contains('.') ? name.replaceAll('.', '.\n') : name}',
               style: TextStyle(
                 color: CustomColor.grey5,
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
               ),
-              maxLines: 2, // 최대 두 줄까지 표시
-              overflow: TextOverflow.ellipsis, // 오버플로우 된 경우 '...'으로 표시
             ),
           ),
         ],
@@ -483,18 +494,18 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-              SizedBox(
-                width: 270,
-                child: Row(
-                  children: [
-                    appIcon(thumbnailUrl),
-                    Padding(
+              Row(
+                children: [
+                  appIcon(thumbnailUrl),
+                  Expanded(
+                    child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             title,
+                            overflow: TextOverflow.clip,
                             style: TextStyle(
                                 color: CustomColor.grey5,
                                 fontSize: 18,
@@ -502,6 +513,7 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
                           ),
                           Text(
                             introLine,
+                            overflow: TextOverflow.clip,
                             style: TextStyle(
                                 color: CustomColor.grey5,
                                 fontSize: 15,
@@ -509,9 +521,9 @@ Widget startMsgBox(String name, String thumbnailUrl, String title,
                           )
                         ],
                       ),
-                    )
-                  ],
-                ),
+                    ),
+                  )
+                ],
               ),
               const SizedBox(
                 height: 10,
@@ -645,12 +657,18 @@ Widget endUploaderBox(String name, String thumbnailUrl, String title,
     child: Column(children: [
       Row(children: [
         const Icon(Icons.cloud_done_outlined),
-        Text(
-          ' $name',
-          style: TextStyle(
-              color: CustomColor.grey5,
-              fontSize: 16,
-              fontWeight: FontWeight.w400),
+        const SizedBox(
+          width: 10,
+        ),
+        Expanded(
+          child: Text(
+            overflow: TextOverflow.clip,
+            name,
+            style: TextStyle(
+                color: CustomColor.grey5,
+                fontSize: 16,
+                fontWeight: FontWeight.w400),
+          ),
         )
       ]),
       const SizedBox(
@@ -668,16 +686,16 @@ Widget endUploaderBox(String name, String thumbnailUrl, String title,
               Row(
                 children: [
                   appIcon(thumbnailUrl),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: SizedBox(
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             title,
                             style: TextStyle(
-                                overflow: TextOverflow.fade,
+                                overflow: TextOverflow.clip,
                                 color: CustomColor.grey5,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold),
@@ -685,7 +703,7 @@ Widget endUploaderBox(String name, String thumbnailUrl, String title,
                           Text(
                             introLine,
                             style: TextStyle(
-                                overflow: TextOverflow.fade,
+                                overflow: TextOverflow.clip,
                                 color: CustomColor.grey5,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w400),
@@ -712,7 +730,7 @@ Widget endUploaderBox(String name, String thumbnailUrl, String title,
                           ),
                         ),
                         onPressed: () {
-                          requestTestEndBroadCast(boardId);
+                          // requestTestEndBroadCast(boardId);
                           Common().showToastN(context, '테스트가 종료되었습니다!', 1);
                         },
                         child: Row(
@@ -727,7 +745,7 @@ Widget endUploaderBox(String name, String thumbnailUrl, String title,
                               width: 5,
                             ),
                             Text(
-                              '테스트 종료하기',
+                              '종료된 테스트',
                               style: TextStyle(
                                   color: CustomColor.primary1,
                                   fontSize: 18,
@@ -755,12 +773,18 @@ Widget endTesterBox(String name, String thumbnailUrl, String title,
     child: Column(children: [
       Row(children: [
         const Icon(Icons.cloud_done_outlined),
-        Text(
-          ' $name',
-          style: TextStyle(
-              color: CustomColor.grey5,
-              fontSize: 16,
-              fontWeight: FontWeight.w400),
+        const SizedBox(
+          width: 10,
+        ),
+        Expanded(
+          child: Text(
+            overflow: TextOverflow.clip,
+            name,
+            style: TextStyle(
+                color: CustomColor.grey5,
+                fontSize: 16,
+                fontWeight: FontWeight.w400),
+          ),
         )
       ]),
       const SizedBox(
@@ -778,26 +802,30 @@ Widget endTesterBox(String name, String thumbnailUrl, String title,
               Row(
                 children: [
                   appIcon(thumbnailUrl),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                              color: CustomColor.grey5,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          introLine,
-                          style: TextStyle(
-                              color: CustomColor.grey5,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400),
-                        )
-                      ],
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            overflow: TextOverflow.clip,
+                            title,
+                            style: TextStyle(
+                                color: CustomColor.grey5,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            introLine,
+                            overflow: TextOverflow.clip,
+                            style: TextStyle(
+                                color: CustomColor.grey5,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400),
+                          )
+                        ],
+                      ),
                     ),
                   )
                 ],
