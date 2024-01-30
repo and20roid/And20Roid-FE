@@ -7,23 +7,51 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1092602569915:android:cbdb05c1cae89a7fe1359e",
+        "mobilesdk_app_id": "1:1092602569915:android:64440326b23c3919e1359e",
         "android_client_info": {
-          "package_name": "com.example.and20roid"
+          "package_name": "com.codekunst.and20roid"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1092602569915-gek175v0v66t13t4fmi3tld53goho722.apps.googleusercontent.com",
+          "client_id": "1092602569915-57cunsmh1d0ioi9h8033nf0l25ijapf7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.and20roid",
-            "certificate_hash": "5ec06b1a4551622320388eda7902b7815fbde3b4"
+            "package_name": "com.codekunst.and20roid",
+            "certificate_hash": "d2d5c260a3cd376c4b37161cef082914b5d6c5c8"
           }
         },
         {
-          "client_id": "1092602569915-sqj0vvop04640k09btvujkm1q2fu8dae.apps.googleusercontent.com",
-          "client_type": 3
+          "client_id": "1092602569915-7mpa7dg3cr9bjboemhml733d0hmovj8c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.codekunst.and20roid",
+            "certificate_hash": "42de8ce0447d5243209ae27930b7da5bf8673462"
+          }
+        },
+        {
+          "client_id": "1092602569915-9kgdfdg9bs24fii0tup95nga4jk25qp3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.codekunst.and20roid",
+            "certificate_hash": "c53188ef2b605cba6c26c72c1c2c264f6dc18fb6"
+          }
+        },
+        {
+          "client_id": "1092602569915-hac2ulncdpaemef1qmh4fbllu5mhrfan.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.codekunst.and20roid",
+            "certificate_hash": "4522593bace05c1cb9949d3412af7a5c165ba241"
+          }
+        },
+        {
+          "client_id": "1092602569915-ni03kurj8bcc90n4p4qd1omgkq2lslsl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.codekunst.and20roid",
+            "certificate_hash": "f1e2122de8d94d4ed906d3e5328cfda5e99818b9"
+          }
         }
       ],
       "api_key": [
@@ -33,19 +61,7 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "1092602569915-sqj0vvop04640k09btvujkm1q2fu8dae.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "1092602569915-le6avr6j06m8qaq8c63r5js8lrp6t255.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.and20roid"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

@@ -79,7 +79,9 @@ class _TmpPageState extends State<DirectingPage> {
         String jwt =
             await FirebaseAuth.instance.currentUser?.getIdToken() as String;
         print('firebase id Token : $jwt');
-        _requestToken();
+        if(jwt != null){
+          _requestToken();
+        }
         Get.offAll(() => const BottomNavigatorPage());
       }
     });

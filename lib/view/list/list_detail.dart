@@ -19,7 +19,8 @@ class ListDetail extends StatefulWidget {
   final List<String> urls;
   final String introLine;
   final bool likedBoard;
-  String? mine;
+  final String state;
+  final bool mine;
 
   ListDetail(
       {Key? key,
@@ -33,7 +34,8 @@ class ListDetail extends StatefulWidget {
       required this.urls,
       required this.introLine,
       required this.likedBoard,
-      this.mine})
+      required this.state,
+      required this.mine})
       : super(key: key);
 
   @override
@@ -383,20 +385,20 @@ class _ListDetailState extends State<ListDetail> {
             const SizedBox(
               height: 10,
             ),
-            (widget.mine == '모집중')
+            (widget.state == '모집중') && (widget.mine)
                 ? Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: mozipjuBtn(widget.intValue, context),
                   )
-                : (widget.mine == '테스트중')
+                : (widget.state == '테스트중') || (widget.state == '모집완료')
                     ? Padding(
                         padding: const EdgeInsets.all(4.0),
-                        child: endMozipBtn(context,'테스트 중'),
+                        child: endMozipBtn(context, '테스트 중'),
                       )
-                    : (widget.mine == '참여중')
+                    : (widget.state == '참여중')
                         ? Padding(
                             padding: const EdgeInsets.all(4.0),
-                            child: endMozipBtn(context,'참여 중'),
+                            child: endMozipBtn(context, '참여 중'),
                           )
                         : Padding(
                             padding: const EdgeInsets.all(4.0),

@@ -611,7 +611,8 @@ Widget joinMsgBox(
                                         urls: listDetailInfo.imageUrls,
                                         introLine: introLine,
                                         likedBoard: listDetailInfo.likedBoard,
-                                        mine: isUp?'모집중':'참여중'));
+                                        mine: true,
+                                        state: isUp?'모집중':'참여중'));
                                   });
                                 }
                               },
@@ -664,7 +665,8 @@ Widget joinMsgBox(
                                             introLine: introLine,
                                             likedBoard:
                                                 listDetailInfo.likedBoard,
-                                            mine: '모집완료'));
+                                            mine: true,
+                                            state: '모집완료'));
                                       });
                                     }
                                   },
@@ -720,7 +722,8 @@ Widget joinMsgBox(
                                                   introLine: introLine,
                                                   likedBoard:
                                                       listDetailInfo.likedBoard,
-                                                  mine: '테스트중',
+                                              mine: true,
+                                              state: '테스트중',
                                                 ));
                                           });
                                         }

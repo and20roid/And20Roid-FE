@@ -55,7 +55,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBvZaKCj4zILZogQ0yy2_DBPMv4QCgTzwo',
-    appId: '1:1092602569915:android:cbdb05c1cae89a7fe1359e',
+    appId: '1:1092602569915:android:64440326b23c3919e1359e',
     messagingSenderId: '1092602569915',
     projectId: 'and20roid-a7e09',
     storageBucket: 'and20roid-a7e09.appspot.com',
@@ -67,7 +67,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1092602569915',
     projectId: 'and20roid-a7e09',
     storageBucket: 'and20roid-a7e09.appspot.com',
-    iosBundleId: 'com.example.and20roid',
+    iosBundleId: 'com.codekunst.and20roid',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -76,6 +76,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1092602569915',
     projectId: 'and20roid-a7e09',
     storageBucket: 'and20roid-a7e09.appspot.com',
-    iosBundleId: 'com.example.and20roid.RunnerTests',
+    iosBundleId: 'com.codekunst.and20roid.RunnerTests',
   );
 }

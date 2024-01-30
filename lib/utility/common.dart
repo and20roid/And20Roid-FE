@@ -95,19 +95,6 @@ class Common {
 class SaveSharedPreferences {
   String uTokenKey = "uToken";
   String uNickkey = "uNick";
-  String profileUrlKey = 'profileUrl';
-
-  Future<void> setUserProfile(String url) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    if (url != null) {
-      preferences.setString(profileUrlKey, url);
-    }
-  }
-
-  Future<String> getUserProfile() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    return preferences.getString(profileUrlKey) ?? "";
-  }
 
   void setUserToken(String userToken) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:and20roid/utility/common.dart';
 import 'package:and20roid/direct_page.dart';
+import 'package:and20roid/view/alarm/notification_controller.dart';
+import 'package:and20roid/view/ranking/ranking_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,8 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import '../bottom_navigator.dart';
+import 'list/list_controller.dart';
+import 'mypage/my_page_controller.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -59,6 +63,7 @@ class _LoginPageState extends State<LoginPage> {
           try {
             await signInWithGoogle();
           } catch (e) {
+            print(e);
             Common().showToastN(context, e.toString(), 1);
           }
         },
@@ -165,9 +170,12 @@ class _LoginPageState extends State<LoginPage> {
         // 성공적으로 처리된 경우
         return true;
       } else {
+        Map<String, dynamic> parsedResponse =
+            jsonDecode(utf8.decode(data.bodyBytes));
+        String message = parsedResponse['message'];
         print("~~~~~~~~~~fail sign up request");
         print("Status code: ${data.statusCode}");
-        print("Response body: ${data.body}");
+        print("Response message: ${message}");
         // 실패한 경우
         return false;
       }
@@ -220,13 +228,9 @@ class _LoginPageState extends State<LoginPage> {
         // 사용자가 Google 로그인을 취소한 경우
         return;
       }
-
       // Google 로그인에서 얻은 인증 정보
       final GoogleSignInAuthentication googleSignInAuthentication =
           await googleSignInAccount.authentication;
-
-      String? userProfileUrl = googleSignInAccount.photoUrl?.toString();
-      sharedPreferences.setUserProfile(userProfileUrl!);
 
       // 사용자의 이메일 앞부분 추출
       final String userEmail = googleSignInAccount.email;
@@ -268,11 +272,18 @@ class _LoginPageState extends State<LoginPage> {
       await requestSignup(uId, userNick);
 
       if (_auth.currentUser != null) {
-        _requestToken();
-        print("~~~~~~~~~null은 아니라서 넘어가유 ~");
+        print('-------------controller loading--------------------');
+        Get.put(ListController());
+        Get.put(RankingController());
+        Get.put(MyPageControllrer());
+        Get.put(NotiController());
+
+        print('-------------controller load success--------------------');
+        await _requestToken();
         Get.offAll(() => const BottomNavigatorPage());
       } else {
-        print("-----------------안넘어가유 ~");
+        Get.offAll(() => const DirectingPage());
+        print("-----------------다시 다이렉트 페이지로");
       }
     } on FirebaseAuthException catch (e) {
       // FirebaseAuthException 예외 발생 시 처리

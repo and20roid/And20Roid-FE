@@ -110,9 +110,4 @@ class NotiController extends GetxController {
     refreshController.loadComplete();
   }
 
-  @override
-  void onInit() {
-    requestUserTestNum();
-    super.onInit();
-  }
 }

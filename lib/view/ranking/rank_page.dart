@@ -38,7 +38,7 @@ class RankingContent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 (rankCtrl.rankList.isEmpty)
-                    ? trophy('1', '', 0.toString(), "assets/images/Vector.png",
+                    ? trophy('1', '1등', 0.toString(), "assets/images/Vector.png",
                         0, 0, false)
                     : trophy(
                         '1',
@@ -197,7 +197,9 @@ class RankingContent extends StatelessWidget {
           color: relatedUser ? CustomColor.primary4 : CustomColor.white),
       child: InkWell(
         onTap: () {
-          movePage(name, userId, ranking, helpEach, relatedUser);
+          if(userId!=0){
+            movePage(name, userId, ranking, helpEach, relatedUser);
+          }
         },
         child: Padding(
           padding: const EdgeInsets.all(12.0),

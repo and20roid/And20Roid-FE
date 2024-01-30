@@ -18,33 +18,38 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+// import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'bottom_navigator.dart';
 import 'direct_page.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 Future<void> main() async {
-  WidgetsBinding widgetsBinding =  WidgetsFlutterBinding.ensureInitialized();
+  // WidgetsBinding widgetsBinding =  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  await FirebaseMessaging.instance.getToken();
-  final initFuture = MobileAds.instance.initialize();
-  final adState = AdState(initFuture);
+  try {
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    await FirebaseMessaging.instance.getToken();
+  } catch (e) {
+    print('Error during Firebase initialization: $e');
+  }
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // final initFuture = MobileAds.instance.initialize();
+  // final adState = AdState(initFuture);
 
   runApp(
-    MultiProvider(
-      providers: [
-        Provider<AdState>(create: (_) => adState),
-      ],
-      child: const MyApp(),
-    ),
-  );
+      // MultiProvider(
+      //   providers: [
+      //     Provider<AdState>(create: (_) => adState),
+      //   ],
+      //   child: const MyApp(),
+      // ),
+      const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -55,10 +60,9 @@ class MyApp extends StatelessWidget {
     init();
     firebaseMessageSetting();
     firebaseMessageProc(context);
-    FlutterNativeSplash.remove();
+    // FlutterNativeSplash.remove();
 
     return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
       color: CustomColor.grey5,
       home: const DirectingPage(),
     );
@@ -68,7 +72,6 @@ class MyApp extends StatelessWidget {
 bool kIsWeb = false;
 
 void init() async {
-  Get.put(ListController());
 
   if (await Permission.notification.isDenied) {
     await Permission.notification.request();
@@ -79,11 +82,16 @@ void init() async {
     alert: true,
     sound: true,
   );
-  String? token = await FirebaseMessaging.instance.getToken();
-  print("fcm token $token");
 
+  String? token = await FirebaseMessaging.instance.getToken();
+  if (token != null) {
+    print("FCM token: $token");
+  } else {
+    print("Warning: FCM token is null.");
+  }
 
 }
+
 
 void firebaseMessageSetting() async {
   AndroidNotificationChannel channel = const AndroidNotificationChannel(
@@ -92,8 +100,7 @@ void firebaseMessageSetting() async {
     importance: Importance.max,
   );
 
-  var androidSetting =
-      const AndroidInitializationSettings('@drawable/appstore');
+  var androidSetting = const AndroidInitializationSettings('@drawable/appstore');
   var initializationSettings = InitializationSettings(android: androidSetting);
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -133,8 +140,6 @@ void firebaseMessageSetting() async {
 
 void firebaseMessageProc(context) {
   final notificationController = Get.put(NotiController());
-  Get.put(RankingController());
-  Get.put(MyPageControllrer());
 
   ///알림 수신[앱 실행중]
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {

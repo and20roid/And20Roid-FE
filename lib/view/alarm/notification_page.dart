@@ -253,6 +253,8 @@ Widget requestMsgBox(String name, String thumbnailUrl, String title,
                                 views: listDetailInfo.views,
                                 urls: listDetailInfo.imageUrls,
                                 introLine: introLine,
+                                mine: true,
+                                state: '모집중',
                                 likedBoard: listDetailInfo.likedBoard));
                           });
                         },
@@ -423,7 +425,8 @@ Widget joinMsgBox(String name, String thumbnailUrl, String title,
                                 urls: listDetailInfo.imageUrls,
                                 introLine: introLine,
                                 likedBoard: listDetailInfo.likedBoard,
-                              mine: '모집중',
+                              mine: true,
+                              state: '모집중',
                             ));
                           });
                         },

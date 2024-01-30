@@ -27,10 +27,10 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
   }
   int _currentIndex = 0;
 
-  final notiCtrl = Get.find<NotiController>();
-  final rankCtrl = Get.find<RankingController>();
-  final listCtrl = Get.find<ListController>();
-  final myCtrl = Get.find<MyPageControllrer>();
+  final notiCtrl = Get.put(NotiController());
+  final rankCtrl = Get.put(RankingController());
+  final listCtrl = Get.put(ListController());
+  final myCtrl = Get.put(MyPageControllrer());
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +98,7 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
                 print('ranking update ');
                 rankCtrl.update();
               } else if (index == 3) {
+                notiCtrl.requestUserTestNum();
                 notiCtrl.alarmCount = 0.obs;
               }else if (index == 4) {
                 myCtrl.getUserName();

@@ -12,6 +12,7 @@ class GatherList {
   int views;
   int likes;
   final bool likedBoard;
+  final bool mine;
 
   GatherList({
     required this.id,
@@ -27,6 +28,7 @@ class GatherList {
     required this.views,
     required this.likes,
     required this.likedBoard,
+    required this.mine,
   });
 
   factory GatherList.fromJson(Map<String, dynamic> json) {
@@ -44,6 +46,7 @@ class GatherList {
       views: json['views'] ?? 0,
       likes: json['likes'] ?? 0,
       likedBoard: json['likedBoard'] ?? false,
+      mine : json['mine'] ?? false,
     );
   }
 }

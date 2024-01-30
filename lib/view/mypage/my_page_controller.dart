@@ -30,7 +30,6 @@ class MyPageControllrer extends GetxController {
 
   Future<void> getUserName() async {
     emailName = await sharedPreferences.getUserNick();
-    profileUrl = await sharedPreferences.getUserProfile();
     await requestMyUploadTest();
     await requestMyParticipantTest();
     await requestMyInfo();

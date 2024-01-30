@@ -1,4 +1,4 @@
-package com.example.and20roid
+package com.codekunst.and20roid
 
 import io.flutter.embedding.android.FlutterActivity
 
