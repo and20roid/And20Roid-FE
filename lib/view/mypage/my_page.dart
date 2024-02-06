@@ -50,15 +50,19 @@ class MyPageContent extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               actions: [
-                IconButton(
+                Semantics(
+                  label: '내 정보 변경하기',
+                  child: IconButton(
                     onPressed: () {
                       Get.to(() => const ChangeInfo(),
                           transition: Transition.rightToLeftWithFade);
                     },
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.settings,
                       size: 30,
-                    ))
+                    ),
+                  ),
+                )
               ],
             ),
             backgroundColor: CustomColor.grey1,

@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
             await signInWithGoogle();
           } catch (e) {
             print(e);
-            Common().showToastN(context, e.toString(), 1);
+            Common().showToastN(context, '잠시 후 다시 시도해주세요', 1);
           }
         },
         child: Row(

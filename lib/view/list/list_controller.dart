@@ -16,15 +16,15 @@ class ListController extends GetxController {
   final RefreshController refreshController =
       RefreshController(initialRefresh: true);
 
-  // Map<String, String> UNIT_ID = kReleaseMode
-  //     ? {
-  //         'ios': '[YOUR iOS AD UNIT ID]',
-  //         'android': 'ca-app-pub-8601392848585629/1080629832',
-  //       }
-  //     : {
-  //         'ios': 'ca-app-pub-3940256099942544/2934735716',
-  //         'android': 'ca-app-pub-3940256099942544/6300978111',
-  //       };
+  Map<String, String> UNIT_ID = kReleaseMode
+      ? {
+          'ios': '[YOUR iOS AD UNIT ID]',
+          'android': 'ca-app-pub-8601392848585629/1080629832',
+        }
+      : {
+          'ios': 'ca-app-pub-3940256099942544/2934735716',
+          'android': 'ca-app-pub-3940256099942544/6300978111',
+        };
 
   // Map<String, String> UNIT_ID = {
   //   'ios': '[YOUR iOS AD UNIT ID]',

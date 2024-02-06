@@ -18,15 +18,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
-// import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'bottom_navigator.dart';
 import 'direct_page.dart';
-// import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 Future<void> main() async {
-  // WidgetsBinding widgetsBinding =  WidgetsFlutterBinding.ensureInitialized();
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding =  WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -38,18 +37,17 @@ Future<void> main() async {
   } catch (e) {
     print('Error during Firebase initialization: $e');
   }
-  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  // final initFuture = MobileAds.instance.initialize();
-  // final adState = AdState(initFuture);
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  final initFuture = MobileAds.instance.initialize();
+  final adState = AdState(initFuture);
 
   runApp(
-      // MultiProvider(
-      //   providers: [
-      //     Provider<AdState>(create: (_) => adState),
-      //   ],
-      //   child: const MyApp(),
-      // ),
-      const MyApp());
+      MultiProvider(
+        providers: [
+          Provider<AdState>(create: (_) => adState),
+        ],
+        child: const MyApp()
+      ));
 }
 
 class MyApp extends StatelessWidget {
@@ -60,7 +58,7 @@ class MyApp extends StatelessWidget {
     init();
     firebaseMessageSetting();
     firebaseMessageProc(context);
-    // FlutterNativeSplash.remove();
+    FlutterNativeSplash.remove();
 
     return GetMaterialApp(
       color: CustomColor.grey5,
@@ -173,7 +171,8 @@ void firebaseMessageProc(context) {
       print(message.notification!.title);
       print(message.notification!.body);
 
-      Get.to(() => NotificationContent());
+      Get.to(() => DirectingPage());
+      notificationController.alarmCount.value++;
     }
   });
 

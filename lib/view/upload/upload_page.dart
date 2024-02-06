@@ -182,10 +182,6 @@ class _UploadSecondState extends State<UploadSecond> {
                       Get.to(() => UploadThird(),
                           transition: Transition.rightToLeftWithFade);
                     },
-                    child: Text(
-                      "다음",
-                      style: TextStyle(fontSize: 18),
-                    ),
                     style: ButtonStyle(
                       backgroundColor:
                           MaterialStateProperty.all(CustomColor.primary1),
@@ -195,6 +191,10 @@ class _UploadSecondState extends State<UploadSecond> {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
+                    ),
+                    child: Text(
+                      "다음",
+                      style: TextStyle(fontSize: 18,color: CustomColor.grey5),
                     ),
                   ),
                 )),
@@ -234,7 +234,7 @@ AppBar _appbar(title, isback) {
     backgroundColor: CustomColor.grey1,
     title: Text(
       title,
-      style: TextStyle(
+      style: const TextStyle(
           color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
     ),
     automaticallyImplyLeading: isback,
@@ -269,10 +269,6 @@ Column _body(UploadFirstController controller, BuildContext context) {
                   }
                 }
               },
-              child: Text(
-                "다음",
-                style: TextStyle(fontSize: 18),
-              ),
               style: ButtonStyle(
                 backgroundColor:
                     MaterialStateProperty.all(CustomColor.primary1),
@@ -282,6 +278,10 @@ Column _body(UploadFirstController controller, BuildContext context) {
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
+              ),
+              child: Text(
+                "다음",
+                style: TextStyle(fontSize: 18,color: CustomColor.grey5),
               ),
             ),
           )),
@@ -401,10 +401,6 @@ Column _body3(UploadThirdController controller, context) {
           }
           // :null
           ,
-          child: Text(
-            "업로드 하기",
-            style: TextStyle(fontSize: 18),
-          ),
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(CustomColor.primary1),
             minimumSize: MaterialStateProperty.all(Size.fromHeight(60)),
@@ -413,6 +409,10 @@ Column _body3(UploadThirdController controller, context) {
                 borderRadius: BorderRadius.circular(8.0),
               ),
             ),
+          ),
+          child: Text(
+            "업로드 하기",
+            style: TextStyle(fontSize: 18,color: CustomColor.grey5),
           ),
         ),
       ),

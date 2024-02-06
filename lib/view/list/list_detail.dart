@@ -649,34 +649,36 @@ class _ListDetailState extends State<ListDetail> {
   }
 
   Widget threeTitle(String nickname, String heart, String views) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12.0),
-      child: Row(
-        children: [
-          Text(nickname),
-          SizedBox(width: 16),
-          InkWell(
-              onTap: () async {
-                await requestClickHeartButton();
-              },
-              child: isLiked
-                  ? Row(
-                      children: [
-                        Icon(Icons.favorite, color: Colors.red),
-                        Text(" ${(int.parse(heart) + 1).toString()}"),
-                      ],
-                    )
-                  : Row(
-                      children: [
-                        Icon(Icons.favorite_border_outlined, color: Colors.red),
-                        Text(" $heart"),
-                      ],
-                    )),
-          const SizedBox(width: 16),
-          const Icon(Icons.visibility_outlined),
-          Text(' $views')
-        ],
-      ),
+    return Row(
+      children: [
+        Text(nickname),
+        const SizedBox(width: 16),
+        InkWell(
+          onTap: () async {
+            await requestClickHeartButton();
+          },
+          child: Container(
+            width: 48.0, // 원하는 폭으로 조절
+            height: 48.0, // 원하는 높이로 조절
+            child: isLiked
+                ? Row(
+                    children: [
+                      Icon(Icons.favorite, color: Colors.red),
+                      Text(" ${(int.parse(heart) + 1).toString()}"),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Icon(Icons.favorite_border_outlined, color: Colors.red),
+                      Text(" $heart"),
+                    ],
+                  ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        const Icon(Icons.visibility_outlined),
+        Text(' $views')
+      ],
     );
   }
 

@@ -52,6 +52,14 @@
             "package_name": "com.codekunst.and20roid",
             "certificate_hash": "f1e2122de8d94d4ed906d3e5328cfda5e99818b9"
           }
+        },
+        {
+          "client_id": "1092602569915-ruo1mmrrp19meo0i3v6i5hem20tbokmu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.codekunst.and20roid",
+            "certificate_hash": "7575ab3e5b59350a2f4137c6c7e50d86029cca39"
+          }
         }
       ],
       "api_key": [

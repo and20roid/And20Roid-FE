@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -25,25 +25,25 @@ class ListContent extends StatefulWidget {
 class _ListContentState extends State<ListContent> {
   final listCtrl = Get.find<ListController>();
 
-  // BannerAd? banner;
-  // bool _bannerIsLoaded = false;
+  BannerAd? banner;
+  bool _bannerIsLoaded = false;
 
   @override
   void initState() {
     super.initState();
-    // final adState = Provider.of<AdState>(context, listen: false);
-    // adState.initialisation.then((status) {
-    //   setState(() {
-    //     banner = BannerAd(
-    //       adUnitId: adState.bannerAdUnitId,
-    //       size: AdSize.banner,
-    //       request: const AdRequest(),
-    //       listener: adState.adListener,
-    //     )..load();
-    //
-    //     _bannerIsLoaded = true;
-    //   });
-    // });
+    final adState = Provider.of<AdState>(context, listen: false);
+    adState.initialisation.then((status) {
+      setState(() {
+        banner = BannerAd(
+          adUnitId: adState.bannerAdUnitId,
+          size: AdSize.banner,
+          request: const AdRequest(),
+          listener: adState.adListener,
+        )..load();
+
+        _bannerIsLoaded = true;
+      });
+    });
   }
 
   @override
@@ -85,32 +85,32 @@ class _ListContentState extends State<ListContent> {
                 if (index > 0 && (index + 1) % 5 == 0) {
                   return Column(
                     children: [
-                      // _bannerIsLoaded
-                      //     ? Container(
-                      //         decoration: BoxDecoration(
-                      //           borderRadius: BorderRadius.circular(12.0),
-                      //           border:
-                      //               Border.all(color: Colors.black, width: 1.0),
-                      //         ),
-                      //         child: FutureBuilder(
-                      //           // Use FutureBuilder to get the ad sizeㄴ
-                      //           future: banner!.load(),
-                      //           builder: (context, snapshot) {
-                      //             if (snapshot.connectionState ==
-                      //                 ConnectionState.done) {
-                      //               double adHeight =
-                      //                   banner!.size.height.toDouble();
-                      //               return SizedBox(
-                      //                 height: adHeight,
-                      //                 child: AdWidget(ad: banner!),
-                      //               );
-                      //             } else {
-                      //               // Return a placeholder or loading indicator if needed
-                      //               return CircularProgressIndicator();
-                      //             }
-                      //           },
-                      //         ))
-                      //     : Container(),
+                      _bannerIsLoaded
+                          ? Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12.0),
+                                border:
+                                    Border.all(color: Colors.black, width: 1.0),
+                              ),
+                              child: FutureBuilder(
+                                // Use FutureBuilder to get the ad sizeㄴ
+                                future: banner!.load(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.done) {
+                                    double adHeight =
+                                        banner!.size.height.toDouble();
+                                    return SizedBox(
+                                      height: adHeight,
+                                      child: AdWidget(ad: banner!),
+                                    );
+                                  } else {
+                                    // Return a placeholder or loading indicator if needed
+                                    return CircularProgressIndicator();
+                                  }
+                                },
+                              ))
+                          : Container(),
                       InkWell(
                         onTap: () {
                           Get.to(
@@ -133,7 +133,7 @@ class _ListContentState extends State<ListContent> {
                               state : listCtrl.gatherListItems[index].state,
                               mine : listCtrl.gatherListItems[index].mine
                             ),
-                            transition: Transition.leftToRight,
+                            transition: Transition.rightToLeft,
                           );
                         },
                         child: renderCard(
@@ -173,7 +173,7 @@ class _ListContentState extends State<ListContent> {
                           state: listCtrl.gatherListItems[index].state,
                           mine: listCtrl.gatherListItems[index].mine,
                         ),
-                        transition: Transition.leftToRight,
+                        transition: Transition.rightToLeft,
                       );
                     },
                     child: renderCard(
