@@ -6,6 +6,7 @@ import 'package:and20roid/view/ranking/rank_page.dart';
 import 'package:and20roid/view/alarm/notification_page.dart';
 import 'package:and20roid/view/ranking/ranking_controller.dart';
 import 'package:and20roid/view/upload/upload_page.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -26,6 +27,14 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
     super.initState();
   }
   int _currentIndex = 0;
+  FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.instance;
+
+  void logScreenView(String screenName) {
+    firebaseAnalytics.logEvent(
+      name: 'screen_view',
+      parameters: {'screen_name': screenName},
+    );
+  }
 
   final notiCtrl = Get.put(NotiController());
   final rankCtrl = Get.put(RankingController());
@@ -93,17 +102,22 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
               if (index == 0) {
                 listCtrl.gotoTop();
                 listCtrl.update();
+                logScreenView('홈');
               }else if (index == 1) {
                 rankCtrl.requestTotalRanking();
                 print('ranking update ');
                 rankCtrl.update();
-              } else if (index == 3) {
+                logScreenView('랭킹');
+              } else if (index== 2){
+                logScreenView('업로드');
+              }else if (index == 3) {
                 notiCtrl.requestUserTestNum();
                 notiCtrl.alarmCount = 0.obs;
+                logScreenView('알림');
               }else if (index == 4) {
                 myCtrl.getUserName();
-                print('ranking update ');
                 myCtrl.update();
+                logScreenView('마이페이지');
               }
               setState(() {
                 _currentIndex = index;

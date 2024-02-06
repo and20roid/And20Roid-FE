@@ -83,7 +83,7 @@ class MyPageContent extends StatelessWidget {
                           child: testInfo(
                               " 게시물",
                               myCtrl.uploadBoardCount.toString(),
-                              Icons.upload_file_outlined,
+                              Icons.create_outlined,
                               '개')),
                       const SizedBox(
                         width: 10,

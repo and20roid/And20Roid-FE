@@ -9,6 +9,7 @@ import 'package:and20roid/view/mypage/my_page.dart';
 import 'package:and20roid/view/mypage/my_page_controller.dart';
 import 'package:and20roid/view/ranking/ranking_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
@@ -23,6 +24,7 @@ import 'package:provider/provider.dart';
 import 'bottom_navigator.dart';
 import 'direct_page.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding =  WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +36,20 @@ Future<void> main() async {
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     await FirebaseMessaging.instance.getToken();
+    // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    /// Crashlytics
+    FlutterError.onError = (errorDetails) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+    };
+    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+
+    /// Analytics
+    FirebaseAnalytics.instance;
+
   } catch (e) {
     print('Error during Firebase initialization: $e');
   }
@@ -168,10 +184,6 @@ void firebaseMessageProc(context) {
   ///알림 클릭[앱 실행중]
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     if (message.notification != null) {
-      print(message.notification!.title);
-      print(message.notification!.body);
-
-      Get.to(() => DirectingPage());
       notificationController.alarmCount.value++;
     }
   });

@@ -57,7 +57,7 @@ class MyPageControllrer extends GetxController {
           name = jsonResults['nickname'];
           completedTestCount = jsonResults['completedTestCount'];
           uploadBoardCount = jsonResults['uploadBoardCount'];
-          rank = jsonResults['rank'];
+          rank = jsonResults['rank'] ?? 0;
 
           print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~name $name');
         }
