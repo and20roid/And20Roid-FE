@@ -1,12 +1,15 @@
 import 'dart:convert';
 
 import 'package:and20roid/model/mypage_tests.dart';
+import 'package:and20roid/view/upload/upload_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
+import '../../bottom_navigator.dart';
 import '../../model/another_page_list_my_tests.dart';
 import '../../model/user_model.dart';
 import '../../utility/common.dart';
@@ -59,6 +62,8 @@ class _RequestTestState extends State<RequestTest> {
       if (data.statusCode == 200) {
         if (data.body.isNotEmpty) {
           var jsonResults = jsonDecode(utf8.decode(data.bodyBytes));
+          print('--------------------남이 보는 내 페이지 ');
+          print(jsonResults);
           setState(() {
             userTestInfo = UserTestInfo.fromJson(jsonResults);
           });
@@ -123,7 +128,7 @@ class _RequestTestState extends State<RequestTest> {
       BuildContext context, List<MyListForRequest> myTestList) {
     const maxListLength = 400;
     final calculatedHeight =
-        100 + myTestList.length.clamp(0, maxListLength) * 100;
+        10 + myTestList.length.clamp(0, maxListLength) * 100;
 
     showDialog(
       context: context,
@@ -138,33 +143,61 @@ class _RequestTestState extends State<RequestTest> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0),
-                  child: Text(
-                    "테스트 목록",
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0),
+                  child: myTestList.isEmpty
+                      ? const Text(
+                          '진행 중인 테스트가 없어요😅',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        )
+                      : const Text(
+                          "테스트 목록",
+                          style: TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.w500),
+                          textAlign: TextAlign.center,
+                        ),
                 ),
                 Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child: Container(
-                      height: calculatedHeight.toDouble(),
-                      child: ListView.builder(
-                          itemCount: myTestList.length,
-                          itemBuilder: (context, index) {
-                            return joinMsgBox(
-                                myTestList[index].thumbnailUrl,
-                                myTestList[index].title,
-                                myTestList[index].introLine,
-                                myTestList[index].participantNum,
-                                myTestList[index].recruitmentNum,
-                                context,
-                                widget.userId,
-                                myTestList[index].id
-                            );
-                          }),
-                    ))
+                    child: myTestList.isEmpty
+                        ? ElevatedButton(
+                            onPressed: () {
+                              Get.offAll(() => const BottomNavigatorPage(
+                                    initialValue: 2,
+                                  ));
+                            },
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: CustomColor.primary1,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      12.0), // 모서리 radius 설정
+                                ),
+                                minimumSize: const Size.fromHeight(60)),
+                            child: Text(
+                              '작성하러 가기',
+                              style: TextStyle(
+                                  color: CustomColor.grey5,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500),
+                            ))
+                        : Container(
+                            height: calculatedHeight.toDouble(),
+                            child: ListView.builder(
+                                itemCount: myTestList.length,
+                                itemBuilder: (context, index) {
+                                  return joinMsgBox(
+                                      myTestList[index].thumbnailUrl,
+                                      myTestList[index].title,
+                                      myTestList[index].introLine,
+                                      myTestList[index].participantNum,
+                                      myTestList[index].recruitmentNum,
+                                      context,
+                                      widget.userId,
+                                      myTestList[index].id);
+                                }),
+                          ))
               ],
             ),
           ),
@@ -186,16 +219,18 @@ class _RequestTestState extends State<RequestTest> {
                   Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(12.0),
+                        padding: const EdgeInsets.fromLTRB(12.0,0,12.0,0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.fromLTRB(8.0,0,8.0,8.0),
                               child: Text(
                                 widget.userName,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 28),
+                                style: TextStyle(
+                                    color: CustomColor.grey5,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 28),
                               ),
                             ),
                             Row(
@@ -322,18 +357,18 @@ class _RequestTestState extends State<RequestTest> {
 
 AppBar _appBar() {
   return AppBar(
+    toolbarHeight: 80.0,
     backgroundColor: CustomColor.grey1,
     title: Text(
       "다른 테스터 정보",
       style: TextStyle(
-          fontSize: 18, color: CustomColor.grey5, fontWeight: FontWeight.w500),
+          fontSize: 28, color: CustomColor.grey5, fontWeight: FontWeight.w500),
     ),
   );
 }
 
 Widget joinMsgBox(String thumbnailUrl, String title, String introLine,
-    int pariNum, int recruNum, BuildContext context,int? userId, int boardId) {
-
+    int pariNum, int recruNum, BuildContext context, int? userId, int boardId) {
   String message = '요청이 완료됐습니다';
 
   Future<bool> requestMyListRequest() async {
@@ -350,7 +385,6 @@ Widget joinMsgBox(String thumbnailUrl, String title, String introLine,
           'Authorization': 'Bearer $bearerToken',
         },
         body: jsonEncode({'boardId': boardId}),
-
       );
 
       if (data.statusCode == 200) {
@@ -359,10 +393,10 @@ Widget joinMsgBox(String thumbnailUrl, String title, String introLine,
         print("Status code: ${data.statusCode}");
         print("Response body: ${utf8.decode(data.bodyBytes)}");
 
-        Map<String, dynamic> jsonResponse = jsonDecode(utf8.decode(data.bodyBytes));
+        Map<String, dynamic> jsonResponse =
+            jsonDecode(utf8.decode(data.bodyBytes));
         message = jsonResponse['message'] ?? '';
       }
-
     } catch (e) {
       print('Error: $e');
     }
@@ -423,7 +457,7 @@ Widget joinMsgBox(String thumbnailUrl, String title, String introLine,
                             ),
                           ),
                         ),
-                        onPressed: () async{
+                        onPressed: () async {
                           await requestMyListRequest();
                           Common().showToastN(context, message, 1);
                         },

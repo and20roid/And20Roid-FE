@@ -12,7 +12,7 @@ import '../../model/list_detail.dart';
 import '../../model/noti_model.dart';
 import '../../utility/common.dart';
 import '../list/list_detail.dart';
-import 'notification_controller.dart';
+import '../../controller/notification_controller.dart';
 
 class NotificationContent extends StatelessWidget {
   final noti = Get.find<NotiController>();

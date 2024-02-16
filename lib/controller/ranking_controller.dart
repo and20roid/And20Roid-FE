@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import '../../model/ranking_model.dart';
-import '../../utility/common.dart';
+import '../model/ranking_model.dart';
+import '../utility/common.dart';
 
 class RankingController extends GetxController{
   List<Rank> rankList = [];

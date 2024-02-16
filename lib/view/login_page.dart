@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:and20roid/utility/common.dart';
 import 'package:and20roid/direct_page.dart';
-import 'package:and20roid/view/alarm/notification_controller.dart';
-import 'package:and20roid/view/ranking/ranking_controller.dart';
+import 'package:and20roid/controller/notification_controller.dart';
+import 'package:and20roid/controller/ranking_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +12,8 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import '../bottom_navigator.dart';
-import 'list/list_controller.dart';
-import 'mypage/my_page_controller.dart';
+import '../controller/list_controller.dart';
+import '../controller/my_page_controller.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);

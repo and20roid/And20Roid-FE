@@ -5,8 +5,8 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import '../../model/mypage_tests.dart';
-import '../../utility/common.dart';
+import '../model/mypage_tests.dart';
+import '../utility/common.dart';
 
 class MyPageControllrer extends GetxController {
   final SaveSharedPreferences sharedPreferences = SaveSharedPreferences();
@@ -59,7 +59,6 @@ class MyPageControllrer extends GetxController {
           uploadBoardCount = jsonResults['uploadBoardCount'];
           rank = jsonResults['rank'] ?? 0;
 
-          print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~name $name');
         }
       } else {
         print("Status code: ${data.statusCode}");

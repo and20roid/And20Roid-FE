@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../main.dart';
 import '../../utility/common.dart';
-import 'my_page_controller.dart';
+import '../../controller/my_page_controller.dart';
 
 class ChangeInfo extends StatefulWidget {
   const ChangeInfo({super.key});

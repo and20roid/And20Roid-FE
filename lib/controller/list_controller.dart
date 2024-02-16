@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import '../../model/list_model.dart';
-import '../../utility/common.dart';
+import '../model/list_model.dart';
+import '../utility/common.dart';
 
 class ListController extends GetxController {
   int lastBoardId = 0;
+  RxBool isLoaded = false.obs;
   List<GatherList> gatherListItems = [];
 
   final RefreshController refreshController =
@@ -32,7 +33,6 @@ class ListController extends GetxController {
   //   // 'android': 'ca-app-pub-8601392848585629/9554016226',
   // }
   // ;
-
 
   ScrollController scrollController = ScrollController();
 
@@ -110,7 +110,8 @@ class ListController extends GetxController {
           var jsonData = jsonResults['readBoardResponses'];
           print(jsonData);
 
-          List<int> existingIds = gatherListItems.map((item) => item.id).toList();
+          List<int> existingIds =
+              gatherListItems.map((item) => item.id).toList();
           print(existingIds);
           for (var jsonResult in jsonData) {
             GatherList gatherList = GatherList.fromJson(jsonResult);

@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import '../../utility/common.dart';
+import '../utility/common.dart';
 
 class NotiController extends GetxController {
   RxInt alarmCount = 0.obs;
@@ -108,6 +108,12 @@ class NotiController extends GetxController {
       print('Error: $e');
     }
     refreshController.loadComplete();
+  }
+
+  @override
+  void onInit() {
+    requestUserTestNum();
+    super.onInit();
   }
 
 }

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:and20roid/view/upload/upload_controller.dart';
+import 'package:and20roid/controller/upload_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart'; // Get 패키지를 import
 import 'package:image_picker/image_picker.dart';

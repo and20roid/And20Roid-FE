@@ -1,20 +1,22 @@
 import 'package:and20roid/utility/common.dart';
-import 'package:and20roid/view/list/list_controller.dart';
+import 'package:and20roid/controller/list_controller.dart';
 import 'package:and20roid/view/list/list_page.dart';
-import 'package:and20roid/view/mypage/my_page_controller.dart';
+import 'package:and20roid/controller/my_page_controller.dart';
 import 'package:and20roid/view/ranking/rank_page.dart';
 import 'package:and20roid/view/alarm/notification_page.dart';
-import 'package:and20roid/view/ranking/ranking_controller.dart';
+import 'package:and20roid/controller/ranking_controller.dart';
 import 'package:and20roid/view/upload/upload_page.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'view/alarm/notification_controller.dart';
+import 'controller/notification_controller.dart';
+import 'view/mypage/another_mypage.dart';
 import 'view/mypage/my_page.dart';
 
 class BottomNavigatorPage extends StatefulWidget {
-  const BottomNavigatorPage({Key? key}) : super(key: key);
+  final int? initialValue;
+  const BottomNavigatorPage({Key? key, this.initialValue}) : super(key: key);
 
   @override
   State<BottomNavigatorPage> createState() => _BottomNavigatorPageState();
@@ -23,9 +25,14 @@ class BottomNavigatorPage extends StatefulWidget {
 class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
   @override
   void initState() {
-    setState(() {});
+    setState(() {
+      if(widget.initialValue != null){
+        _currentIndex = widget.initialValue!;
+      }
+    });
     super.initState();
   }
+
   int _currentIndex = 0;
   FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.instance;
 
@@ -36,10 +43,10 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
     );
   }
 
-  final notiCtrl = Get.put(NotiController());
-  final rankCtrl = Get.put(RankingController());
-  final listCtrl = Get.put(ListController());
-  final myCtrl = Get.put(MyPageControllrer());
+  final notiCtrl = Get.find<NotiController>();
+  final rankCtrl = Get.find<RankingController>();
+  final listCtrl = Get.find<ListController>();
+  final myCtrl = Get.find<MyPageControllrer>();
 
   @override
   Widget build(BuildContext context) {
@@ -103,18 +110,18 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
                 listCtrl.gotoTop();
                 listCtrl.update();
                 logScreenView('홈');
-              }else if (index == 1) {
+              } else if (index == 1) {
                 rankCtrl.requestTotalRanking();
                 print('ranking update ');
                 rankCtrl.update();
                 logScreenView('랭킹');
-              } else if (index== 2){
+              } else if (index == 2) {
                 logScreenView('업로드');
-              }else if (index == 3) {
+              } else if (index == 3) {
                 notiCtrl.requestUserTestNum();
                 notiCtrl.alarmCount = 0.obs;
                 logScreenView('알림');
-              }else if (index == 4) {
+              } else if (index == 4) {
                 myCtrl.getUserName();
                 myCtrl.update();
                 logScreenView('마이페이지');
@@ -135,6 +142,7 @@ class _BottomNavigatorPageState extends State<BottomNavigatorPage> {
       case 0:
         return ListContent(); // 목록 페이지
       case 1:
+        // return RequestTest(userName: 'test', ranking: '1', helpEach: 1, related: true,); // 랭킹 페이지
         return RankingContent(); // 랭킹 페이지
       case 2:
         return UploadView(); // 업로드 페이지

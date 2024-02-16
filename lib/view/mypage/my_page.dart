@@ -15,7 +15,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../model/list_detail.dart';
 import '../../model/mypage_tests.dart';
 import '../../utility/common.dart';
-import 'my_page_controller.dart';
+import '../../controller/my_page_controller.dart';
 
 class MyPageContent extends StatelessWidget {
   final myCtrl = Get.find<MyPageControllrer>();

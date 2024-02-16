@@ -357,7 +357,7 @@ class _ListDetailState extends State<ListDetail> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 12.0, 0, 0),
                         child: Text(content,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontWeight: FontWeight.w300, fontSize: 16)),
                       ),
                     ],

@@ -14,7 +14,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../model/list_model.dart';
 import '../../utility/common.dart';
 import 'adState.dart';
-import 'list_controller.dart';
+import '../../controller/list_controller.dart';
 import 'list_detail.dart';
 
 class ListContent extends StatefulWidget {
@@ -82,77 +82,77 @@ class _ListContentState extends State<ListContent> {
               shrinkWrap: true,
               itemCount: listCtrl.gatherListItems.length,
               itemBuilder: (context, index) {
-                if (index > 0 && (index + 1) % 5 == 0) {
-                  return Column(
-                    children: [
-                      _bannerIsLoaded
-                          ? Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.0),
-                                border:
-                                    Border.all(color: Colors.black, width: 1.0),
-                              ),
-                              child: FutureBuilder(
-                                // Use FutureBuilder to get the ad sizeㄴ
-                                future: banner!.load(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.done) {
-                                    double adHeight =
-                                        banner!.size.height.toDouble();
-                                    return SizedBox(
-                                      height: adHeight,
-                                      child: AdWidget(ad: banner!),
-                                    );
-                                  } else {
-                                    // Return a placeholder or loading indicator if needed
-                                    return CircularProgressIndicator();
-                                  }
-                                },
-                              ))
-                          : Container(),
-                      InkWell(
-                        onTap: () {
-                          Get.to(
-                            () => ListDetail(
-                              intValue: listCtrl.gatherListItems[index].id,
-                              title: listCtrl.gatherListItems[index].title,
-                              nickname:
-                                  listCtrl.gatherListItems[index].nickname,
-                              createdDate:
-                                  listCtrl.gatherListItems[index].createdDate,
-                              thumbnailUrl:
-                                  listCtrl.gatherListItems[index].thumbnailUrl,
-                              likes: listCtrl.gatherListItems[index].likes,
-                              views: listCtrl.gatherListItems[index].views,
-                              urls: listCtrl.gatherListItems[index].imageUrls,
-                              introLine:
-                                  listCtrl.gatherListItems[index].introLine,
-                              likedBoard:
-                                  listCtrl.gatherListItems[index].likedBoard,
-                              state : listCtrl.gatherListItems[index].state,
-                              mine : listCtrl.gatherListItems[index].mine
-                            ),
-                            transition: Transition.rightToLeft,
-                          );
-                        },
-                        child: renderCard(
-                          listCtrl.gatherListItems[index].participantNum
-                              .toString(),
-                          listCtrl.gatherListItems[index].title,
-                          listCtrl.gatherListItems[index].introLine,
-                          listCtrl.gatherListItems[index].imageUrls,
-                          listCtrl.gatherListItems[index].thumbnailUrl,
-                          listCtrl.gatherListItems[index].nickname,
-                          listCtrl.gatherListItems[index].likes,
-                          listCtrl.gatherListItems[index].views,
-                          MediaQuery.of(context).size.width,
-                          listCtrl.gatherListItems[index].likedBoard,
-                        ),
-                      )
-                    ],
-                  );
-                } else {
+                // if (index > 0 && (index + 1) % 5 == 0) {
+                  // return Column(
+                  //   children: [
+                      // _bannerIsLoaded
+                      //     ? Container(
+                      //         decoration: BoxDecoration(
+                      //           borderRadius: BorderRadius.circular(12.0),
+                      //           border:
+                      //               Border.all(color: Colors.black, width: 1.0),
+                      //         ),
+                      //         child: FutureBuilder(
+                      //           // Use FutureBuilder to get the ad sizeㄴ
+                      //           future: banner!.load(),
+                      //           builder: (context, snapshot) {
+                      //             if (snapshot.connectionState ==
+                      //                 ConnectionState.done) {
+                      //               double adHeight =
+                      //                   banner!.size.height.toDouble();
+                      //               return SizedBox(
+                      //                 height: adHeight,
+                      //                 child: AdWidget(ad: banner!),
+                      //               );
+                      //             } else {
+                      //               // Return a placeholder or loading indicator if needed
+                      //               return CircularProgressIndicator();
+                      //             }
+                      //           },
+                      //         ))
+                      //     : Container(),
+                //       InkWell(
+                //         onTap: () {
+                //           Get.to(
+                //             () => ListDetail(
+                //               intValue: listCtrl.gatherListItems[index].id,
+                //               title: listCtrl.gatherListItems[index].title,
+                //               nickname:
+                //                   listCtrl.gatherListItems[index].nickname,
+                //               createdDate:
+                //                   listCtrl.gatherListItems[index].createdDate,
+                //               thumbnailUrl:
+                //                   listCtrl.gatherListItems[index].thumbnailUrl,
+                //               likes: listCtrl.gatherListItems[index].likes,
+                //               views: listCtrl.gatherListItems[index].views,
+                //               urls: listCtrl.gatherListItems[index].imageUrls,
+                //               introLine:
+                //                   listCtrl.gatherListItems[index].introLine,
+                //               likedBoard:
+                //                   listCtrl.gatherListItems[index].likedBoard,
+                //               state : listCtrl.gatherListItems[index].state,
+                //               mine : listCtrl.gatherListItems[index].mine
+                //             ),
+                //             transition: Transition.rightToLeft,
+                //           );
+                //         },
+                //         child: renderCard(
+                //           listCtrl.gatherListItems[index].participantNum
+                //               .toString(),
+                //           listCtrl.gatherListItems[index].title,
+                //           listCtrl.gatherListItems[index].introLine,
+                //           listCtrl.gatherListItems[index].imageUrls,
+                //           listCtrl.gatherListItems[index].thumbnailUrl,
+                //           listCtrl.gatherListItems[index].nickname,
+                //           listCtrl.gatherListItems[index].likes,
+                //           listCtrl.gatherListItems[index].views,
+                //           MediaQuery.of(context).size.width,
+                //           listCtrl.gatherListItems[index].likedBoard,
+                //         ),
+                //       )
+                //     ],
+                //   );
+                // } else {
                   return InkWell(
                     onTap: () {
                       Get.to(
@@ -190,7 +190,7 @@ class _ListContentState extends State<ListContent> {
                     ),
                   );
                 }
-              },
+              // },
             ),
           );
         },
@@ -311,7 +311,7 @@ class _ListContentState extends State<ListContent> {
           return Padding(
             padding: const EdgeInsets.fromLTRB(12.0, 0, 6.0, 0),
             child: SizedBox(
-              width: screenWidth / 3.5, // 화면 너비의 3분의 1 크기로 설정
+              width: screenWidth / 3.5,
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.0),
@@ -320,8 +320,16 @@ class _ListContentState extends State<ListContent> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12.0),
                   child: CachedNetworkImage(
-                    imageUrl: urls[index],
+                    imageBuilder: (context, imageProvider) {
+                      listCtrl.isLoaded = true.obs;
+                      return Image(
+                        image: imageProvider,
+                        fit: BoxFit.fill,
+                      );
+                    },
+                    errorWidget: (context, url, error) => const Icon(Icons.error),
                     fit: BoxFit.fill,
+                    imageUrl: urls[index],
                   ),
                 ),
               ),
@@ -331,6 +339,7 @@ class _ListContentState extends State<ListContent> {
       ),
     );
   }
+
 
   Widget threeTitle(String nickname, String heart, String views, bool liked) {
     return Padding(

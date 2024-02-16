@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:and20roid/utility/common.dart';
-import 'package:and20roid/view/alarm/notification_controller.dart';
+import 'package:and20roid/controller/notification_controller.dart';
 import 'package:and20roid/view/alarm/notification_page.dart';
 import 'package:and20roid/view/list/adState.dart';
-import 'package:and20roid/view/list/list_controller.dart';
+import 'package:and20roid/controller/list_controller.dart';
 import 'package:and20roid/view/list/list_page.dart';
 import 'package:and20roid/view/mypage/my_page.dart';
-import 'package:and20roid/view/mypage/my_page_controller.dart';
-import 'package:and20roid/view/ranking/ranking_controller.dart';
+import 'package:and20roid/controller/my_page_controller.dart';
+import 'package:and20roid/controller/ranking_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/services.dart';
@@ -27,7 +27,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
 Future<void> main() async {
-  WidgetsBinding widgetsBinding =  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -49,7 +49,6 @@ Future<void> main() async {
 
     /// Analytics
     FirebaseAnalytics.instance;
-
   } catch (e) {
     print('Error during Firebase initialization: $e');
   }
@@ -57,13 +56,9 @@ Future<void> main() async {
   final initFuture = MobileAds.instance.initialize();
   final adState = AdState(initFuture);
 
-  runApp(
-      MultiProvider(
-        providers: [
-          Provider<AdState>(create: (_) => adState),
-        ],
-        child: const MyApp()
-      ));
+  runApp(MultiProvider(providers: [
+    Provider<AdState>(create: (_) => adState),
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -86,6 +81,10 @@ class MyApp extends StatelessWidget {
 bool kIsWeb = false;
 
 void init() async {
+  Get.put(ListController());
+  Get.put(NotiController());
+  Get.put(RankingController());
+  Get.put(MyPageControllrer());
 
   if (await Permission.notification.isDenied) {
     await Permission.notification.request();
@@ -103,9 +102,7 @@ void init() async {
   } else {
     print("Warning: FCM token is null.");
   }
-
 }
-
 
 void firebaseMessageSetting() async {
   AndroidNotificationChannel channel = const AndroidNotificationChannel(
@@ -114,7 +111,8 @@ void firebaseMessageSetting() async {
     importance: Importance.max,
   );
 
-  var androidSetting = const AndroidInitializationSettings('@drawable/appstore');
+  var androidSetting =
+      const AndroidInitializationSettings('@drawable/appstore');
   var initializationSettings = InitializationSettings(android: androidSetting);
 
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
